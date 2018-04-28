@@ -1,14 +1,14 @@
 package com.api.data.db;
 
-import java.io.IOException;
-import java.io.InputStream;
+// import java.io.IOException;
+// import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
+// import java.util.Properties;
 
 public class Connection {
-	private Properties prop = new Properties();
-	private InputStream input = null;
+	// private Properties prop = new Properties();
+	// private InputStream input = null;
 
 	private static Connection instancia;
 	public static Connection getInstancia() {
@@ -18,10 +18,10 @@ public class Connection {
 		return instancia;
 	}
 
-	private static String dbUrl = "jdbc:mysql://localhost:3306/NegocioRopa";
+	private static String dbUrl = "jdbc:mysql://localhost:3306/wholesaler";
 	private static String dbUser = "root";
 	private static String dbPassword = "root";
-	private static String env = "DEV";
+	// private static String env = "DEV";
 
 	private java.sql.Connection conn;
 	static int cantCon=0;

@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import com.api.logic.business.SecurityLogic;
-import com.api.logic.business.UserLogic;
+import com.api.data.business.UserDataAccess;
 
 import com.api.entities.business.User;
 
@@ -71,14 +71,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // Check if the token was issued by the server and if it's not expired
         // Throw an Exception if the token is invalid
         SecurityLogic sl = new SecurityLogic();
-        UserLogic ul = new UserLogic();
-        
+        UserDataAccess uda = new UserDataAccess();
+
         int userId = sl.validateToken(token);
 
         if (userId == 0)
             throw new Exception("Token is not valid");
 
-        User user = ul.getUser(userId);
+        User user = uda.getUser(userId);
 
         return user;
     }
