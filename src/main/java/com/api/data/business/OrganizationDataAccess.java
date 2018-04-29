@@ -62,7 +62,7 @@ public class OrganizationDataAccess extends BaseDataAccess {
         return organization;
     }
 
-    public boolean saveOrganization(Organization organization) {
+    public boolean createOrganization(Organization organization) {
         query = "INSERT INTO Organization (name, legalName, cuit) VALUES (?, ?, ?);";
         int updatedFields = 0;
         try {
@@ -81,5 +81,35 @@ public class OrganizationDataAccess extends BaseDataAccess {
         }
 
         return (updatedFields > 0);
+    }
+
+    public int updateOrganization(Organization organization) {
+        int id = 0;
+
+        query = "UPDATE Organization SET name = ?, legalName = ?, cuit = ? WHERE id = ?;";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setString(1, organization.getName());
+            ((PreparedStatement)statement).setString(2, organization.getLegalName());
+            ((PreparedStatement)statement).setString(3, organization.getCuit());
+
+            ((PreparedStatement)statement).executeUpdate();
+
+            resultSet = statement.getGeneratedKeys();
+
+            // If it updated the user, return the updated id
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return id;
     }
 }
