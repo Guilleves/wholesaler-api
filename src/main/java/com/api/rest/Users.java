@@ -9,27 +9,20 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
 
-import java.util.ArrayList;
-
-import com.api.entities.business.User;
-import com.api.entities.models.user.AuthenticateUserRequestModel;
-import com.api.entities.models.user.AuthenticateUserResponseModel;
+import com.api.entities.models.user.LoginRequest;
+import com.api.entities.models.user.GetUserRequest;
+import com.api.entities.models.user.SaveUserRequest;
 
 import com.api.logic.business.UserLogic;
 
 import com.api.logic.validations.ServerResponse;
 
 import com.api.rest.security.Secured;
-import com.api.rest.security.Resource;
-import com.api.rest.security.Permission;
 
-// #endregion
+    // #endregion
 
 @Path("/users")
-@Resource(resource=com.api.entities.enums.Resource.USERS)
 public class Users {
     private UserLogic ul;
 
@@ -41,36 +34,80 @@ public class Users {
 
     // #endregion
 
-    // #region Security
+    // #region UserSetup
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/getUser")
-    public User getUser(int userId) {
-        User user = ul.getUser(userId);
-
-        return user;
+    @Secured()
+    @Path("/")
+    public Response getUsers() {
+        try {
+            return Response.ok(ul.getUsers()).build();
+        }
+        catch(ServerResponse e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        }
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/{userId}")
+    public Response getUser(@PathParam("userId") int userId) {
+        GetUserRequest request = new GetUserRequest(userId, null);
+
+        try {
+            return Response.ok(ul.getUser(request)).build();
+        }
+        catch(ServerResponse e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/")
+    public Response saveUser(SaveUserRequest request) {
+        try {
+            ul.saveUser(request);
+            return Response.ok().build();
+        }
+        catch(ServerResponse e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getErrores()).build();
+        }
+    }
+
+    // #endregion
+
+    // #region Security
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
-    public Response login(AuthenticateUserRequestModel request) {
-        AuthenticateUserResponseModel response = new AuthenticateUserResponseModel();
-
+    public Response login(LoginRequest request) {
         try {
-            // Respond with the token
-            response = ul.login(request);
-            return Response.ok(response).build();
+            return Response.ok(ul.login(request)).build();
         }
         catch(ServerResponse e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getErrores()).build();
         }
-        catch(Exception e) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/signup")
+    public Response signup(SaveUserRequest request) {
+        try {
+            return Response.ok(ul.signup(request)).build();
+        }
+        catch(ServerResponse e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getErrores()).build();
         }
     }
 
