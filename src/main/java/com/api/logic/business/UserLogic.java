@@ -4,23 +4,6 @@ package com.api.logic.business;
 
 import java.util.ArrayList;
 
-<<<<<<< HEAD
-import java.io.UnsupportedEncodingException;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
-import com.api.data.business.UserDataAccess;
-
-import com.api.entities.business.User;
-import com.api.entities.models.user.AuthenticateUserRequestModel;
-import com.api.entities.models.user.AuthenticateUserResponseModel;
-
-import com.api.logic.validations.ServerResponse;
-
-import com.auth0.jwt.exceptions.JWTCreationException;
-
-=======
 import com.api.data.business.UserDataAccess;
 
 import com.api.entities.business.User;
@@ -32,23 +15,10 @@ import com.api.entities.models.user.LoginResponse;
 
 import com.api.logic.validations.ServerResponse;
 
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
 // #endregion
 
 public class UserLogic {
     private UserDataAccess uda;
-<<<<<<< HEAD
-
-    public UserLogic() {
-        uda = new UserDataAccess();
-    }
-
-    // #region UserSetup
-
-    public User getUser(int userId) throws ServerResponse {
-        UserDataAccess uda = new UserDataAccess();
-        ServerResponse sr = validateGetUser(userId);
-=======
     private SecurityLogic sl;
 
     // #region Constructors
@@ -64,24 +34,10 @@ public class UserLogic {
 
     public GetUserResponse getUser(GetUserRequest request) throws ServerResponse {
         ServerResponse sr = validateGetUser(request.getUserId());
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
 
         if (!sr.getStatus())
             throw sr;
 
-<<<<<<< HEAD
-        return uda.getUser(userId);
-    }
-
-    public ArrayList<User> getUsers() {
-        UserDataAccess uda = new UserDataAccess();
-
-        return uda.getUsers();
-    }
-
-    public boolean createUser(User user) throws ServerResponse {
-        UserDataAccess uda = new UserDataAccess();
-=======
         // Fetch the user.
         User user = uda.getUser(request.getUserId());
 
@@ -137,15 +93,11 @@ public class UserLogic {
             request.getEmail()
         );
 
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
         ServerResponse sr = validateSaveUser(user);
 
         if (!sr.getStatus())
             throw sr;
 
-<<<<<<< HEAD
-        return uda.saveUser(user);
-=======
         // If password is being created/updated, ecrypt it
         if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
             try {
@@ -161,18 +113,12 @@ public class UserLogic {
             return uda.createUser(user);
         else
             return uda.updateUser(user);
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
     }
 
     // #endregion
 
     // #region Security
 
-<<<<<<< HEAD
-    public AuthenticateUserResponseModel login(AuthenticateUserRequestModel request) throws ServerResponse {
-        AuthenticateUserResponseModel response = new  AuthenticateUserResponseModel();
-        SecurityLogic sl = new SecurityLogic();
-=======
     public LoginResponse signup(SaveUserRequest request) throws ServerResponse {
         ServerResponse sr = new ServerResponse();
 
@@ -210,7 +156,6 @@ public class UserLogic {
 
     public LoginResponse login(LoginRequest request) throws ServerResponse {
         LoginResponse response = new LoginResponse();
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
 
         boolean couldAuthenticate = false;
         String username = request.getUsername();
@@ -222,10 +167,7 @@ public class UserLogic {
         if (!sr.getStatus())
             throw sr;
 
-<<<<<<< HEAD
-=======
         // Fetch user.
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
         User dbUser = uda.getUser(username);
 
         if (dbUser == null) {
@@ -237,15 +179,7 @@ public class UserLogic {
         try {
             couldAuthenticate = sl.validatePassword(password, dbUser.getPassword());
         }
-<<<<<<< HEAD
-        catch(NoSuchAlgorithmException e) {
-            sr.addError(e);
-            throw(sr);
-        }
-        catch (InvalidKeySpecException e) {
-=======
         catch(Exception e) {
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
             sr.addError(e);
             throw(sr);
         }
@@ -256,15 +190,7 @@ public class UserLogic {
                 // Set the token in the response body.
                 response.setToken(sl.issueAuthToken(dbUser.getId()));
             }
-<<<<<<< HEAD
-            catch(UnsupportedEncodingException e) {
-                sr.addError(e);
-                throw(sr);
-            }
-            catch(JWTCreationException e) {
-=======
             catch(Exception e) {
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
                 sr.addError(e);
                 throw(sr);
             }
@@ -273,37 +199,18 @@ public class UserLogic {
         return response;
     }
 
-<<<<<<< HEAD
-    public AuthenticateUserResponseModel signup(AuthenticateUserRequestModel request) {
-        AuthenticateUserResponseModel response = new  AuthenticateUserResponseModel();
-
-        return response;
-    }
-
-    // #endregion
-
-    // #region Privates
-=======
     // #endregion
 
     // #region Validations
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
 
     private ServerResponse validateAuthentication(String username, String password) {
         ServerResponse sr = new ServerResponse();
 
         if (username == null || username.isEmpty())
-<<<<<<< HEAD
-        sr.addError("El nombre de usuario no puede estar vacío.");
-
-        if (password == null || password.isEmpty())
-        sr.addError("La contraseña no puede estar vacía.");
-=======
             sr.addError("El nombre de usuario no puede estar vacío.");
 
         if (password == null || password.isEmpty())
             sr.addError("La contraseña no puede estar vacía.");
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
 
         // if (passwordRequirements(password))
 
@@ -314,11 +221,7 @@ public class UserLogic {
         ServerResponse sr = new ServerResponse();
 
         if (userId <= 0)
-<<<<<<< HEAD
-        sr.addError("Please provide a valid user id");
-=======
             sr.addError("Please provide a valid user id");
->>>>>>> b866114a19142079da6e615bfd09b5a45fe75f99
 
         return sr;
     }
