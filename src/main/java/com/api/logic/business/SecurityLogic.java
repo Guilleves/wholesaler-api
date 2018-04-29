@@ -1,7 +1,7 @@
 package com.api.logic.business;
 
 // #region Imports
-import java.util.Properties;
+// import java.util.Properties;
 
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 // #endregion
 
 public class SecurityLogic {
-    private Properties prop = new Properties();
+    // private Properties prop = new Properties();
     private String securityPassword = "plzTrustMe!";
 
     // #region Constructors
