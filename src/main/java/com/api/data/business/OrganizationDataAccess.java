@@ -70,6 +70,7 @@ public class OrganizationDataAccess extends BaseDataAccess {
             ((PreparedStatement)statement).setString(1, organization.getName());
             ((PreparedStatement)statement).setString(2, organization.getLegalName());
             ((PreparedStatement)statement).setString(3, organization.getCuit());
+            ((PreparedStatement)statement).setInt(4, organization.getId());
 
             updatedFields = ((PreparedStatement)statement).executeUpdate();
         }
