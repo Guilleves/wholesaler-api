@@ -150,5 +150,29 @@ public class UserDataAccess extends BaseDataAccess {
         return id;
     }
 
+    public ArrayList<User> getUsersByOrganization(int organizationId) {
+        ArrayList<User> users = new ArrayList<User>();
+        query = "SELECT * FROM User u WHERE u.organizationId = ?;";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, organizationId);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            while(resultSet.next()) {
+                users.add(new User(resultSet));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return users;
+    }
+
     // #endregion
 }

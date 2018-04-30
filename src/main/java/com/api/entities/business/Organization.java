@@ -2,6 +2,8 @@ package com.api.entities.business;
 
 // #region Imports
 
+import com.api.data.business.UserDataAccess;
+import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 public class Organization {
     private int id;
     private String name, cuit, legalName;
+    private ArrayList<User> users;
 
 	/**
 	* Default empty Organization constructor
@@ -104,4 +107,9 @@ public class Organization {
 	public void setLegalName(String legalName) {
 		this.legalName = legalName;
 	}
+
+  public ArrayList<User> getUsers(int organizationId) {
+    UserDataAccess uda = new UserDataAccess();
+    return uda.getUsersByOrganization(organizationId);
+  }
 }

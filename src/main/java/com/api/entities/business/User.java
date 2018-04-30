@@ -1,10 +1,6 @@
 package com.api.entities.business;
 
 // #region Imports
-
-import java.util.Date;
-import java.util.ArrayList;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
