@@ -38,13 +38,13 @@ public class OrganizationDataAccess extends BaseDataAccess {
         return organizations;
     }
 
-    public Organization getOrganization(String organizationId) {
+    public Organization getOrganization(int organizationId) {
         Organization organization = null;
         query = "SELECT * FROM Organization WHERE organizationId = ?;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, organizationId);
+            ((PreparedStatement)statement).setInt(1, organizationId);
 
             resultSet = ((PreparedStatement)statement).executeQuery();
 
