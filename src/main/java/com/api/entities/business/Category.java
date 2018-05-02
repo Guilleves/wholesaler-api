@@ -51,4 +51,13 @@ public class Category {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	/**
+	* Create string representation of Category for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "Category [id=" + id + ", name=" + name + "]";
+	}
 }

@@ -51,4 +51,13 @@ public class Brand {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	/**
+	* Create string representation of Brand for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "Brand [id=" + id + ", name=" + name + "]";
+	}
 }
