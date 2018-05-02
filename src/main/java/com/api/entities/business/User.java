@@ -174,4 +174,13 @@ public class User {
 	public void setOrganization(Organization organization) {
 		this.organization = organization;
 	}
+
+	/**
+	* Create string representation of User for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", username=" + username + ", password=" + password + ", email=" + email + "]";
+	}
 }
