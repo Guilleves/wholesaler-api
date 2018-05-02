@@ -1,8 +1,6 @@
 package com.api.entities.models.product;
 
 import java.io.Serializable;
-import com.api.entities.business.Category;
-import com.api.entities.business.Brand;
 
 public class SaveProductRequest implements Serializable {
     static final long serialVersionUID = 0L;
@@ -110,4 +108,46 @@ public class SaveProductRequest implements Serializable {
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+
+    class Brand {
+        private int id;
+        private String name;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    class Category {
+        private int id;
+        private String name;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 }
