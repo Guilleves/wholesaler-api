@@ -17,13 +17,13 @@ public class ProposalDataAccess extends BaseDataAccess {
         // Eeeeeeeeeeeeeeeeeek...
         query = "SELECT " +
             "P.*, " +
-            "PL.price as price" +
-            "Pr.id as productId " +
-            "Pr.name as productName " +
-            "Pr.gtin as gtin " +
-            "B.id as brandId " +
-            "B.name as brandName " +
-            "C.id as categoryId " +
+            "PL.price as price, " +
+            "Pr.id as productId, " +
+            "Pr.name as productName, " +
+            "Pr.gtin as gtin, " +
+            "B.id as brandId, " +
+            "B.name as brandName, " +
+            "C.id as categoryId, " +
             "C.name as categoryName " +
             "FROM " +
             "Proposal P " +
@@ -52,6 +52,8 @@ public class ProposalDataAccess extends BaseDataAccess {
 
                 if (resultSet.getInt("productId") != currentProductId) {
                     ProposalLine line = new ProposalLine();
+
+                    line.setPrice(resultSet.getFloat("price"));
 
                     line.setProduct(new Product(
                         resultSet.getInt("productId"),

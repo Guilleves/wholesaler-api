@@ -87,4 +87,13 @@ public class ProposalLine {
 	public void setPrice(float price) {
 		this.price = price;
 	}
+
+	/**
+	* Create string representation of ProposalLine for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "ProposalLine [id=" + id + ", product=" + product.toString() + ", price=" + price + "]";
+	}
 }

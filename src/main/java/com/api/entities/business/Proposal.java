@@ -109,4 +109,21 @@ public class Proposal {
 	public void setProposalLines(ArrayList<ProposalLine> proposalLines) {
 		this.proposalLines = proposalLines;
 	}
+
+	/**
+	* Create string representation of Proposal for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		String string = "Proposal [id=" + id + ", beginDate=" + beginDate.toString() + ", endDate=" + endDate.toString() + ", description=" + description + "] ";
+
+        string += "Lines [ ";
+        for(ProposalLine pl : proposalLines) {
+            string = string + pl.toString();
+        }
+        string += "]";
+
+        return string;
+	}
 }

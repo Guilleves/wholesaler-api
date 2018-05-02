@@ -24,7 +24,7 @@ public class GetProposalResponse {
 		this.beginDate = beginDate;
 		this.endDate = endDate;
     }
-    
+
 	/**
 	* Returns value of id
 	* @return
