@@ -33,6 +33,8 @@ public class ConsoleTest {
         // #region Propsals
 
         getProposal();
+        System.out.println("=========================");
+        getProposals();
 
         // #endregion
 
@@ -116,6 +118,16 @@ public class ConsoleTest {
         }
 
         System.out.println(proposal.toString());
+    }
+
+    private static void getProposals() {
+        ArrayList<Proposal> proposals = proposalData.getProposals();
+
+        for(Proposal proposal : proposals) {
+            System.out.println(proposal.toString());
+        }
+
+        System.out.println("End of proposal list");
     }
 
     // #endregion
