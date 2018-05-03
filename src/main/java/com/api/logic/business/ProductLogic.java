@@ -1,6 +1,8 @@
 package com.api.logic.business;
 
-// #region Imports
+// #region Import
+import com.api.entities.models.product.SaveProductRequest;
+import com.api.entities.models.product.SaveProductResponse;
 
 import java.util.ArrayList;
 
@@ -18,9 +20,14 @@ import com.api.data.business.ProductDataAccess;
 public class ProductLogic {
     private ProductDataAccess pda;
 
+    // #region Constructors
     public ProductLogic() {
         pda = new ProductDataAccess();
     }
+
+    // #endregion
+
+    // #region ProductSetup
 
     public GetProductResponse getProduct(GetProductRequest request) throws ServerResponse {
         ServerResponse sr = new ServerResponse();
@@ -70,4 +77,43 @@ public class ProductLogic {
 
         return response;
     }
+
+    public SaveProductResponse saveProduct(SaveProductRequest request) throws ServerResponse {
+        SaveProductResponse response = new SaveProductResponse();
+
+        Product product = new Product(
+            request.getId(),
+            request.getName(),
+            request.getGtin(),
+            request.getBrand(),
+            request.getCategory()
+        );
+
+        ServerResponse sr = validateSaveProduct(product);
+
+        if (!sr.getStatus())
+            throw(sr);
+
+        if (product.getId() == 0)
+            pda.createProduct(product);
+        else
+            pda.updateProduct(product);
+
+        return response;
+    }
+
+    // #endregion
+
+    // #region Validation
+
+    private ServerResponse validateSaveProduct(Product product) {
+        ServerResponse sr = new ServerResponse();
+
+        if (product.getName() == null || product.getName().isEmpty())
+            sr.addError("Product name cannot be empty.");
+
+        return sr;
+    }
+
+    // #endregion
 }

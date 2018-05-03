@@ -1,25 +1,28 @@
-package com.api.entities.business;
+package com.api.entities.models.product;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.Serializable;
+import com.api.entities.business.Category;
+import com.api.entities.business.Brand;
 
-public class Product {
+public class SaveProductRequest implements Serializable {
+    static final long serialVersionUID = 0L;
+
     private int id;
     private String name, gtin;
     private Brand brand;
     private Category category;
 
 	/**
-	* Default empty Product constructor
+	* Default empty SaveProductRequest constructor
 	*/
-	public Product() {
+	public SaveProductRequest() {
 		super();
 	}
 
 	/**
-	* Default Product constructor
+	* Default SaveProductRequest constructor
 	*/
-	public Product(int id, String name, String gtin, Brand brand, Category category) {
+	public SaveProductRequest(int id, String name, String gtin, Brand brand, Category category) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -27,24 +30,6 @@ public class Product {
 		this.brand = brand;
 		this.category = category;
 	}
-
-    /**
-    * Default Product constructor
-    */
-    public Product(ResultSet rs) throws SQLException {
-        super();
-        this.id = rs.getInt("id");
-        this.name = rs.getString("name");
-        this.gtin = rs.getString("gtin");
-        this.brand = new Brand(
-            rs.getInt("brandId"),
-            rs.getString("brandName")
-        );
-        this.category = new Category(
-            rs.getInt("categoryId"),
-            rs.getString("categoryName")
-        );
-    }
 
 	/**
 	* Returns value of id
@@ -124,14 +109,5 @@ public class Product {
 	*/
 	public void setCategory(Category category) {
 		this.category = category;
-	}
-
-	/**
-	* Create string representation of Product for printing
-	* @return
-	*/
-	@Override
-	public String toString() {
-		return "Product [id=" + id + ", name=" + name + ", gtin=" + gtin + ", brand=" + brand.toString() + ", category=" + category.toString() + "]";
 	}
 }
