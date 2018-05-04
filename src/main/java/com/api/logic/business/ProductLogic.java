@@ -131,6 +131,9 @@ public class ProductLogic {
     private ServerResponse validateSaveProduct(SaveProductRequest product, Brand brand, Category category) {
         ServerResponse sr = new ServerResponse();
 
+        if (pda.validateGtin(product.getGtin()))
+            sr.addError("A product with this gtin has already been created.");
+
         if (product.getName() == null || product.getName().isEmpty())
             sr.addError("Product name cannot be empty.");
 
