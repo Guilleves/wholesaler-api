@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class Organization {
     private int id;
-    private String name, cuit, legalName;
+    private String name, cuit, legalName, role;
     private ArrayList<User> users;
 
 	/**
@@ -43,6 +43,12 @@ public class Organization {
         this.cuit = rs.getString("cuit");
         this.legalName = rs.getString("legalName");
     }
+
+
+  public ArrayList<User> getUsers(int organizationId) {
+    UserDataAccess uda = new UserDataAccess();
+    return uda.getUsersByOrganization(organizationId);
+  }
 
 	/**
 	* Returns value of id
@@ -108,8 +114,36 @@ public class Organization {
 		this.legalName = legalName;
 	}
 
-  public ArrayList<User> getUsers(int organizationId) {
-    UserDataAccess uda = new UserDataAccess();
-    return uda.getUsersByOrganization(organizationId);
-  }
+	/**
+	* Returns value of role
+	* @return
+	*/
+	public String getRole() {
+		return role;
+	}
+
+	/**
+	* Sets new value of role
+	* @param
+	*/
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	/**
+	* Returns value of users
+	* @return
+	*/
+	public ArrayList<User> getUsers() {
+		return users;
+	}
+
+	/**
+	* Sets new value of users
+	* @param
+	*/
+	public void setUsers(ArrayList<User> users) {
+		this.users = users;
+	}
+
 }
