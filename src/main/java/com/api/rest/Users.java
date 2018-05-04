@@ -1,6 +1,6 @@
 package com.api.rest;
 
-// #region Imports
+// #region Impor
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,7 +20,7 @@ import com.api.logic.validations.ServerResponse;
 
 import com.api.rest.security.Secured;
 
-    // #endregion
+// #endregion
 
 @Path("/users")
 public class Users {
@@ -74,6 +74,7 @@ public class Users {
     public Response saveUser(SaveUserRequest request) {
         try {
             ul.saveUser(request);
+
             return Response.ok().build();
         }
         catch(ServerResponse e) {

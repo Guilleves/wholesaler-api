@@ -1,6 +1,10 @@
 package com.api.rest;
 
 // #region Imports
+
+import com.api.rest.security.UserPrincipal;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,7 +23,7 @@ import com.api.logic.validations.ServerResponse;
 
 import com.api.rest.security.Secured;
 
-    // #endregion
+// #endregion
 
 @Path("/products")
 public class Products {
@@ -70,9 +74,9 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response saveProduct(SaveProductRequest request) {
+    public Response saveProduct(@Context SecurityContext context, SaveProductRequest request) {
         try {
-            pl.saveProduct(request);
+            pl.saveProduct(request, (UserPrincipal)context.getUserPrincipal());
             return Response.ok().build();
         }
         catch(ServerResponse e) {

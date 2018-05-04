@@ -1,6 +1,8 @@
 package com.api.data.business;
 
-// #region Imports
+// #region Import
+import com.api.entities.business.Category;
+import com.api.entities.business.Brand;
 
 import com.api.entities.business.Product;
 
@@ -144,6 +146,64 @@ public class ProductDataAccess extends BaseDataAccess {
         }
 
         return id;
+    }
+
+    // #endregion
+
+    // #region BrandInfo
+
+    public Brand getBrand(int brandId) {
+        Brand brand = null;
+
+        query = "SELECT * FROM Brand WHERE id = ?";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, brandId);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            if (resultSet.next()) {
+                brand = new Brand(resultSet);
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return brand;
+    }
+
+    // #endregion
+
+    // #region CategoryInfo
+
+    public Category getCategory(int categoryId) {
+        Category category = null;
+
+        query = "SELECT * FROM Category WHERE id = ?";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, categoryId);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            if (resultSet.next()) {
+                category = new Category(resultSet);
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return category;
     }
 
     // #endregion

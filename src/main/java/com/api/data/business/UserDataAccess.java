@@ -14,9 +14,19 @@ import com.api.entities.business.User;
 
 public class UserDataAccess extends BaseDataAccess {
     // #region UserSetup
+
     public ArrayList<User> getUsers() {
         ArrayList<User> users = new ArrayList<User>();
-        query = "SELECT * FROM User;";
+
+        query = "SELECT " +
+            "U.*, " +
+            "O.id as organizationId, " +
+            "O.name as organizationName, " +
+            "O.cuit as cuit, " +
+            "O.legalName as legalName, " +
+            "O.role as role " +
+            "FROM User U " +
+            "INNER JOIN Organization O on U.organizationId = O.id;";
 
         try {
             statement = Connection.getInstancia().getConn().createStatement();
@@ -39,7 +49,17 @@ public class UserDataAccess extends BaseDataAccess {
 
     public User getUser(int id) {
         User user = null;
-        query = "SELECT * FROM User WHERE id = ?;";
+
+        query = "SELECT " +
+            "U.*, " +
+            "O.id as organizationId, " +
+            "O.name as organizationName, " +
+            "O.cuit as cuit, " +
+            "O.legalName as legalName, " +
+            "O.role as role " +
+            "FROM User U " +
+            "INNER JOIN Organization O on U.organizationId = O.id " +
+            "WHERE U.id = ?;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -63,7 +83,17 @@ public class UserDataAccess extends BaseDataAccess {
 
     public User getUser(String username) {
         User user = null;
-        query = "SELECT * FROM User WHERE username = ?;";
+
+        query = "SELECT " +
+            "U.*, " +
+            "O.id as organizationId, " +
+            "O.name as organizationName, " +
+            "O.cuit as cuit, " +
+            "O.legalName as legalName, " +
+            "O.role as role " +
+            "FROM User U " +
+            "INNER JOIN Organization O on U.organizationId = O.id " +
+            "WHERE U.username = ?;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);

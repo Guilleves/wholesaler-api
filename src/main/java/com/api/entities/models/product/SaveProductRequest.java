@@ -5,10 +5,8 @@ import java.io.Serializable;
 public class SaveProductRequest implements Serializable {
     static final long serialVersionUID = 0L;
 
-    private int id;
+    private int id, brandId, categoryId;
     private String name, gtin;
-    private Brand brand;
-    private Category category;
 
 	/**
 	* Default empty SaveProductRequest constructor
@@ -20,13 +18,13 @@ public class SaveProductRequest implements Serializable {
 	/**
 	* Default SaveProductRequest constructor
 	*/
-	public SaveProductRequest(int id, String name, String gtin, Brand brand, Category category) {
+	public SaveProductRequest(int id, int brandId, int categoryId, String name, String gtin) {
 		super();
 		this.id = id;
+		this.brandId = brandId;
+		this.categoryId = categoryId;
 		this.name = name;
 		this.gtin = gtin;
-		this.brand = brand;
-		this.category = category;
 	}
 
 	/**
@@ -43,6 +41,38 @@ public class SaveProductRequest implements Serializable {
 	*/
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	/**
+	* Returns value of brandId
+	* @return
+	*/
+	public int getBrandId() {
+		return brandId;
+	}
+
+	/**
+	* Sets new value of brandId
+	* @param
+	*/
+	public void setBrandId(int brandId) {
+		this.brandId = brandId;
+	}
+
+	/**
+	* Returns value of categoryId
+	* @return
+	*/
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	/**
+	* Sets new value of categoryId
+	* @param
+	*/
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	}
 
 	/**
@@ -76,78 +106,4 @@ public class SaveProductRequest implements Serializable {
 	public void setGtin(String gtin) {
 		this.gtin = gtin;
 	}
-
-	/**
-	* Returns value of brand
-	* @return
-	*/
-	public Brand getBrand() {
-		return brand;
-	}
-
-	/**
-	* Sets new value of brand
-	* @param
-	*/
-	public void setBrand(Brand brand) {
-		this.brand = brand;
-	}
-
-	/**
-	* Returns value of category
-	* @return
-	*/
-	public Category getCategory() {
-		return category;
-	}
-
-	/**
-	* Sets new value of category
-	* @param
-	*/
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
-    public class Brand {
-        private int id;
-        private String name;
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
-
-    public class Category {
-        private int id;
-        private String name;
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
 }
