@@ -1,5 +1,8 @@
 package com.api.entities.business;
 
+import java.sql.SQLException;
+import java.sql.ResultSet;
+
 public class Category {
     private int id;
     private String name;
@@ -19,6 +22,15 @@ public class Category {
 		this.id = id;
 		this.name = name;
 	}
+
+    /**
+    * Default Category constructor
+    */
+    public Category(ResultSet rs) throws SQLException {
+        super();
+        this.id = rs.getInt("id");
+        this.name = rs.getString("name");
+    }
 
 	/**
 	* Returns value of id
@@ -50,5 +62,14 @@ public class Category {
 	*/
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	* Create string representation of Category for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "Category [id=" + id + ", name=" + name + "]";
 	}
 }

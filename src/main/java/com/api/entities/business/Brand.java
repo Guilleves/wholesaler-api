@@ -1,5 +1,8 @@
 package com.api.entities.business;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Brand {
     private int id;
     private String name;
@@ -18,6 +21,15 @@ public class Brand {
 		super();
 		this.id = id;
 		this.name = name;
+	}
+
+    /**
+	* Default Brand constructor
+	*/
+	public Brand(ResultSet rs) throws SQLException {
+		super();
+		this.id = rs.getInt("id");
+		this.name = rs.getString("name");
 	}
 
 	/**
@@ -50,5 +62,14 @@ public class Brand {
 	*/
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	* Create string representation of Brand for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "Brand [id=" + id + ", name=" + name + "]";
 	}
 }

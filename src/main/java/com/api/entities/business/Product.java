@@ -125,4 +125,13 @@ public class Product {
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+
+	/**
+	* Create string representation of Product for printing
+	* @return
+	*/
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", name=" + name + ", gtin=" + gtin + ", brand=" + brand.toString() + ", category=" + category.toString() + "]";
+	}
 }
