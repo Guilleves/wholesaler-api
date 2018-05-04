@@ -10,8 +10,7 @@ import com.api.entities.business.User;
 
 public class UserPrincipal implements java.security.Principal {
     private int id;
-    private String username, firstName, lastName;
-    private ArrayList<String> roles;
+    private String username, firstName, lastName, role;
 
     /**
     * Default empty UserPrincipal constructor
@@ -29,7 +28,7 @@ public class UserPrincipal implements java.security.Principal {
         this.username = user.getUsername();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
-        // this.roles = roles;
+        this.role = user.getOrganization().getRole();
     }
 
     /**
@@ -41,7 +40,6 @@ public class UserPrincipal implements java.security.Principal {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.roles = roles;
     }
 
     /**
@@ -109,32 +107,23 @@ public class UserPrincipal implements java.security.Principal {
     }
 
     /**
-    * Returns value of roles
+    * Returns value of lastName
     * @return
     */
-    public ArrayList<String> getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 
     /**
-    * Sets new value of roles
+    * Sets new value of lastName
     * @param
     */
-    public void setRoles(ArrayList<String> roles) {
-        this.roles = roles;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override
     public String getName() {
         return this.firstName + " " + this.lastName;
-    }
-
-    /**
-    * Create string representation of UserPrincipal for printing
-    * @return
-    */
-    @Override
-    public String toString() {
-        return "UserPrincipal [id=" + id + ", username=" + username + ", firstName=" + firstName + ", lastName=" + lastName + ", roles=" + roles + "]";
     }
 }

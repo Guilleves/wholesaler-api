@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class Organization {
     private int id;
-    private String name, cuit, legalName;
+    private String name, cuit, legalName, role;
 
 	/**
 	* Default empty Organization constructor
@@ -21,25 +21,14 @@ public class Organization {
 	/**
 	* Default Organization constructor
 	*/
-	public Organization(int id, String name, String cuit, String legalName) {
+	public Organization(int id, String name, String cuit, String legalName, String role) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.cuit = cuit;
 		this.legalName = legalName;
+		this.role = role;
 	}
-
-    /**
-    * SQL constructor
-    */
-    public Organization(ResultSet rs) throws SQLException {
-        super();
-
-        this.id = rs.getInt("id");
-        this.name = rs.getString("name");
-        this.cuit = rs.getString("cuit");
-        this.legalName = rs.getString("legalName");
-    }
 
 	/**
 	* Returns value of id
@@ -103,5 +92,21 @@ public class Organization {
 	*/
 	public void setLegalName(String legalName) {
 		this.legalName = legalName;
+	}
+
+	/**
+	* Returns value of role
+	* @return
+	*/
+	public String getRole() {
+		return role;
+	}
+
+	/**
+	* Sets new value of role
+	* @param
+	*/
+	public void setRole(String role) {
+		this.role = role;
 	}
 }

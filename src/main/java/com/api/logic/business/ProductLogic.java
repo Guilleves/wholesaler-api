@@ -1,12 +1,17 @@
 package com.api.logic.business;
 
-// #region Import
+// #region Imports
+
+import com.api.data.business.UserDataAccess;
+import com.api.rest.security.UserPrincipal;
 import com.api.entities.models.product.SaveProductRequest;
 import com.api.entities.models.product.SaveProductResponse;
 
 import java.util.ArrayList;
 
 import com.api.entities.business.Product;
+import com.api.entities.business.Brand;
+import com.api.entities.business.Category;
 
 import com.api.logic.validations.ServerResponse;
 
@@ -45,8 +50,10 @@ public class ProductLogic {
             product.getId(),
             product.getName(),
             product.getGtin(),
-            product.getBrand(),
-            product.getCategory()
+            product.getBrand().getId(),
+            product.getBrand().getName(),
+            product.getCategory().getId(),
+            product.getCategory().getName()
         );
 
         return response;
@@ -70,29 +77,44 @@ public class ProductLogic {
                 product.getId(),
                 product.getName(),
                 product.getGtin(),
-                product.getBrand(),
-                product.getCategory()
+                product.getBrand().getId(),
+                product.getBrand().getName(),
+                product.getCategory().getId(),
+                product.getCategory().getName()
             ));
         }
 
         return response;
     }
 
-    public SaveProductResponse saveProduct(SaveProductRequest request) throws ServerResponse {
+    public SaveProductResponse saveProduct(SaveProductRequest request, UserPrincipal loggedUser) throws ServerResponse {
         SaveProductResponse response = new SaveProductResponse();
+        ServerResponse sr = new ServerResponse();
+
+        if(!(loggedUser.getRole().equals("supplier"))) {
+            sr.addError("You don't have permissions to access here...");
+            throw sr;
+        }
+
+        // Search brand.
+        Brand brand = pda.getBrand(request.getBrandId());
+
+        // Search category.
+        Category category = pda.getCategory(request.getCategoryId());
+
+        // Validate fields.
+        sr = validateSaveProduct(request, brand, category);
+
+        if (!sr.getStatus())
+            throw(sr);
 
         Product product = new Product(
             request.getId(),
             request.getName(),
             request.getGtin(),
-            request.getBrand(),
-            request.getCategory()
+            brand,
+            category
         );
-
-        ServerResponse sr = validateSaveProduct(product);
-
-        if (!sr.getStatus())
-            throw(sr);
 
         if (product.getId() == 0)
             pda.createProduct(product);
@@ -106,11 +128,20 @@ public class ProductLogic {
 
     // #region Validation
 
-    private ServerResponse validateSaveProduct(Product product) {
+    private ServerResponse validateSaveProduct(SaveProductRequest product, Brand brand, Category category) {
         ServerResponse sr = new ServerResponse();
 
         if (product.getName() == null || product.getName().isEmpty())
             sr.addError("Product name cannot be empty.");
+
+        if (product.getGtin() == null || product.getGtin().isEmpty())
+            sr.addError("Gtin code cannot be empty.");
+
+        if (brand == null)
+            sr.addError("Brand could not be found.");
+
+        if (category == null)
+            sr.addError("Category could not be found.");
 
         return sr;
     }

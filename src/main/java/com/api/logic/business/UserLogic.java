@@ -1,7 +1,7 @@
 package com.api.logic.business;
 
-// #region Imports
-
+// #region Import
+import com.api.rest.security.UserPrincipal;
 import java.util.ArrayList;
 
 import com.api.data.business.UserDataAccess;
