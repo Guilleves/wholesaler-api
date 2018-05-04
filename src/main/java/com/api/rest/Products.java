@@ -21,7 +21,7 @@ import com.api.rest.security.Secured;
 
     // #endregion
 
-@Path("/users")
+@Path("/products")
 public class Products {
     private ProductLogic pl;
 
@@ -65,7 +65,7 @@ public class Products {
         }
     }
 
-    /*@POST
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
@@ -78,7 +78,7 @@ public class Products {
         catch(ServerResponse e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getErrores()).build();
         }
-    }*/
+    }
 
     // #endregion
 }
