@@ -109,7 +109,7 @@ public class SaveProductRequest implements Serializable {
 		this.category = category;
 	}
 
-    class Brand {
+    public class Brand {
         private int id;
         private String name;
 
@@ -130,7 +130,7 @@ public class SaveProductRequest implements Serializable {
         }
     }
 
-    class Category {
+    public class Category {
         private int id;
         private String name;
 

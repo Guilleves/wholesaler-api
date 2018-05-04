@@ -7,6 +7,8 @@ import com.api.entities.models.product.SaveProductResponse;
 import java.util.ArrayList;
 
 import com.api.entities.business.Product;
+import com.api.entities.business.Brand;
+import com.api.entities.business.Category;
 
 import com.api.logic.validations.ServerResponse;
 
@@ -45,8 +47,10 @@ public class ProductLogic {
             product.getId(),
             product.getName(),
             product.getGtin(),
-            product.getBrand(),
-            product.getCategory()
+            product.getBrand().getId(),
+            product.getBrand().getName(),
+            product.getCategory().getId(),
+            product.getCategory().getName()
         );
 
         return response;
@@ -70,8 +74,10 @@ public class ProductLogic {
                 product.getId(),
                 product.getName(),
                 product.getGtin(),
-                product.getBrand(),
-                product.getCategory()
+                product.getBrand().getId(),
+                product.getBrand().getName(),
+                product.getCategory().getId(),
+                product.getCategory().getName()
             ));
         }
 
@@ -85,8 +91,8 @@ public class ProductLogic {
             request.getId(),
             request.getName(),
             request.getGtin(),
-            request.getBrand(),
-            request.getCategory()
+            new Brand(request.getBrand().getId(), request.getBrand().getName()),
+            new Category(request.getCategory().getId(), request.getCategory().getName())
         );
 
         ServerResponse sr = validateSaveProduct(product);
