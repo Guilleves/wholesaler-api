@@ -1,6 +1,8 @@
 package com.api.data.business;
 
 // #region Imports
+import com.api.entities.business.Retail;
+import com.api.entities.business.Supplier;
 import com.api.data.db.Connection;
 
 import java.sql.PreparedStatement;
@@ -62,17 +64,19 @@ public class OrganizationDataAccess extends BaseDataAccess {
         return organization;
     }
 
-    public boolean createOrganization(Organization organization) {
+    public Organization createOrganization(Organization organization) {
         query = "INSERT INTO Organization (name, legalName, cuit) VALUES (?, ?, ?);";
-        int updatedFields = 0;
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ((PreparedStatement)statement).setString(1, organization.getName());
             ((PreparedStatement)statement).setString(2, organization.getLegalName());
             ((PreparedStatement)statement).setString(3, organization.getCuit());
-            ((PreparedStatement)statement).setInt(4, organization.getId());
+            ((PreparedStatement)statement).executeUpdate();
 
-            updatedFields = ((PreparedStatement)statement).executeUpdate();
+            resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                organization.setId(resultSet.getInt(1));
+            }
         }
         catch(SQLException e) {
             e.printStackTrace();
@@ -81,7 +85,13 @@ public class OrganizationDataAccess extends BaseDataAccess {
             Connection.getInstancia().closeConn();
         }
 
-        return (updatedFields > 0);
+        return organization;
+
+        // if (organization.getRole().equals("supplier")) {
+        //     return (Supplier) organization;
+        // } else {
+        //     return (Retail) organization;
+        // }
     }
 
     public int updateOrganization(Organization organization) {

@@ -18,7 +18,7 @@ public class Connection {
 		return instancia;
 	}
 
-	private static String dbUrl = "jdbc:mysql://localhost:3306/wholesaler";
+	private static String dbUrl = "jdbc:mysql://localhost:3306/wholesaler?useSSL=false";
 	private static String dbUser = "root";
 	private static String dbPassword = "root";
 	// private static String env = "DEV";
