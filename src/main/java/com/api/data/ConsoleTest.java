@@ -1,7 +1,5 @@
 package com.api.data;
 
-import com.api.entities.business.Proposal;
-import com.api.data.business.ProposalDataAccess;
 import java.util.ArrayList;
 
 import com.api.entities.business.Category;
@@ -14,29 +12,14 @@ import com.api.data.business.UserDataAccess;
 public class ConsoleTest {
     private static UserDataAccess userData;
     private static ProductDataAccess productData;
-    private static ProposalDataAccess proposalData;
 
     public static void main(String[] args) {
         userData = new UserDataAccess();
         productData = new ProductDataAccess();
-        proposalData = new ProposalDataAccess();
 
         // *Comment para @guilleves* Acá iríamos haciendo el llamado a cada método y comentando los que van funcionando
-
-        // #region Users
-
         // getUser();
         // getUsers();
-
-        // #endregion
-
-        // #region Propsals
-
-        getProposal();
-        System.out.println("=========================");
-        getProposals();
-
-        // #endregion
 
         // #region Products
 
@@ -107,33 +90,6 @@ public class ConsoleTest {
 
     // #endregion
 
-    // #region Proposals
-
-    private static void getProposal() {
-        Proposal proposal = proposalData.getProposal(1);
-
-        if (proposal == null) {
-            System.out.println("Couldn't find a proposal.");
-            return;
-        }
-
-        System.out.println(proposal.toString());
-    }
-
-    private static void getProposals() {
-        ArrayList<Proposal> proposals = proposalData.getProposals();
-
-        for(Proposal proposal : proposals) {
-            System.out.println(proposal.toString());
-        }
-
-        System.out.println("End of proposal list");
-    }
-
-    // #endregion
-
-    // #region Users
-
     private static void getUser() {
         int userId = 2;
 
@@ -144,6 +100,4 @@ public class ConsoleTest {
 
         System.out.println(user.toString());
     }
-
-    // #endregion
 }
