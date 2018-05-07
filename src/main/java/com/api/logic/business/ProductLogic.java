@@ -2,6 +2,8 @@ package com.api.logic.business;
 
 // #region Imports
 
+import javax.ws.rs.core.Response.Status;
+
 import com.api.rest.security.UserPrincipal;
 import com.api.entities.models.product.SaveProductRequest;
 import com.api.entities.models.product.SaveProductResponse;
@@ -38,7 +40,7 @@ public class ProductLogic {
         Product product = pda.getProduct(request.getProductId());
 
         if (product == null)
-            throw new ApiException("Product was not found.");
+            throw new ApiException("Product was not found.", Status.NOT_FOUND);
 
 
         // Generate the response object.
@@ -56,14 +58,13 @@ public class ProductLogic {
     }
 
     public ArrayList<GetProductResponse> getProducts() throws ApiException {
-        ApiException ex = new ApiException();
         ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
 
         // Fetch product list.
         ArrayList<Product> products = pda.getProducts();
 
         if (products == null || products.isEmpty())
-            throw ex.addError("Couldn't find products.");
+            throw new ApiException("Couldn't find products.", Status.NOT_FOUND);
 
         // Generate the response object.
         for (Product product : products) {
@@ -83,10 +84,9 @@ public class ProductLogic {
 
     public SaveProductResponse saveProduct(SaveProductRequest request, UserPrincipal loggedUser) throws ApiException {
         SaveProductResponse response = new SaveProductResponse();
-        ApiException ex = new ApiException();
 
         if(!(loggedUser.getRole().equals("supplier")))
-            throw ex.addError("You don't have permissions to access here...");
+            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
         // Search brand.
         Brand brand = pda.getBrand(request.getBrandId());
@@ -95,7 +95,7 @@ public class ProductLogic {
         Category category = pda.getCategory(request.getCategoryId());
 
         // Validate fields.
-        ex = validateSaveProduct(request, brand, category);
+        ApiException ex = validateSaveProduct(request, brand, category);
 
         if (!ex.isOk())
             throw(ex);
