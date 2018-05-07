@@ -2,7 +2,8 @@ package com.api.logic.business;
 
 // #region Imports
 
-import com.api.data.business.UserDataAccess;
+import javax.ws.rs.core.Response.Status;
+
 import com.api.rest.security.UserPrincipal;
 import com.api.entities.models.product.SaveProductRequest;
 import com.api.entities.models.product.SaveProductResponse;
@@ -13,7 +14,7 @@ import com.api.entities.business.Product;
 import com.api.entities.business.Brand;
 import com.api.entities.business.Category;
 
-import com.api.logic.validations.ServerResponse;
+import com.api.logic.validations.ApiException;
 
 import com.api.entities.models.product.GetProductRequest;
 import com.api.entities.models.product.GetProductResponse;
@@ -34,16 +35,13 @@ public class ProductLogic {
 
     // #region ProductSetup
 
-    public GetProductResponse getProduct(GetProductRequest request) throws ServerResponse {
-        ServerResponse sr = new ServerResponse();
-
+    public GetProductResponse getProduct(GetProductRequest request) throws ApiException {
         // Fetch product.
         Product product = pda.getProduct(request.getProductId());
 
-        if (product == null) {
-            sr.addError("Product was not found.");
-            throw sr;
-        }
+        if (product == null)
+            throw new ApiException("Product was not found.", Status.NOT_FOUND);
+
 
         // Generate the response object.
         GetProductResponse response = new GetProductResponse(
@@ -59,17 +57,14 @@ public class ProductLogic {
         return response;
     }
 
-    public ArrayList<GetProductResponse> getProducts() throws ServerResponse {
-        ServerResponse sr = new ServerResponse();
+    public ArrayList<GetProductResponse> getProducts() throws ApiException {
         ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
 
         // Fetch product list.
         ArrayList<Product> products = pda.getProducts();
 
-        if (products == null || products.isEmpty()) {
-            sr.addError("Couldn't find products.");
-            throw sr;
-        }
+        if (products == null || products.isEmpty())
+            throw new ApiException("Couldn't find products.", Status.NOT_FOUND);
 
         // Generate the response object.
         for (Product product : products) {
@@ -87,14 +82,11 @@ public class ProductLogic {
         return response;
     }
 
-    public SaveProductResponse saveProduct(SaveProductRequest request, UserPrincipal loggedUser) throws ServerResponse {
+    public SaveProductResponse saveProduct(SaveProductRequest request, UserPrincipal loggedUser) throws ApiException {
         SaveProductResponse response = new SaveProductResponse();
-        ServerResponse sr = new ServerResponse();
 
-        if(!(loggedUser.getRole().equals("supplier"))) {
-            sr.addError("You don't have permissions to access here...");
-            throw sr;
-        }
+        if(!(loggedUser.getRole().equals("supplier")))
+            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
         // Search brand.
         Brand brand = pda.getBrand(request.getBrandId());
@@ -103,10 +95,10 @@ public class ProductLogic {
         Category category = pda.getCategory(request.getCategoryId());
 
         // Validate fields.
-        sr = validateSaveProduct(request, brand, category);
+        ApiException ex = validateSaveProduct(request, brand, category);
 
-        if (!sr.getStatus())
-            throw(sr);
+        if (!ex.isOk())
+            throw(ex);
 
         Product product = new Product(
             request.getId(),
@@ -128,22 +120,25 @@ public class ProductLogic {
 
     // #region Validation
 
-    private ServerResponse validateSaveProduct(SaveProductRequest product, Brand brand, Category category) {
-        ServerResponse sr = new ServerResponse();
+    private ApiException validateSaveProduct(SaveProductRequest product, Brand brand, Category category) {
+        ApiException ex = new ApiException();
+
+        if (pda.validateGtin(product.getGtin()))
+            ex.addError("A product with this gtin has already been created.");
 
         if (product.getName() == null || product.getName().isEmpty())
-            sr.addError("Product name cannot be empty.");
+            ex.addError("Product name cannot be empty.");
 
         if (product.getGtin() == null || product.getGtin().isEmpty())
-            sr.addError("Gtin code cannot be empty.");
+            ex.addError("Gtin code cannot be empty.");
 
         if (brand == null)
-            sr.addError("Brand could not be found.");
+            ex.addError("Brand could not be found.");
 
         if (category == null)
-            sr.addError("Category could not be found.");
+            ex.addError("Category could not be found.");
 
-        return sr;
+        return ex;
     }
 
     // #endregion

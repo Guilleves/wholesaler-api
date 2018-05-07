@@ -148,6 +148,29 @@ public class ProductDataAccess extends BaseDataAccess {
         return id;
     }
 
+    public boolean validateGtin(String gtin) {
+        query = "SELECT * FROM product WHERE gtin = ?";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setString(1, gtin);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            if (resultSet.next()) {
+                return true;
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return false;
+    }
+
     // #endregion
 
     // #region BrandInfo
