@@ -12,15 +12,34 @@ public class ApiException extends Exception {
     // #region Constructors
 
     public ApiException() {
+        super();
         errors = new ArrayList<ApiError>();
     }
 
     public ApiException(Exception ex) {
+        super();
+        errors = new ArrayList<ApiError>();
         addError(ex);
     }
 
     public ApiException(String message) {
+        super();
+        errors = new ArrayList<ApiError>();
         addError(message);
+    }
+
+    public ApiException(String message, Status status) {
+        super();
+        errors = new ArrayList<ApiError>();
+        addError(message);
+        this.status = status;
+    }
+
+    public ApiException(Exception ex, Status status) {
+        super();
+        errors = new ArrayList<ApiError>();
+        addError(ex);
+        this.status = status;
     }
 
     // #endregion
