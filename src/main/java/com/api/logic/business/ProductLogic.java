@@ -124,7 +124,7 @@ public class ProductLogic {
         ApiException ex = new ApiException();
 
         if (pda.validateGtin(product.getGtin()))
-            sr.addError("A product with this gtin has already been created.");
+            ex.addError("A product with this gtin has already been created.");
 
         if (product.getName() == null || product.getName().isEmpty())
             ex.addError("Product name cannot be empty.");
