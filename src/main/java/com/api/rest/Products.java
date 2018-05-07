@@ -19,7 +19,7 @@ import com.api.entities.models.product.SaveProductRequest;
 
 import com.api.logic.business.ProductLogic;
 
-import com.api.logic.validations.ServerResponse;
+import com.api.logic.validations.ApiException;
 
 import com.api.rest.security.Secured;
 
@@ -48,8 +48,8 @@ public class Products {
         try {
             return Response.ok(pl.getProducts()).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -64,8 +64,8 @@ public class Products {
         try {
             return Response.ok(pl.getProduct(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -79,8 +79,8 @@ public class Products {
             pl.saveProduct(request, (UserPrincipal)context.getUserPrincipal());
             return Response.ok().build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 

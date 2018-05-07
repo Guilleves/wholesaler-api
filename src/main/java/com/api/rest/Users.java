@@ -16,7 +16,7 @@ import com.api.entities.models.user.SaveUserRequest;
 
 import com.api.logic.business.UserLogic;
 
-import com.api.logic.validations.ServerResponse;
+import com.api.logic.validations.ApiException;
 
 import com.api.rest.security.Secured;
 
@@ -45,8 +45,8 @@ public class Users {
         try {
             return Response.ok(ul.getUsers()).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -61,8 +61,8 @@ public class Users {
         try {
             return Response.ok(ul.getUser(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -77,8 +77,8 @@ public class Users {
 
             return Response.ok().build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -94,8 +94,8 @@ public class Users {
         try {
             return Response.ok(ul.login(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -107,8 +107,8 @@ public class Users {
         try {
             return Response.ok(ul.signup(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
