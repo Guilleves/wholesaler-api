@@ -14,6 +14,9 @@ import java.sql.PreparedStatement;
 import com.api.entities.business.Proposal;
 
 public class ProposalDataAccess extends BaseDataAccess {
+
+    // #region Proposal setup
+
     public Proposal getProposal(int proposalId) {
         Proposal proposal = null;
 
@@ -59,8 +62,6 @@ public class ProposalDataAccess extends BaseDataAccess {
         ArrayList<Proposal> proposals = new ArrayList<Proposal>();
 
         // Eeeeeeeeeeeeeeeeeek...
-        // TODO: Ask @guilleves
-        // Should I inner join? or left join? Are we always generating lines or could empty proposals exist?
         query = "SELECT " +
             "P.*, " +
             "PL.id as proposalLineId, " +
@@ -95,6 +96,107 @@ public class ProposalDataAccess extends BaseDataAccess {
 
         return proposals;
     }
+
+    public Proposal registerProposal(Proposal proposal) {
+        java.sql.Connection conn = Connection.getInstancia().getConn();
+
+        try {
+            conn.setAutoCommit(false);
+
+            // All this messy code is to run everything as a transaction.
+            proposal = createProposal(proposal);
+
+            for (ProposalLine pl : proposal.getProposalLines()) {
+                // TODO: IDK other way to avoid infinite loops, at least this way it works.
+                Proposal p = new Proposal();
+                p.setId(proposal.getId());
+                pl.setProposal(p);
+
+                // Would this do the trick? Damn java, you tha boss.
+                pl = createProposalLine(pl);
+            }
+
+            conn.commit();
+            conn.setAutoCommit(true);
+        }
+        catch(SQLException e1) {
+            try {
+                e1.printStackTrace();
+                conn.rollback();
+                conn.setAutoCommit(true);
+            }
+            catch(SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposal;
+    }
+
+    public Proposal createProposal(Proposal proposal) {
+        query = "INSERT INTO Proposal (beginDate, endDate, description) VALUES (?, ?, ?);";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(proposal.getBeginDate().getTime()));
+            ((PreparedStatement)statement).setTimestamp(2, new java.sql.Timestamp(proposal.getEndDate().getTime()));
+            ((PreparedStatement)statement).setString(3, proposal.getDescription());
+
+            ((PreparedStatement)statement).executeUpdate();
+
+            resultSet = statement.getGeneratedKeys();
+
+            // If it created the user, return the created id
+            if (resultSet.next()) {
+                proposal.setId(resultSet.getInt(1));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposal;
+    }
+
+    public ProposalLine createProposalLine(ProposalLine proposalLine) {
+        query = "INSERT INTO ProposalLine (proposalId, productId, price) VALUES (?, ?, ?);";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, proposalLine.getProposal().getId());
+            ((PreparedStatement)statement).setInt(2, proposalLine.getProduct().getId());
+            ((PreparedStatement)statement).setFloat(3, proposalLine.getPrice());
+
+            ((PreparedStatement)statement).executeUpdate();
+
+            resultSet = statement.getGeneratedKeys();
+
+            // If it created the user, return the created id
+            if (resultSet.next()) {
+                proposalLine.setId(resultSet.getInt(1));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposalLine;
+    }
+
+
+    // #endregion
+
+
+    // #region Privates
 
     private Proposal deserializeProposal(ResultSet resultSet) throws SQLException {
         Proposal proposal = new Proposal();
@@ -172,4 +274,6 @@ public class ProposalDataAccess extends BaseDataAccess {
 
         return new ArrayList<Proposal>(proposals.values());
     }
+
+    // #endregion
 }

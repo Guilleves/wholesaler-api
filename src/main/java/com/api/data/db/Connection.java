@@ -95,37 +95,19 @@ public class Connection {
 		}
 	}
 
-	public void beginTransaction() {
-		try {
-			this.getConn().setAutoCommit(false);
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void beginTransaction() throws SQLException {
+		this.getConn().setAutoCommit(false);
 	}
 
-	public void commitTransaction() {
-		try {
-			this.conn.commit();
-			this.conn.setAutoCommit(true);
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		finally {
-			this.closeConn();
-		}
+	public void commitTransaction() throws SQLException {
+		java.sql.Connection conn = this.getConn();
+		conn.commit();
+		conn.setAutoCommit(true);
 	}
 
-	public void rollbackTransaction() {
-		try {
-			this.conn.rollback();
-			this.conn.setAutoCommit(true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		finally {
-			this.closeConn();
-		}
+	public void rollbackTransaction() throws SQLException {
+		java.sql.Connection conn = this.getConn();
+		conn.rollback();
+		conn.setAutoCommit(true);
 	}
 }
