@@ -57,6 +57,14 @@ public class User {
 		this.username = rs.getString("username");
 		this.password = rs.getString("password");
 		this.email = rs.getString("email");
+
+        this.organization = new Organization(
+            rs.getInt("organizationId"),
+            rs.getString("organizationName"),
+            rs.getString("cuit"),
+            rs.getString("legalName"),
+            rs.getString("role")
+        );
     }
 
 	/**
