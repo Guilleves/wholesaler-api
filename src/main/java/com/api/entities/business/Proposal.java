@@ -8,6 +8,7 @@ public class Proposal {
     private Date beginDate, endDate;
     private String description;
     private ArrayList<ProposalLine> proposalLines;
+    private Organization supplier; // TODO: this should be a Supplier, no an Organization
 
 	/**
 	* Default empty Proposal constructor
@@ -108,6 +109,22 @@ public class Proposal {
 	*/
 	public void setProposalLines(ArrayList<ProposalLine> proposalLines) {
 		this.proposalLines = proposalLines;
+	}
+
+    /**
+	* Returns value of organization
+	* @return
+	*/
+	public Organization getSupplier() {
+		return supplier;
+	}
+
+	/**
+	* Sets new value of proposalLine
+	* @param
+	*/
+	public void setSupplier(Organization supplier) {
+		this.supplier = supplier;
 	}
 
 	/**
