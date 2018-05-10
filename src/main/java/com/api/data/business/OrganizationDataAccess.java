@@ -16,7 +16,9 @@ import com.api.entities.business.Organization;
 // #endregion
 
 public class OrganizationDataAccess extends BaseDataAccess {
+
     // #region OrganizationSetup
+
     public ArrayList<Organization> getOrganizations() {
         ArrayList<Organization> organizations = new ArrayList<Organization>();
         query = "SELECT * FROM Organization;";
@@ -115,4 +117,7 @@ public class OrganizationDataAccess extends BaseDataAccess {
 
         return id;
     }
+    
+    // #endregion
+
 }
