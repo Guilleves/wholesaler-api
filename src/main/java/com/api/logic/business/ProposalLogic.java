@@ -96,6 +96,7 @@ public class ProposalLogic {
         User user = uda.getUser(loggedUser.getId());
 
         // Set primitive data.
+        // TODO: This should be already in the context...
         proposal.setSupplier(user.getOrganization());
         proposal.setDescription(request.getDescription());
         proposal.setBeginDate(request.getBeginDate());
