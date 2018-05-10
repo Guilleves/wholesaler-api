@@ -2,6 +2,7 @@ package com.api.logic.business;
 
 // #region Imports
 
+import com.api.entities.enums.OrganizationRoles;
 import com.api.entities.business.Supplier;
 import com.api.entities.business.Retail;
 import com.api.entities.models.organization.SaveOrganizationRequest;
@@ -37,7 +38,7 @@ public class OrganizationLogic {
 
       Organization organization;
 
-      if (request.getRole() == "supplier")
+      if (request.getRole().equals(OrganizationRoles.SUPPLIER))
           organization = new Supplier();
       else
           organization = new Retail();

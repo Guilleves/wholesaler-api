@@ -1,6 +1,7 @@
 package com.api.entities.business;
 
 // #region Imports
+import com.api.entities.enums.OrganizationRoles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -13,7 +14,7 @@ public class Retail extends Organization {
 	*/
 	public Retail() {
 		super();
-        super.setRole("retail");
+        super.setRole(OrganizationRoles.RETAIL);
 	}
 
     /**
@@ -21,6 +22,6 @@ public class Retail extends Organization {
     */
     public Retail(ResultSet rs) throws SQLException {
         super();
-        super.setRole("retail");
+        super.setRole(OrganizationRoles.RETAIL);
     }
 }
