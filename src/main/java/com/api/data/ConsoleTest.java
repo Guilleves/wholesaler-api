@@ -1,5 +1,8 @@
 package com.api.data;
 
+import com.api.entities.business.Organization;
+import com.api.entities.business.Supplier;
+import com.api.data.business.OrganizationDataAccess;
 import java.util.ArrayList;
 
 import com.api.entities.business.Category;
@@ -12,10 +15,12 @@ import com.api.data.business.UserDataAccess;
 public class ConsoleTest {
     private static UserDataAccess userData;
     private static ProductDataAccess productData;
+    private static OrganizationDataAccess organizationData;
 
     public static void main(String[] args) {
         userData = new UserDataAccess();
         productData = new ProductDataAccess();
+        organizationData = new OrganizationDataAccess();
 
         // *Comment para @guilleves* Acá iríamos haciendo el llamado a cada método y comentando los que van funcionando
         // getUser();
@@ -24,13 +29,35 @@ public class ConsoleTest {
         // #region Products
 
         // saveProduct();
-        updateProduct();
+        // updateProduct();
+        // getProduct();
+        // getProducts();
+
+        // #region Supplier
+
+        saveSupplier();
+        // updateProduct();
         // getProduct();
         // getProducts();
 
         // #endregion
 
         return;
+    }
+
+    // region Supplier
+    private static void saveSupplier() {
+        Supplier supplier = new Supplier();
+        supplier.setName("Longvie");
+        supplier.setLegalName("Longvie S.A.");
+        supplier.setCuit("2342323424");
+
+        supplier = (Supplier) organizationData.createOrganization((Organization) supplier);
+
+        if (supplier.getId() == 0)
+            System.out.println("Supplier could not be created");
+        else
+            System.out.println(supplier.getName() + " " + supplier.getId());
     }
 
     // #region Products
