@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class GetProposalResponse {
     private int id;
-    private String description;
+    private String title, description;
     private Date beginDate, endDate;
 
 	/**
@@ -17,9 +17,10 @@ public class GetProposalResponse {
 	/**
 	* Default GetProposalResponse constructor
 	*/
-	public GetProposalResponse(int id, String description, Date beginDate, Date endDate) {
+	public GetProposalResponse(int id, String title, String description, Date beginDate, Date endDate) {
 		super();
 		this.id = id;
+        this.title = title;
 		this.description = description;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
@@ -42,6 +43,22 @@ public class GetProposalResponse {
 	}
 
 	/**
+	* Returns value of title
+	* @return
+	*/
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	* Sets new value of title
+	* @param
+	*/
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+    /**
 	* Returns value of description
 	* @return
 	*/

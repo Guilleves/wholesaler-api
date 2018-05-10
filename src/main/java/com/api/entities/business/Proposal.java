@@ -6,29 +6,29 @@ import java.util.Date;
 public class Proposal {
     private int id;
     private Date beginDate, endDate;
-    private String description;
+    private String title, description;
     private ArrayList<ProposalLine> proposalLines;
-    private Organization supplier; // TODO: this should be a Supplier, no an Organization
+    private Supplier supplier;
 
 	/**
 	* Default empty Proposal constructor
 	*/
 	public Proposal() {
 		super();
-
-        proposalLines = new ArrayList<ProposalLine>();
 	}
 
 	/**
 	* Default Proposal constructor
 	*/
-	public Proposal(int id, Date beginDate, Date endDate, String description, ArrayList<ProposalLine> proposalLines) {
+	public Proposal(int id, Date beginDate, Date endDate, String title, String description, ArrayList<ProposalLine> proposalLines, Supplier supplier) {
 		super();
 		this.id = id;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
+		this.title = title;
 		this.description = description;
 		this.proposalLines = proposalLines;
+		this.supplier = supplier;
 	}
 
 	/**
@@ -80,6 +80,22 @@ public class Proposal {
 	}
 
 	/**
+	* Returns value of title
+	* @return
+	*/
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	* Sets new value of title
+	* @param
+	*/
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
 	* Returns value of description
 	* @return
 	*/
@@ -96,7 +112,7 @@ public class Proposal {
 	}
 
 	/**
-	* Returns value of proposalLine
+	* Returns value of proposalLines
 	* @return
 	*/
 	public ArrayList<ProposalLine> getProposalLines() {
@@ -104,36 +120,36 @@ public class Proposal {
 	}
 
 	/**
-	* Sets new value of proposalLine
+	* Sets new value of proposalLines
 	* @param
 	*/
 	public void setProposalLines(ArrayList<ProposalLine> proposalLines) {
 		this.proposalLines = proposalLines;
 	}
 
-    /**
-	* Returns value of organization
+	/**
+	* Returns value of supplier
 	* @return
 	*/
-	public Organization getSupplier() {
+	public Supplier getSupplier() {
 		return supplier;
 	}
 
 	/**
-	* Sets new value of proposalLine
+	* Sets new value of supplier
 	* @param
 	*/
-	public void setSupplier(Organization supplier) {
+	public void setSupplier(Supplier supplier) {
 		this.supplier = supplier;
 	}
 
-	/**
+    /**
 	* Create string representation of Proposal for printing
 	* @return
 	*/
 	@Override
 	public String toString() {
-		String string = "Proposal [id=" + id + ", beginDate=" + beginDate.toString() + ", endDate=" + endDate.toString() + ", description=" + description + "] ";
+		String string = "Proposal [id=" + id + ", title=" + title.toString() + ", beginDate=" + beginDate.toString() + ", endDate=" + endDate.toString() + ", description=" + description + "] ";
 
         string += "Lines [ ";
         for(ProposalLine pl : proposalLines) {

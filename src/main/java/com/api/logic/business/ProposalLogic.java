@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import com.api.entities.business.Supplier;
 import com.api.data.business.UserDataAccess;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
@@ -37,6 +38,7 @@ public class ProposalLogic {
         for(Proposal proposal : proposals) {
             response.add(new GetProposalResponse(
                 proposal.getId(),
+                proposal.getTitle(),
                 proposal.getDescription(),
                 proposal.getBeginDate(),
                 proposal.getEndDate()
@@ -54,6 +56,7 @@ public class ProposalLogic {
 
         return new GetProposalResponse(
             proposal.getId(),
+            proposal.getTitle(),
             proposal.getDescription(),
             proposal.getBeginDate(),
             proposal.getEndDate()
@@ -96,7 +99,8 @@ public class ProposalLogic {
         User user = uda.getUser(loggedUser.getId());
 
         // Set primitive data.
-        proposal.setSupplier(user.getOrganization());
+        proposal.setSupplier((Supplier)(user.getOrganization()));
+        proposal.setTitle(request.getTitle());
         proposal.setDescription(request.getDescription());
         proposal.setBeginDate(request.getBeginDate());
         proposal.setEndDate(request.getEndDate());
@@ -106,6 +110,7 @@ public class ProposalLogic {
 
         return new GetProposalResponse(
             createdProposal.getId(),
+            createdProposal.getTitle(),
             createdProposal.getDescription(),
             createdProposal.getBeginDate(),
             createdProposal.getEndDate()
@@ -114,6 +119,9 @@ public class ProposalLogic {
 
     private ApiException validateSaveProposal(SaveProposalRequest request) {
         ApiException ex = new ApiException();
+
+        if (request.getTitle() == null)
+            ex.addError("Title can't be empty.");
 
         if (request.getBeginDate() == null)
             ex.addError("Begin date cannot be empty.");

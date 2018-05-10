@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import com.api.entities.business.Supplier;
 import com.api.entities.business.Organization;
 import java.util.HashMap;
 import java.sql.ResultSet;
@@ -150,7 +151,7 @@ public class ProposalDataAccess extends BaseDataAccess {
     }
 
     public Proposal createProposal(Proposal proposal) {
-        query = "INSERT INTO Proposal (beginDate, endDate, description, supplierId) VALUES (?, ?, ?, ?);";
+        query = "INSERT INTO Proposal (beginDate, endDate, description, supplierId, title) VALUES (?, ?, ?, ?, ?);";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -158,6 +159,8 @@ public class ProposalDataAccess extends BaseDataAccess {
             ((PreparedStatement)statement).setTimestamp(2, new java.sql.Timestamp(proposal.getEndDate().getTime()));
             ((PreparedStatement)statement).setString(3, proposal.getDescription());
             ((PreparedStatement)statement).setInt(4, proposal.getSupplier().getId());
+            ((PreparedStatement)statement).setString(5, proposal.getTitle());
+
 
             ((PreparedStatement)statement).executeUpdate();
 
@@ -224,13 +227,14 @@ public class ProposalDataAccess extends BaseDataAccess {
                 proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
                 proposal.setEndDate(resultSet.getTimestamp("endDate"));
                 proposal.setDescription(resultSet.getString("description"));
-                proposal.setSupplier(new Organization(
+                proposal.setTitle(resultSet.getString("title"));
+                proposal.setSupplier((Supplier)(new Organization(
                     resultSet.getInt("organizationId"),
                     resultSet.getString("organizationName"),
                     resultSet.getString("cuit"),
                     resultSet.getString("legalName"),
                     resultSet.getString("role")
-                ));
+                )));
 
                 currentProposalId = proposal.getId();
             }
@@ -271,13 +275,14 @@ public class ProposalDataAccess extends BaseDataAccess {
                 proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
                 proposal.setEndDate(resultSet.getTimestamp("endDate"));
                 proposal.setDescription(resultSet.getString("description"));
-                proposal.setSupplier(new Organization(
+                proposal.setTitle(resultSet.getString("title"));
+                proposal.setSupplier((Supplier)(new Organization(
                     resultSet.getInt("organizationId"),
                     resultSet.getString("organizationName"),
                     resultSet.getString("cuit"),
                     resultSet.getString("legalName"),
                     resultSet.getString("role")
-                ));
+                )));
 
                 proposals.put(proposal.getId() ,proposal);
             }
