@@ -2,6 +2,7 @@ package com.api.rest;
 
 // #region Imports
 
+import com.api.entities.business.User;
 import com.api.entities.models.proposal.SaveProposalRequest;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
@@ -76,7 +77,8 @@ public class Proposal {
     @Path("/")
     public Response saveProposal(@Context SecurityContext context, SaveProposalRequest request) {
         try {
-            return Response.ok(pl.saveProposal(request, (UserPrincipal)context.getUserPrincipal())).build();
+            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            return Response.ok(pl.saveProposal(request, user)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
