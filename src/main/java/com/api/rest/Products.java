@@ -2,6 +2,8 @@ package com.api.rest;
 
 // #region Imports
 
+import javax.ws.rs.QueryParam;
+import com.api.entities.models.product.GetProductsByBrandRequest;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
@@ -44,12 +46,25 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
+    @QueryParam("brandId")
     public Response getProducts() {
-        try {
-            return Response.ok(pl.getProducts()).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        int brandId = 0;
+        if (brandId == 0) {
+            GetProductsByBrandRequest request = new GetProductsByBrandRequest(brandId);
+
+            try {
+                return Response.ok(pl.getProductsByBrand(request)).build();
+            }
+            catch(ApiException e) {
+                return Response.status(e.getStatus()).entity(e.getErrors()).build();
+            }
+        } else {
+            try {
+                return Response.ok(pl.getProducts()).build();
+            }
+            catch(ApiException e) {
+                return Response.status(e.getStatus()).entity(e.getErrors()).build();
+            }
         }
     }
 
