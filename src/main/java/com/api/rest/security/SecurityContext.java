@@ -14,10 +14,7 @@ public class SecurityContext implements javax.ws.rs.core.SecurityContext {
 
     @Override
     public boolean isUserInRole(String s) {
-        if (userPrincipal.getRoles() != null)
-            return userPrincipal.getRoles().contains(s);
-        
-        return false;
+        return true;
     }
 
     @Override

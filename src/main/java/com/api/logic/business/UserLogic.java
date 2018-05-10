@@ -1,7 +1,6 @@
 package com.api.logic.business;
 
-// #region Imports
-
+// #region Import
 import java.util.ArrayList;
 
 import com.api.data.business.UserDataAccess;
@@ -13,7 +12,7 @@ import com.api.entities.models.user.SaveUserRequest;
 import com.api.entities.models.user.LoginRequest;
 import com.api.entities.models.user.LoginResponse;
 
-import com.api.logic.validations.ServerResponse;
+import com.api.logic.validations.ApiException;
 
 // #endregion
 
@@ -32,19 +31,17 @@ public class UserLogic {
 
     // #region UserSetup
 
-    public GetUserResponse getUser(GetUserRequest request) throws ServerResponse {
-        ServerResponse sr = validateGetUser(request.getUserId());
+    public GetUserResponse getUser(GetUserRequest request) throws ApiException {
+        ApiException ex = validateGetUser(request.getUserId());
 
-        if (!sr.getStatus())
-            throw sr;
+        if (!ex.isOk())
+            throw ex;
 
         // Fetch the user.
         User user = uda.getUser(request.getUserId());
 
-        if (user == null) {
-            sr.addError("User not found.");
-            throw sr;
-        }
+        if (user == null)
+            throw ex.addError("User not found.");
 
         // Generate de response object (future JSON).
         GetUserResponse response = new GetUserResponse(
@@ -59,14 +56,15 @@ public class UserLogic {
     }
 
     // In case we actually use this method, it would probably need some filters.
-    public ArrayList<GetUserResponse> getUsers() throws ServerResponse {
+    public ArrayList<GetUserResponse> getUsers() throws ApiException {
         ArrayList<GetUserResponse> response = new ArrayList<GetUserResponse>();
 
         // Fetch the user list.
         ArrayList<User> users = uda.getUsers();
 
-        if (users == null || users.isEmpty())
-            return null;
+        if (users == null || users.isEmpty()) {
+            throw new ApiException("No users found.");
+        }
 
         // Generate the response (future JSON).
         for (User user : users) {
@@ -83,7 +81,7 @@ public class UserLogic {
     }
 
     // Is this void? If something goes wrong, it would let me know throw the ServerResponse error
-    public int saveUser(SaveUserRequest request) throws ServerResponse {
+    public int saveUser(SaveUserRequest request) throws ApiException {
         User user = new User(
             request.getUserId(),
             request.getFirstName(),
@@ -93,10 +91,10 @@ public class UserLogic {
             request.getEmail()
         );
 
-        ServerResponse sr = validateSaveUser(user);
+        ApiException ex = validateSaveUser(user);
 
-        if (!sr.getStatus())
-            throw sr;
+        if (!ex.isOk())
+            throw ex;
 
         // If password is being created/updated, ecrypt it
         if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
@@ -104,8 +102,7 @@ public class UserLogic {
                 user.setPassword(sl.encryptPassword(user.getPassword()));
             } // Dunno if should specify the exception, since I'll handle all of them equally
             catch(Exception e) {
-                sr.addError(e);
-                throw sr;
+                throw ex.addError(e);
             }
         }
 
@@ -119,9 +116,7 @@ public class UserLogic {
 
     // #region Security
 
-    public LoginResponse signup(SaveUserRequest request) throws ServerResponse {
-        ServerResponse sr = new ServerResponse();
-
+    public LoginResponse signup(SaveUserRequest request) throws ApiException {
         User user = new User(
             0,
             request.getFirstName(),
@@ -134,10 +129,8 @@ public class UserLogic {
         // Fetch user.
         User dbUser = uda.getUser(request.getUsername());
 
-        if (dbUser != null) {
-            sr.addError("This username is taken");
-            throw sr;
-        }
+        if (dbUser != null)
+            throw new ApiException("This username is taken");
 
         int id = uda.createUser(user);
 
@@ -147,14 +140,13 @@ public class UserLogic {
             token = sl.issueAuthToken(id);
         }
         catch(Exception e) {
-            sr.addError(e);
-            throw sr;
+            throw new ApiException(e);
         }
 
         return new LoginResponse(token);
     }
 
-    public LoginResponse login(LoginRequest request) throws ServerResponse {
+    public LoginResponse login(LoginRequest request) throws ApiException {
         LoginResponse response = new LoginResponse();
 
         boolean couldAuthenticate = false;
@@ -162,26 +154,23 @@ public class UserLogic {
         String password = request.getPassword();
 
         // Validate input fields, and throw exception if invalid.
-        ServerResponse sr = validateAuthentication(username, password);
+        ApiException ex = validateAuthentication(username, password);
 
-        if (!sr.getStatus())
-            throw sr;
+        if (!ex.isOk())
+            throw ex;
 
         // Fetch user.
         User dbUser = uda.getUser(username);
 
-        if (dbUser == null) {
-            sr.addError("User was not found.");
-            throw(sr);
-        }
+        if (dbUser == null)
+            throw ex.addError("User was not found.");
 
         // First, try to authenticate against the db.
         try {
             couldAuthenticate = sl.validatePassword(password, dbUser.getPassword());
         }
         catch(Exception e) {
-            sr.addError(e);
-            throw(sr);
+            throw ex.addError(e);
         }
 
         // If the password comparison succeed.
@@ -191,8 +180,7 @@ public class UserLogic {
                 response.setToken(sl.issueAuthToken(dbUser.getId()));
             }
             catch(Exception e) {
-                sr.addError(e);
-                throw(sr);
+                throw ex.addError(e);
             }
         }
 
@@ -203,8 +191,8 @@ public class UserLogic {
 
     // #region Validations
 
-    private ServerResponse validateAuthentication(String username, String password) {
-        ServerResponse sr = new ServerResponse();
+    private ApiException validateAuthentication(String username, String password) {
+        ApiException sr = new ApiException();
 
         if (username == null || username.isEmpty())
             sr.addError("El nombre de usuario no puede estar vacío.");
@@ -217,8 +205,8 @@ public class UserLogic {
         return sr;
     }
 
-    private ServerResponse validateGetUser(int userId) {
-        ServerResponse sr = new ServerResponse();
+    private ApiException validateGetUser(int userId) {
+        ApiException sr = new ApiException();
 
         if (userId <= 0)
             sr.addError("Please provide a valid user id");
@@ -226,8 +214,8 @@ public class UserLogic {
         return sr;
     }
 
-    private ServerResponse validateSaveUser(User user) {
-        ServerResponse sr = new ServerResponse();
+    private ApiException validateSaveUser(User user) {
+        ApiException sr = new ApiException();
 
         if (user.getUsername() == null || user.getUsername().isEmpty())
         sr.addError("El nombre de usuario es un campo obligatorio");

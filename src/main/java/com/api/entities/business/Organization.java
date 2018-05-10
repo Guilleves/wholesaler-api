@@ -24,12 +24,13 @@ public class Organization {
 	/**
 	* Default Organization constructor
 	*/
-	public Organization(int id, String name, String cuit, String legalName) {
+	public Organization(int id, String name, String cuit, String legalName, String role) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.cuit = cuit;
 		this.legalName = legalName;
+		this.role = role;
 	}
 
     /**

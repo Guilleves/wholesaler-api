@@ -1,6 +1,6 @@
 package com.api.rest;
 
-// #region Imports
+// #region Impor
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,11 +16,11 @@ import com.api.entities.models.user.SaveUserRequest;
 
 import com.api.logic.business.UserLogic;
 
-import com.api.logic.validations.ServerResponse;
+import com.api.logic.validations.ApiException;
 
 import com.api.rest.security.Secured;
 
-    // #endregion
+// #endregion
 
 @Path("/users")
 public class Users {
@@ -45,8 +45,8 @@ public class Users {
         try {
             return Response.ok(ul.getUsers()).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -61,8 +61,8 @@ public class Users {
         try {
             return Response.ok(ul.getUser(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -74,10 +74,11 @@ public class Users {
     public Response saveUser(SaveUserRequest request) {
         try {
             ul.saveUser(request);
+
             return Response.ok().build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -93,8 +94,8 @@ public class Users {
         try {
             return Response.ok(ul.login(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 
@@ -106,8 +107,8 @@ public class Users {
         try {
             return Response.ok(ul.signup(request)).build();
         }
-        catch(ServerResponse e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getErrores()).build();
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
 

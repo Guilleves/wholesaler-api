@@ -74,9 +74,8 @@ public class OrganizationDataAccess extends BaseDataAccess {
             ((PreparedStatement)statement).executeUpdate();
 
             resultSet = statement.getGeneratedKeys();
-            if (resultSet.next()) {
+            if (resultSet.next())
                 organization.setId(resultSet.getInt(1));
-            }
         }
         catch(SQLException e) {
             e.printStackTrace();
@@ -86,12 +85,6 @@ public class OrganizationDataAccess extends BaseDataAccess {
         }
 
         return organization;
-
-        // if (organization.getRole().equals("supplier")) {
-        //     return (Supplier) organization;
-        // } else {
-        //     return (Retail) organization;
-        // }
     }
 
     public int updateOrganization(Organization organization) {
@@ -110,9 +103,8 @@ public class OrganizationDataAccess extends BaseDataAccess {
             resultSet = statement.getGeneratedKeys();
 
             // If it updated the user, return the updated id
-            if (resultSet.next()) {
+            if (resultSet.next())
                 id = resultSet.getInt(1);
-            }
         }
         catch(SQLException e) {
             e.printStackTrace();
