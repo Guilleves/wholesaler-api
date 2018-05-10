@@ -2,6 +2,7 @@ package com.api.logic.business;
 
 // #region Imports
 
+import com.api.entities.enums.OrganizationRoles;
 import javax.ws.rs.core.Response.Status;
 
 import com.api.rest.security.UserPrincipal;
@@ -85,7 +86,7 @@ public class ProductLogic {
     public SaveProductResponse saveProduct(SaveProductRequest request, UserPrincipal loggedUser) throws ApiException {
         SaveProductResponse response = new SaveProductResponse();
 
-        if(!(loggedUser.getRole().equals("supplier")))
+        if(!(loggedUser.getRole().equals(OrganizationRoles.SUPPLIER)))
             throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
         // Search brand.
