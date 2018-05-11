@@ -1,6 +1,8 @@
 package com.api.data.business;
 
 // #region Imports
+
+import com.api.entities.enums.OrganizationRoles;
 import com.api.entities.business.Retail;
 import com.api.entities.business.Supplier;
 import com.api.data.db.Connection;
@@ -29,7 +31,11 @@ public class OrganizationDataAccess extends BaseDataAccess {
             resultSet = statement.executeQuery(query);
 
             while(resultSet.next()) {
-                organizations.add(new Organization(resultSet));
+                // Organization factory
+                if (resultSet.getString("role").equals(OrganizationRoles.SUPPLIER))
+                    organizations.add(new Supplier(resultSet));
+                else
+                    organizations.add(new Retail(resultSet));
             }
         }
         catch(SQLException e) {
@@ -53,7 +59,11 @@ public class OrganizationDataAccess extends BaseDataAccess {
             resultSet = ((PreparedStatement)statement).executeQuery();
 
             if (resultSet.next()) {
-                organization = new Organization(resultSet);
+                // Organization factory
+                if (resultSet.getString("role").equals(OrganizationRoles.SUPPLIER))
+                    organization = new Supplier(resultSet);
+                else
+                    organization = new Retail(resultSet);
             }
         }
         catch(SQLException e) {
@@ -117,7 +127,7 @@ public class OrganizationDataAccess extends BaseDataAccess {
 
         return id;
     }
-    
+
     // #endregion
 
 }
