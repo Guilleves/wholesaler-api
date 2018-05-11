@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Proposal {
     private int id;
-    private Date beginDate, endDate;
+    private Date beginDate, endDate, deletedAt;
     private String description;
     private ArrayList<ProposalLine> proposalLines;
     private Organization supplier; // TODO: this should be a Supplier, no an Organization
@@ -126,6 +126,14 @@ public class Proposal {
 	public void setSupplier(Organization supplier) {
 		this.supplier = supplier;
 	}
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date date) {
+        this.deletedAt = date;
+    }
 
 	/**
 	* Create string representation of Proposal for printing

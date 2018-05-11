@@ -1,6 +1,8 @@
 package com.api.data.business;
 
-// #region Import
+// #region Imports
+
+import java.util.Date;
 import com.api.entities.business.Category;
 import com.api.entities.business.Brand;
 
@@ -32,7 +34,8 @@ public class ProductDataAccess extends BaseDataAccess {
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
             "INNER JOIN Category C ON P.brandId = B.id " +
-            "WHERE P.id = ?;";
+            "WHERE P.id = ? " +
+            "AND P.deletedAt IS NULL;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -64,7 +67,8 @@ public class ProductDataAccess extends BaseDataAccess {
             "FROM " +
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.brandId = B.id ";
+            "INNER JOIN Category C ON P.brandId = B.id " +
+            "WHERE P.deletedAt IS NULL;";
 
         try {
             statement = Connection.getInstancia().getConn().createStatement();
@@ -169,6 +173,30 @@ public class ProductDataAccess extends BaseDataAccess {
         }
 
         return false;
+    }
+
+    public Product deleteProduct(Product product) {
+        query = "UPDATE Product SET deletedAt = ? WHERE id = ?;";
+        Date now = new Date();
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
+            ((PreparedStatement)statement).setInt(2, product.getId());
+
+            int editionAmt = ((PreparedStatement)statement).executeUpdate();
+
+            if (editionAmt == 1)
+                product.setDeletedAt(now);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return product;
     }
 
     // #endregion
