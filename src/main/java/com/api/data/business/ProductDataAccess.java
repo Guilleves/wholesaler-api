@@ -67,7 +67,7 @@ public class ProductDataAccess extends BaseDataAccess {
             "FROM " +
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.brandId = B.id " +
+            "INNER JOIN Category C ON P.categoryId = C.id " +
             "WHERE P.deletedAt IS NULL;";
 
         try {

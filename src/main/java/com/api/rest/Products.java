@@ -48,23 +48,18 @@ public class Products {
     @Secured()
     @Path("/")
     public Response getProducts(@QueryParam("brandId") int brandId) {
-        if (brandId == 0) {
             GetProductsByBrandRequest request = new GetProductsByBrandRequest(brandId);
 
             try {
-                return Response.ok(pl.getProductsByBrand(request)).build();
+                if (brandId == 0) {
+                    return Response.ok(pl.getProducts()).build();
+                } else {
+                    return Response.ok(pl.getProductsByBrand(request)).build();
+                }
             }
             catch(ApiException e) {
                 return Response.status(e.getStatus()).entity(e.getErrors()).build();
             }
-        } else {
-            try {
-                return Response.ok(pl.getProducts()).build();
-            }
-            catch(ApiException e) {
-                return Response.status(e.getStatus()).entity(e.getErrors()).build();
-            }
-        }
     }
 
     @GET
