@@ -3,6 +3,7 @@ package com.api.rest;
 // #region Imports
 
 import com.api.entities.business.User;
+import com.api.entities.models.proposal.SaveProposalRequest;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
@@ -15,10 +16,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.api.entities.models.product.GetProductRequest;
-import com.api.entities.models.product.SaveProductRequest;
+import com.api.entities.models.proposal.GetProposalRequest;
 
-import com.api.logic.business.ProductLogic;
+import com.api.logic.business.ProposalLogic;
 
 import com.api.logic.validations.ApiException;
 
@@ -26,28 +26,28 @@ import com.api.rest.security.Secured;
 
 // #endregion
 
-@Path("/products")
-public class Products {
-    private ProductLogic pl;
+@Path("/proposals")
+public class Proposal {
+    private ProposalLogic pl;
 
     // #region Constructors
 
-    public Products() {
-        pl = new ProductLogic();
+    public Proposal() {
+        pl = new ProposalLogic();
     }
 
     // #endregion
 
-    // #region ProductSetup
+    // #region ProposalSetup
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProducts() {
+    public Response getProposals() {
         try {
-            return Response.ok(pl.getProducts()).build();
+            return Response.ok(pl.getProposals()).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -58,12 +58,12 @@ public class Products {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
-    @Path("/{productId}")
-    public Response getProduct(@PathParam("productId") int productId) {
-        GetProductRequest request = new GetProductRequest(productId);
+    @Path("/{proposalId}")
+    public Response getProduct(@PathParam("proposalId") int proposalId) {
+        GetProposalRequest request = new GetProposalRequest(proposalId);
 
         try {
-            return Response.ok(pl.getProduct(request)).build();
+            return Response.ok(pl.getProposal(request)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -75,11 +75,10 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response saveProduct(@Context SecurityContext context, SaveProductRequest request) {
+    public Response saveProposal(@Context SecurityContext context, SaveProposalRequest request) {
         try {
-            User loggedUser = ((UserPrincipal)context.getUserPrincipal()).getUser();
-            pl.saveProduct(request, loggedUser);
-            return Response.ok().build();
+            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            return Response.ok(pl.saveProposal(request, user)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
