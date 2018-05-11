@@ -16,6 +16,13 @@ public class Retail extends Organization {
         super.setRole("retail");
 	}
 
+	/**
+	* Inheritance Constructor
+	*/
+	public Retail(int id, String name, String cuit, String legalName, String role) {
+		super(id, name, cuit, legalName, role);
+	}
+
     /**
     * SQL Constructor
     */
