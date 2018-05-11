@@ -87,7 +87,7 @@ public class ProductLogic {
     public ArrayList<GetProductsByBrandResponse> getProductsByBrand(GetProductsByBrandRequest request) throws ApiException {
         ArrayList<GetProductsByBrandResponse> response = new ArrayList<GetProductsByBrandResponse>();
 
-        ArrayList<Product> products = pda.getProducts();
+        ArrayList<Product> products = pda.getProductsByBrand(request.getBrandId());
 
         if (products == null || products.isEmpty())
             throw new ApiException("There are no products with that brand yet.", Status.NOT_FOUND);
