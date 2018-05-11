@@ -45,7 +45,9 @@ public class ProposalDataAccess extends BaseDataAccess {
             "INNER JOIN Product Pr ON PL.productId = Pr.id " +
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
             "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "WHERE P.id = ?;";
+            "WHERE P.id = ? " +
+            "AND P.deletedAt IS NULL " +
+            "AND PL.deletedAt IS NULL;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -91,7 +93,9 @@ public class ProposalDataAccess extends BaseDataAccess {
             "INNER JOIN ProposalLine PL ON P.id = PL.proposalId " +
             "INNER JOIN Product Pr ON PL.productId = Pr.id " +
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
-            "INNER JOIN Category C ON Pr.categoryId = C.id;";
+            "INNER JOIN Category C ON Pr.categoryId = C.id " +
+            "AND P.deletedAt IS NULL " +
+            "AND PL.deletedAt IS NULL;";
 
         try {
             statement = Connection.getInstancia().getConn().createStatement();
@@ -323,4 +327,6 @@ public class ProposalDataAccess extends BaseDataAccess {
 
         return proposals;
     }
+
+    // #endregion
 }

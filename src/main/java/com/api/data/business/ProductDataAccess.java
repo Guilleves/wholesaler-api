@@ -32,7 +32,8 @@ public class ProductDataAccess extends BaseDataAccess {
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
             "INNER JOIN Category C ON P.brandId = B.id " +
-            "WHERE P.id = ?;";
+            "WHERE P.id = ? " +
+            "AND P.deletedAt IS NULL;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -64,7 +65,8 @@ public class ProductDataAccess extends BaseDataAccess {
             "FROM " +
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.brandId = B.id ";
+            "INNER JOIN Category C ON P.brandId = B.id " +
+            "WHERE P.deletedAt IS NULL;";
 
         try {
             statement = Connection.getInstancia().getConn().createStatement();
