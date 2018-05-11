@@ -1,10 +1,13 @@
 package com.api.entities.business;
 
+import java.util.Date;
+
 public class ProposalLine {
     private int id;
     private Proposal proposal;
     private Product product;
     private float price;
+    private Date deletedAt;
 
 	/**
 	* Default empty ProposalLine constructor
@@ -87,6 +90,14 @@ public class ProposalLine {
 	public void setPrice(float price) {
 		this.price = price;
 	}
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date date) {
+        this.deletedAt = date;
+    }
 
 	/**
 	* Create string representation of ProposalLine for printing
