@@ -28,7 +28,7 @@ public class Retail extends Organization {
     * SQL Constructor
     */
     public Retail(ResultSet rs) throws SQLException {
-        super();
+        super(rs);
         super.setRole(OrganizationRoles.RETAIL);
     }
 }

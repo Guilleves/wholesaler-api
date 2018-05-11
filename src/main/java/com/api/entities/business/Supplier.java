@@ -30,7 +30,7 @@ public class Supplier extends Organization {
     * SQL Constructor
     */
     public Supplier(ResultSet rs) throws SQLException {
-        super();
+        super(rs);
         super.setRole(OrganizationRoles.SUPPLIER);
     }
 
