@@ -2,6 +2,8 @@ package com.api.rest;
 
 // #region Imports
 
+import javax.ws.rs.QueryParam;
+import com.api.entities.models.organization.GetOrganizationsRequest;
 import com.api.entities.models.organization.SaveOrganizationRequest;
 import com.api.entities.models.organization.GetOrganizationRequest;
 import javax.ws.rs.GET;
@@ -39,9 +41,29 @@ public class Organizations {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
+    @Path("/")
+    public Response getOrganizations(@QueryParam("role") String role) {
+        GetOrganizationsRequest request = new GetOrganizationsRequest();
+
+        request.setRole(role);
+
+        try {
+            return Response.ok(ol.getOrganizations(request)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
     @Path("/{organizationId}")
     public Response getOrganization(@PathParam("organizationId") int organizationId) {
         GetOrganizationRequest request = new GetOrganizationRequest();
+
+        request.setOrganizationId(organizationId);
 
         try {
             return Response.ok(ol.getOrganization(request)).build();

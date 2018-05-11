@@ -48,9 +48,37 @@ public class OrganizationDataAccess extends BaseDataAccess {
         return organizations;
     }
 
+    public ArrayList<Organization> getOrganizations(String role) {
+        ArrayList<Organization> organizations = new ArrayList<Organization>();
+        query = "SELECT * FROM Organization WHERE role = ?;";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setString(1, role);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            while(resultSet.next()) {
+                // Organization factory
+                if (resultSet.getString("role").equals(OrganizationRoles.SUPPLIER))
+                    organizations.add(new Supplier(resultSet));
+                else
+                    organizations.add(new Retail(resultSet));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return organizations;
+    }
+
     public Organization getOrganization(int organizationId) {
         Organization organization = null;
-        query = "SELECT * FROM Organization WHERE organizationId = ?;";
+        query = "SELECT * FROM Organization WHERE id = ?;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -77,15 +105,18 @@ public class OrganizationDataAccess extends BaseDataAccess {
     }
 
     public Organization createOrganization(Organization organization) {
-        query = "INSERT INTO Organization (name, legalName, cuit) VALUES (?, ?, ?);";
+        query = "INSERT INTO Organization (name, legalName, cuit, role) VALUES (?, ?, ?, ?);";
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ((PreparedStatement)statement).setString(1, organization.getName());
             ((PreparedStatement)statement).setString(2, organization.getLegalName());
             ((PreparedStatement)statement).setString(3, organization.getCuit());
+            ((PreparedStatement)statement).setString(4, organization.getRole());
+
             ((PreparedStatement)statement).executeUpdate();
 
             resultSet = statement.getGeneratedKeys();
+
             if (resultSet.next())
                 organization.setId(resultSet.getInt(1));
         }
