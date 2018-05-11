@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class SaveProposalRequest implements Serializable {
     static final long serialVersionUID = 0L;
 
-    private String description;
+    private String title, description;
     private Date beginDate, endDate;
     private ArrayList<Line> lines;
 
@@ -26,8 +26,9 @@ public class SaveProposalRequest implements Serializable {
 	/**
 	* Default SaveProposalRequest constructor
 	*/
-	public SaveProposalRequest(String description, Date beginDate, Date endDate, ArrayList<Line> lines) {
+	public SaveProposalRequest(String title, String description, Date beginDate, Date endDate, ArrayList<Line> lines) {
 		super();
+        this.title = title;
 		this.description = description;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
@@ -36,7 +37,23 @@ public class SaveProposalRequest implements Serializable {
 
 
     // #region Getters and setters
-	/**
+    /**
+    * Returns value of title
+    * @return
+    */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+    * Sets new value of title
+    * @param
+    */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
 	* Returns value of description
 	* @return
 	*/

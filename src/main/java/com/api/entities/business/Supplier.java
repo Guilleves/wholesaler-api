@@ -20,6 +20,21 @@ public class Supplier extends Organization {
 	}
 
 	/**
+	* Default empty Supplier constructor
+	*/
+	public Supplier(Organization organization) {
+		super(
+			organization.getId(),
+			organization.getName(),
+			organization.getCuit(),
+			organization.getLegalName(),
+			organization.getRole()
+		);
+		
+        super.setRole(OrganizationRoles.SUPPLIER);
+	}
+
+	/**
 	* Inheritance Constructor
 	*/
 	public Supplier(int id, String name, String cuit, String legalName, String role) {
