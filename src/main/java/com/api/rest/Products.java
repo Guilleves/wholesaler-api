@@ -46,9 +46,7 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    @QueryParam("brandId")
-    public Response getProducts() {
-        int brandId = 0;
+    public Response getProducts(@QueryParam("brandId") int brandId) {
         if (brandId == 0) {
             GetProductsByBrandRequest request = new GetProductsByBrandRequest(brandId);
 
