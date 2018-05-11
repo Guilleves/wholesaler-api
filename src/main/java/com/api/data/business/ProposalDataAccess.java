@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import java.util.Date;
 import com.api.entities.business.Organization;
 import java.util.HashMap;
 import java.sql.ResultSet;
@@ -45,7 +46,9 @@ public class ProposalDataAccess extends BaseDataAccess {
             "INNER JOIN Product Pr ON PL.productId = Pr.id " +
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
             "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "WHERE P.id = ?;";
+            "WHERE P.id = ? " +
+            "AND P.deletedAt IS NULL " +
+            "AND PL.deletedAt IS NULL;";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -91,7 +94,9 @@ public class ProposalDataAccess extends BaseDataAccess {
             "INNER JOIN ProposalLine PL ON P.id = PL.proposalId " +
             "INNER JOIN Product Pr ON PL.productId = Pr.id " +
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
-            "INNER JOIN Category C ON Pr.categoryId = C.id;";
+            "INNER JOIN Category C ON Pr.categoryId = C.id " +
+            "AND P.deletedAt IS NULL " +
+            "AND PL.deletedAt IS NULL;";
 
         try {
             statement = Connection.getInstancia().getConn().createStatement();
@@ -108,6 +113,54 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
 
         return proposals;
+    }
+
+    public Proposal deleteProposal(Proposal proposal) {
+        query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
+        Date now = new Date();
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
+            ((PreparedStatement)statement).setInt(2, proposal.getId());
+
+            int editionAmt = ((PreparedStatement)statement).executeUpdate();
+
+            if (editionAmt == 1)
+                proposal.setDeletedAt(now);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposal;
+    }
+
+    public ProposalLine deleteProposalLine(ProposalLine proposalLine) {
+        query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
+        Date now = new Date();
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
+            ((PreparedStatement)statement).setInt(2, proposalLine.getId());
+
+            int editionAmt = ((PreparedStatement)statement).executeUpdate();
+
+            if (editionAmt == 1)
+                proposalLine.setDeletedAt(now);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposalLine;
     }
 
     public Proposal registerProposal(Proposal proposal) {
@@ -323,4 +376,6 @@ public class ProposalDataAccess extends BaseDataAccess {
 
         return proposals;
     }
+
+    // #endregion
 }

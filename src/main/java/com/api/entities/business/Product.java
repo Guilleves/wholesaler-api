@@ -1,5 +1,6 @@
 package com.api.entities.business;
 
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -8,6 +9,7 @@ public class Product {
     private String name, gtin;
     private Brand brand;
     private Category category;
+    private Date deletedAt;
 
 	/**
 	* Default empty Product constructor
@@ -125,6 +127,14 @@ public class Product {
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date date) {
+        this.deletedAt = date;
+    }
 
 	/**
 	* Create string representation of Product for printing

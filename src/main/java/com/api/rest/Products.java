@@ -4,6 +4,7 @@ package com.api.rest;
 
 import javax.ws.rs.QueryParam;
 import com.api.entities.models.product.GetProductsByBrandRequest;
+import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
@@ -89,7 +90,8 @@ public class Products {
     @Path("/")
     public Response saveProduct(@Context SecurityContext context, SaveProductRequest request) {
         try {
-            pl.saveProduct(request, (UserPrincipal)context.getUserPrincipal());
+            User loggedUser = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            pl.saveProduct(request, loggedUser);
             return Response.ok().build();
         }
         catch(ApiException e) {

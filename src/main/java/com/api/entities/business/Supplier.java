@@ -19,11 +19,18 @@ public class Supplier extends Organization {
         super.setRole(OrganizationRoles.SUPPLIER);
 	}
 
+	/**
+	* Inheritance Constructor
+	*/
+	public Supplier(int id, String name, String cuit, String legalName, String role) {
+		super(id, name, cuit, legalName, role);
+	}
+
     /**
     * SQL Constructor
     */
     public Supplier(ResultSet rs) throws SQLException {
-        super();
+        super(rs);
         super.setRole(OrganizationRoles.SUPPLIER);
     }
 
