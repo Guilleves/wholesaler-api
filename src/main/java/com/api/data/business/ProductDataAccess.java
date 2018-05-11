@@ -67,7 +67,7 @@ public class ProductDataAccess extends BaseDataAccess {
             "FROM " +
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.brandId = B.id " +
+            "INNER JOIN Category C ON P.categoryId = C.id " +
             "WHERE P.deletedAt IS NULL;";
 
         try {
@@ -255,6 +255,31 @@ public class ProductDataAccess extends BaseDataAccess {
         }
 
         return category;
+    }
+
+    public ArrayList<Product> getProductsByBrand(int brandId) {
+        ArrayList<Product> products = new ArrayList<Product>();
+
+        query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE p.brandId = ?";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, brandId);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            while(resultSet.next()) {
+                products.add(new Product(resultSet));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return products;
     }
 
     // #endregion
