@@ -32,10 +32,11 @@ public class ConsoleTest {
         // updateProduct();
         // getProduct();
         // getProducts();
+        getProductsByBrand(1);
 
         // #region Supplier
 
-        saveSupplier();
+        // saveSupplier();
         // updateProduct();
         // getProduct();
         // getProducts();
@@ -107,6 +108,16 @@ public class ConsoleTest {
 
     private static void getProducts() {
         ArrayList<Product> products = productData.getProducts();
+
+        for(Product product : products) {
+            System.out.println(product.toString());
+        }
+
+        System.out.println("End of product list.");
+    }
+
+    private static void getProductsByBrand(int brandId) {
+        ArrayList<Product> products = productData.getProductsByBrand(brandId);
 
         for(Product product : products) {
             System.out.println(product.toString());

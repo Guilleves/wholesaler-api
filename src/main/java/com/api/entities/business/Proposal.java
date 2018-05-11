@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Proposal {
     private int id;
-    private Date beginDate, endDate;
+    private Date beginDate, endDate, deletedAt;
     private String title, description;
     private ArrayList<ProposalLine> proposalLines;
     private Supplier supplier;
@@ -14,7 +14,8 @@ public class Proposal {
 	* Default empty Proposal constructor
 	*/
 	public Proposal() {
-		super();
+        super();
+        proposalLines = new ArrayList<ProposalLine>();
 	}
 
 	/**
@@ -22,6 +23,8 @@ public class Proposal {
 	*/
 	public Proposal(int id, Date beginDate, Date endDate, String title, String description, ArrayList<ProposalLine> proposalLines, Supplier supplier) {
 		super();
+        proposalLines = new ArrayList<ProposalLine>();
+        
 		this.id = id;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
@@ -143,7 +146,15 @@ public class Proposal {
 		this.supplier = supplier;
 	}
 
-    /**
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date date) {
+        this.deletedAt = date;
+    }
+
+	/**
 	* Create string representation of Proposal for printing
 	* @return
 	*/

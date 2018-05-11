@@ -1,6 +1,7 @@
 package com.api.entities.business;
 
 // #region Imports
+import com.api.entities.enums.OrganizationRoles;
 import com.api.data.business.ProposalDataAccess;
 import java.util.ArrayList;
 import java.sql.ResultSet;
@@ -15,15 +16,37 @@ public class Supplier extends Organization {
 	*/
 	public Supplier() {
 		super();
-        super.setRole("supplier");
+        super.setRole(OrganizationRoles.SUPPLIER);
+	}
+
+	/**
+	* Default empty Supplier constructor
+	*/
+	public Supplier(Organization organization) {
+		super(
+			organization.getId(),
+			organization.getName(),
+			organization.getCuit(),
+			organization.getLegalName(),
+			organization.getRole()
+		);
+		
+        super.setRole(OrganizationRoles.SUPPLIER);
+	}
+
+	/**
+	* Inheritance Constructor
+	*/
+	public Supplier(int id, String name, String cuit, String legalName, String role) {
+		super(id, name, cuit, legalName, role);
 	}
 
     /**
     * SQL Constructor
     */
     public Supplier(ResultSet rs) throws SQLException {
-        super();
-        super.setRole("supplier");
+        super(rs);
+        super.setRole(OrganizationRoles.SUPPLIER);
     }
 
     public ArrayList<Proposal> getProposals(int organizationId) {

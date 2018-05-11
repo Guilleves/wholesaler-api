@@ -3,7 +3,6 @@ package com.api.logic.business;
 import com.api.entities.business.Supplier;
 import com.api.data.business.UserDataAccess;
 import com.api.entities.business.User;
-import com.api.rest.security.UserPrincipal;
 import com.api.entities.business.Product;
 import com.api.data.business.ProductDataAccess;
 import com.api.entities.models.proposal.SaveProposalRequest.Line;
@@ -20,12 +19,10 @@ import com.api.data.business.ProposalDataAccess;
 public class ProposalLogic {
     private ProposalDataAccess pda;
     private ProductDataAccess productDa;
-    private UserDataAccess uda;
 
     public ProposalLogic() {
         pda = new ProposalDataAccess();
         productDa = new ProductDataAccess();
-        uda = new UserDataAccess();
     }
 
     public ArrayList<GetProposalResponse> getProposals() throws ApiException {
@@ -63,11 +60,11 @@ public class ProposalLogic {
         );
     }
 
-    public GetProposalResponse saveProposal(SaveProposalRequest request, UserPrincipal loggedUser) throws ApiException {
+    public GetProposalResponse saveProposal(SaveProposalRequest request, User loggedUser) throws ApiException {
         Proposal proposal = new Proposal();
 
         // Only suppliers can create Proposals
-        if(!(loggedUser.getRole().equals("supplier")))
+        if(!(loggedUser.getOrganization().getRole().equals("supplier")))
             throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
         // Validate fields.
@@ -96,10 +93,8 @@ public class ProposalLogic {
             lines.add(proposalLine);
         }
 
-        User user = uda.getUser(loggedUser.getId());
-
         // Set primitive data.
-        proposal.setSupplier((Supplier)(user.getOrganization()));
+        proposal.setSupplier(new Supplier(loggedUser.getOrganization()));
         proposal.setTitle(request.getTitle());
         proposal.setDescription(request.getDescription());
         proposal.setBeginDate(request.getBeginDate());

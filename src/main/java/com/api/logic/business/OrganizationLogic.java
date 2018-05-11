@@ -2,6 +2,8 @@ package com.api.logic.business;
 
 // #region Imports
 
+import com.api.entities.models.organization.GetOrganizationsRequest;
+import com.api.entities.enums.OrganizationRoles;
 import com.api.entities.business.Supplier;
 import com.api.entities.business.Retail;
 import com.api.entities.models.organization.SaveOrganizationRequest;
@@ -37,18 +39,19 @@ public class OrganizationLogic {
 
       Organization organization;
 
-      if (request.getRole() == "supplier")
+      if (request.getRole().equals(OrganizationRoles.SUPPLIER))
           organization = new Supplier();
       else
           organization = new Retail();
 
       organization.setId(request.getId());
       organization.setRole(request.getRole());
+      organization.setCuit(request.getCuit());
       organization.setLegalName(request.getLegalName());
       organization.setName(request.getName());
 
       if (organization.getId() == 0)
-          oda.createOrganization(organization);
+          organization = oda.createOrganization(organization);
       else
           oda.updateOrganization(organization);
 
@@ -67,17 +70,23 @@ public class OrganizationLogic {
         organization.getId(),
         organization.getName(),
         organization.getLegalName(),
-        organization.getCuit()
+        organization.getCuit(),
+        organization.getRole()
     );
 
     return response;
   }
 
-  public ArrayList<GetOrganizationResponse> getOrganizations() throws ApiException {
+  public ArrayList<GetOrganizationResponse> getOrganizations(GetOrganizationsRequest request) throws ApiException {
     ArrayList<GetOrganizationResponse> response = new ArrayList<GetOrganizationResponse>();
 
     // Fetch organization list.
-    ArrayList<Organization> organizations = oda.getOrganizations();
+    ArrayList<Organization> organizations;
+
+    if (request.getRole() == null || request.getRole().isEmpty())
+        organizations = oda.getOrganizations();
+    else
+        organizations = oda.getOrganizations(request.getRole());
 
     if (organizations == null || organizations.isEmpty()) {
       throw new ApiException("Couldn't find organizations.", Status.NOT_FOUND);
@@ -89,7 +98,8 @@ public class OrganizationLogic {
         organization.getId(),
         organization.getName(),
         organization.getLegalName(),
-        organization.getCuit()
+        organization.getCuit(),
+        organization.getRole()
       ));
     }
 

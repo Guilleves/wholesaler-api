@@ -2,6 +2,9 @@ package com.api.rest;
 
 // #region Imports
 
+import javax.ws.rs.QueryParam;
+import com.api.entities.models.product.GetProductsByBrandRequest;
+import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
@@ -44,13 +47,19 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProducts() {
-        try {
-            return Response.ok(pl.getProducts()).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    public Response getProducts(@QueryParam("brandId") int brandId) {
+            GetProductsByBrandRequest request = new GetProductsByBrandRequest(brandId);
+
+            try {
+                if (brandId == 0) {
+                    return Response.ok(pl.getProducts()).build();
+                } else {
+                    return Response.ok(pl.getProductsByBrand(request)).build();
+                }
+            }
+            catch(ApiException e) {
+                return Response.status(e.getStatus()).entity(e.getErrors()).build();
+            }
     }
 
     @GET
@@ -76,7 +85,8 @@ public class Products {
     @Path("/")
     public Response saveProduct(@Context SecurityContext context, SaveProductRequest request) {
         try {
-            pl.saveProduct(request, (UserPrincipal)context.getUserPrincipal());
+            User loggedUser = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            pl.saveProduct(request, loggedUser);
             return Response.ok().build();
         }
         catch(ApiException e) {

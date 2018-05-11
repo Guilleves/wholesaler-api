@@ -1,10 +1,12 @@
 package com.api.logic.business;
 
 // #region Imports
-
+import com.api.entities.business.User;
+import com.api.entities.models.product.GetProductsByBrandRequest;
+import com.api.entities.models.product.GetProductsByBrandResponse;
+import com.api.entities.enums.OrganizationRoles;
 import javax.ws.rs.core.Response.Status;
 
-import com.api.rest.security.UserPrincipal;
 import com.api.entities.models.product.SaveProductRequest;
 import com.api.entities.models.product.SaveProductResponse;
 
@@ -82,10 +84,33 @@ public class ProductLogic {
         return response;
     }
 
-    public SaveProductResponse saveProduct(SaveProductRequest request, UserPrincipal loggedUser) throws ApiException {
+    public ArrayList<GetProductsByBrandResponse> getProductsByBrand(GetProductsByBrandRequest request) throws ApiException {
+        ArrayList<GetProductsByBrandResponse> response = new ArrayList<GetProductsByBrandResponse>();
+
+        ArrayList<Product> products = pda.getProductsByBrand(request.getBrandId());
+
+        if (products == null || products.isEmpty())
+            throw new ApiException("There are no products with that brand yet.", Status.NOT_FOUND);
+
+        for (Product product : products) {
+            response.add(new GetProductsByBrandResponse(
+                product.getId(),
+                product.getName(),
+                product.getGtin(),
+                product.getBrand().getId(),
+                product.getBrand().getName(),
+                product.getCategory().getId(),
+                product.getCategory().getName()
+            ));
+        }
+
+        return response;
+    }
+
+    public SaveProductResponse saveProduct(SaveProductRequest request, User loggedUser) throws ApiException {
         SaveProductResponse response = new SaveProductResponse();
 
-        if(!(loggedUser.getRole().equals("supplier")))
+        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
             throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
         // Search brand.
