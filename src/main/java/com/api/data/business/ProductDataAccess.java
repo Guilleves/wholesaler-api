@@ -1,6 +1,8 @@
 package com.api.data.business;
 
-// #region Import
+// #region Imports
+
+import java.util.Date;
 import com.api.entities.business.Category;
 import com.api.entities.business.Brand;
 
@@ -171,6 +173,30 @@ public class ProductDataAccess extends BaseDataAccess {
         }
 
         return false;
+    }
+
+    public Product deleteProduct(Product product) {
+        query = "UPDATE Product SET deletedAt = ? WHERE id = ?;";
+        Date now = new Date();
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
+            ((PreparedStatement)statement).setInt(2, product.getId());
+
+            int editionAmt = ((PreparedStatement)statement).executeUpdate();
+
+            if (editionAmt == 1)
+                product.setDeletedAt(now);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return product;
     }
 
     // #endregion

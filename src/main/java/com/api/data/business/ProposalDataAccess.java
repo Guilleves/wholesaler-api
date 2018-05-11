@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import java.util.Date;
 import com.api.entities.business.Organization;
 import java.util.HashMap;
 import java.sql.ResultSet;
@@ -112,6 +113,54 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
 
         return proposals;
+    }
+
+    public Proposal deleteProposal(Proposal proposal) {
+        query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
+        Date now = new Date();
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
+            ((PreparedStatement)statement).setInt(2, proposal.getId());
+
+            int editionAmt = ((PreparedStatement)statement).executeUpdate();
+
+            if (editionAmt == 1)
+                proposal.setDeletedAt(now);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposal;
+    }
+
+    public ProposalLine deleteProposalLine(ProposalLine proposalLine) {
+        query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
+        Date now = new Date();
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
+            ((PreparedStatement)statement).setInt(2, proposalLine.getId());
+
+            int editionAmt = ((PreparedStatement)statement).executeUpdate();
+
+            if (editionAmt == 1)
+                proposalLine.setDeletedAt(now);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposalLine;
     }
 
     public Proposal registerProposal(Proposal proposal) {
