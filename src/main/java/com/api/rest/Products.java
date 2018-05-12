@@ -3,7 +3,7 @@ package com.api.rest;
 // #region Imports
 
 import javax.ws.rs.QueryParam;
-import com.api.entities.models.product.GetProductsByBrandRequest;
+import com.api.entities.models.product.GetProductsByFilterRequest;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
@@ -47,14 +47,14 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProducts(@QueryParam("brandId") int brandId) {
-            GetProductsByBrandRequest request = new GetProductsByBrandRequest(brandId);
+    public Response getProducts(@QueryParam("brandId") int brandId, @QueryParam("categoryId") int categoryId, @QueryParam("keyword") String keyword) {
+            GetProductsByFilterRequest request = new GetProductsByFilterRequest(brandId, categoryId, keyword);
 
             try {
-                if (brandId == 0) {
+                if (brandId == 0 && categoryId == 0 && keyword == null) {
                     return Response.ok(pl.getProducts()).build();
                 } else {
-                    return Response.ok(pl.getProductsByBrand(request)).build();
+                    return Response.ok(pl.getProductsByFilter(request)).build();
                 }
             }
             catch(ApiException e) {
