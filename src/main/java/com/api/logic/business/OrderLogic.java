@@ -27,16 +27,10 @@ public class OrderLogic {
         ArrayList<GetOrderResponse> response = new ArrayList<GetOrderResponse>();
 
         for (Order order : orders) {
-            ArrayList<GetOrderResponse.OrderLine> lineResponse = new ArrayList<GetOrderResponse.OrderLine>();
-
-            for(OrderLine orderLine : order.getOrderLines()) {
-                lineResponse.add(getOrderLine(orderLine));
-            }
-
             response.add(new GetOrderResponse(
                 order.getId(),
                 order.getDateOrdered(),
-                lineResponse,
+                getOrderLine(order.getOrderLines()),
                 new GetOrganizationResponse(
                     order.getRetail().getId(),
                     order.getRetail().getName(),
@@ -56,16 +50,11 @@ public class OrderLogic {
         if (order == null)
             throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
 
-        ArrayList<GetOrderResponse.OrderLine> lineResponse = new ArrayList<GetOrderResponse.OrderLine>();
-
-        for(OrderLine orderLine : order.getOrderLines()) {
-            lineResponse.add(getOrderLine(orderLine));
-        }
 
         return new GetOrderResponse(
             order.getId(),
             order.getDateOrdered(),
-            lineResponse,
+            getOrderLine(order.getOrderLines()),
             new GetOrganizationResponse(
                 order.getRetail().getId(),
                 order.getRetail().getName(),
@@ -76,30 +65,36 @@ public class OrderLogic {
         );
     }
 
-    private GetOrderResponse.OrderLine getOrderLine(OrderLine orderLine) {
-        return new GetOrderResponse.OrderLine(
-            orderLine.getId(),
-            orderLine.getQuantity(),
-            new GetOrderResponse.OrderLine.ProposalLine(
-                orderLine.getProposalLine().getId(),
-                new GetOrderResponse.OrderLine.ProposalLine.Proposal(
-                    orderLine.getProposalLine().getProposal().getId(),
-                    orderLine.getProposalLine().getProposal().getBeginDate(),
-                    orderLine.getProposalLine().getProposal().getEndDate(),
-                    orderLine.getProposalLine().getProposal().getTitle(),
-                    orderLine.getProposalLine().getProposal().getDescription()
-                ),
-                new GetProductResponse(
-                    orderLine.getProposalLine().getProduct().getId(),
-                    orderLine.getProposalLine().getProduct().getName(),
-                    orderLine.getProposalLine().getProduct().getGtin(),
-                    orderLine.getProposalLine().getProduct().getBrand().getId(),
-                    orderLine.getProposalLine().getProduct().getBrand().getName(),
-                    orderLine.getProposalLine().getProduct().getCategory().getId(),
-                    orderLine.getProposalLine().getProduct().getCategory().getName()
-                ),
-                orderLine.getProposalLine().getPrice()
-            )
-        );
+    private ArrayList<GetOrderResponse.OrderLine> getOrderLine(ArrayList<OrderLine> orderLines) {
+        ArrayList<GetOrderResponse.OrderLine> lineResponse = new ArrayList<GetOrderResponse.OrderLine>();
+
+        for(OrderLine orderLine : orderLines) {
+            lineResponse.add(new GetOrderResponse.OrderLine(
+                orderLine.getId(),
+                orderLine.getQuantity(),
+                new GetOrderResponse.OrderLine.ProposalLine(
+                    orderLine.getProposalLine().getId(),
+                    new GetOrderResponse.OrderLine.ProposalLine.Proposal(
+                        orderLine.getProposalLine().getProposal().getId(),
+                        orderLine.getProposalLine().getProposal().getBeginDate(),
+                        orderLine.getProposalLine().getProposal().getEndDate(),
+                        orderLine.getProposalLine().getProposal().getTitle(),
+                        orderLine.getProposalLine().getProposal().getDescription()
+                    ),
+                    new GetProductResponse(
+                        orderLine.getProposalLine().getProduct().getId(),
+                        orderLine.getProposalLine().getProduct().getName(),
+                        orderLine.getProposalLine().getProduct().getGtin(),
+                        orderLine.getProposalLine().getProduct().getBrand().getId(),
+                        orderLine.getProposalLine().getProduct().getBrand().getName(),
+                        orderLine.getProposalLine().getProduct().getCategory().getId(),
+                        orderLine.getProposalLine().getProduct().getCategory().getName()
+                    ),
+                    orderLine.getProposalLine().getPrice()
+                )
+            ));
+        }
+
+        return lineResponse;
     }
 }
