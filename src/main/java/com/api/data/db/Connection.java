@@ -21,7 +21,6 @@ public class Connection {
 	private static String dbUrl;
 	private static String dbUser;
 	private static String dbPassword;
-	private static String env = "DEV";
 
 	private java.sql.Connection conn;
 	static int cantCon=0;
@@ -42,17 +41,9 @@ public class Connection {
 			input = getClass().getResourceAsStream("/config.properties");
 
 			prop.load(input);
-
-			if (env.equals("PRD")) {
-				dbUrl = prop.getProperty("db-url-prd");
-				dbUser = prop.getProperty("db-user-prd");
-				dbPassword = prop.getProperty("db-password-prd");
-			}
-			else if (env.equals("DEV")) {
-				dbUrl = prop.getProperty("db-url-dev");
-				dbUser = prop.getProperty("db-user-dev");
-				dbPassword = prop.getProperty("db-password-dev");
-			}
+			dbUrl = prop.getProperty("db-url");
+			dbUser = prop.getProperty("db-user");
+			dbPassword = prop.getProperty("db-password");
 
 			if (conn == null || !conn.isValid(3)) {
 				Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -84,7 +75,7 @@ public class Connection {
 	public void closeConn() {
 		try {
 			cantCon--;
-			
+
 			if(cantCon==0)
 			conn.close();
 		}
