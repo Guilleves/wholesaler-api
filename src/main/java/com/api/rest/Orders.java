@@ -37,6 +37,20 @@ public class Orders {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
+    @Path("/")
+    public Response getOrders() {
+        try {
+            return Response.ok(ol.getOrders()).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
     @Path("/{orderId}")
     public Response getOrder(@PathParam("orderId") int orderId) {
         GetOrderRequest request = new GetOrderRequest(orderId);
