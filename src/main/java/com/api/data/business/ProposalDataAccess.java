@@ -2,7 +2,6 @@ package com.api.data.business;
 
 import com.api.entities.business.Supplier;
 import java.util.Date;
-import com.api.entities.business.Organization;
 import java.util.HashMap;
 import java.sql.ResultSet;
 import java.util.ArrayList;
