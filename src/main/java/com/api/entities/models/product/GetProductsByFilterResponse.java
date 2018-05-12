@@ -1,16 +1,16 @@
 package com.api.entities.models.product;
 
-public class GetProductsByBrandResponse {
+public class GetProductsByFilterResponse {
     private int id;
     private String name, gtin;
     private Brand brand;
     private Category category;
 
-	public GetProductsByBrandResponse() {
+	public GetProductsByFilterResponse() {
 		super();
 	}
 
-	public GetProductsByBrandResponse(int id, String name, String gtin, int brandId, String brandName, int categoryId, String categoryName) {
+	public GetProductsByFilterResponse(int id, String name, String gtin, int brandId, String brandName, int categoryId, String categoryName) {
 		super();
 		this.id = id;
 		this.name = name;

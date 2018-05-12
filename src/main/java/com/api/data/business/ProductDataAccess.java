@@ -257,14 +257,20 @@ public class ProductDataAccess extends BaseDataAccess {
         return category;
     }
 
-    public ArrayList<Product> getProductsByBrand(int brandId) {
+    public ArrayList<Product> getProductsByFilter(int brandId, int categoryId, String keyword) {
         ArrayList<Product> products = new ArrayList<Product>();
-
-        query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE p.brandId = ?";
+        query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE (p.brandId = ? or ? = 0) AND (p.categoryId = ? or ? = 0) AND (p.name LIKE ? or b.name LIKE ? or c.name LIKE ? or ? is null)";
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ((PreparedStatement)statement).setInt(1, brandId);
+            ((PreparedStatement)statement).setInt(2, brandId);
+            ((PreparedStatement)statement).setInt(3, categoryId);
+            ((PreparedStatement)statement).setInt(4, categoryId);
+            ((PreparedStatement)statement).setString(5, '%' + keyword + '%');
+            ((PreparedStatement)statement).setString(6, '%' + keyword + '%');
+            ((PreparedStatement)statement).setString(7, '%' + keyword + '%');
+            ((PreparedStatement)statement).setString(8, keyword);
 
             resultSet = ((PreparedStatement)statement).executeQuery();
 
@@ -281,6 +287,5 @@ public class ProductDataAccess extends BaseDataAccess {
 
         return products;
     }
-
     // #endregion
 }

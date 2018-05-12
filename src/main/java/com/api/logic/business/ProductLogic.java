@@ -1,9 +1,9 @@
 package com.api.logic.business;
 
 // #region Imports
+import com.api.entities.models.product.GetProductsByFilterResponse;
+import com.api.entities.models.product.GetProductsByFilterRequest;
 import com.api.entities.business.User;
-import com.api.entities.models.product.GetProductsByBrandRequest;
-import com.api.entities.models.product.GetProductsByBrandResponse;
 import com.api.entities.enums.OrganizationRoles;
 import javax.ws.rs.core.Response.Status;
 
@@ -84,16 +84,16 @@ public class ProductLogic {
         return response;
     }
 
-    public ArrayList<GetProductsByBrandResponse> getProductsByBrand(GetProductsByBrandRequest request) throws ApiException {
-        ArrayList<GetProductsByBrandResponse> response = new ArrayList<GetProductsByBrandResponse>();
+    public ArrayList<GetProductsByFilterResponse>getProductsByFilter(GetProductsByFilterRequest request) throws ApiException {
+        ArrayList<GetProductsByFilterResponse> response = new ArrayList<GetProductsByFilterResponse>();
 
-        ArrayList<Product> products = pda.getProductsByBrand(request.getBrandId());
+        ArrayList<Product> products = pda.getProductsByFilter(request.getBrandId(), request.getCategoryId(), request.getKeyword());
 
         if (products == null || products.isEmpty())
-            throw new ApiException("There are no products with that brand yet.", Status.NOT_FOUND);
+            throw new ApiException("There are no products that match this criteria.", Status.NOT_FOUND);
 
         for (Product product : products) {
-            response.add(new GetProductsByBrandResponse(
+            response.add(new GetProductsByFilterResponse(
                 product.getId(),
                 product.getName(),
                 product.getGtin(),
