@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import com.api.entities.business.Proposal;
 import com.api.entities.business.ProposalLine;
 import com.api.entities.business.Category;
 import com.api.entities.business.Brand;
@@ -20,6 +21,11 @@ public class OrderDataAccess extends BaseDataAccess {
         // Eeeeeeeeeeeeeeeeeek...
         query = "SELECT " +
             "O.*, " +
+            "P.id as proposalId, " +
+            "P.id as proposalTitle, " +
+            "P.beginDate, " +
+            "P.endDate, " +
+            "P.description, " +
             "R.id as organizationId, " +
             "R.name as organizationName, " +
             "R.cuit, " +
@@ -41,6 +47,7 @@ public class OrderDataAccess extends BaseDataAccess {
             "INNER JOIN Organization R ON R.id = O.retailId " +
             "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
             "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+            "INNER JOIN Proposal P ON PL.proposalId = P.id " +
             "INNER JOIN Product Pr ON PL.productId = Pr.id " +
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
             "INNER JOIN Category C ON Pr.categoryId = C.id " +
@@ -78,7 +85,13 @@ public class OrderDataAccess extends BaseDataAccess {
 
                 order.setId(resultSet.getInt("id"));
                 order.setDateOrdered(resultSet.getTimestamp("dateOrdered"));
-                order.setRetail(new Retail(resultSet));
+                order.setRetail(new Retail(
+                    resultSet.getInt("organizationId"),
+                    resultSet.getString("organizationName"),
+                    resultSet.getString("cuit"),
+                    resultSet.getString("legalName"),
+                    resultSet.getString("role")
+                ));
 
                 currentOrderId = order.getId();
             }
@@ -103,7 +116,19 @@ public class OrderDataAccess extends BaseDataAccess {
                 new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
             ));
 
+            Proposal proposal = new Proposal();
+
+            proposal.setId(resultSet.getInt("proposalId"));
+            proposal.setTitle(resultSet.getString("proposalTitle"));
+            proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
+            proposal.setEndDate(resultSet.getTimestamp("endDate"));
+            proposal.setDescription(resultSet.getString("description"));
+
+            proposalLine.setProposal(proposal);
+
             line.setProposalLine(proposalLine);
+
+            order.getOrderLines().add(line);
         }
 
         return order;
