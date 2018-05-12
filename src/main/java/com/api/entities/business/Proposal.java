@@ -1,5 +1,6 @@
 package com.api.entities.business;
 
+import com.api.entities.enums.ProposalStates;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -9,6 +10,7 @@ public class Proposal {
     private String title, description;
     private ArrayList<ProposalLine> proposalLines;
     private Supplier supplier;
+
 
 	/**
 	* Default empty Proposal constructor
@@ -24,7 +26,7 @@ public class Proposal {
 	public Proposal(int id, Date beginDate, Date endDate, String title, String description, ArrayList<ProposalLine> proposalLines, Supplier supplier) {
 		super();
         proposalLines = new ArrayList<ProposalLine>();
-        
+
 		this.id = id;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
@@ -152,6 +154,18 @@ public class Proposal {
 
     public void setDeletedAt(Date date) {
         this.deletedAt = date;
+    }
+
+    public String getState(){
+        Date today = new Date();
+
+        if (this.getBeginDate().after(today))
+            return ProposalStates.SCHEDULED;
+        if (this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate())))
+            return ProposalStates.ACTIVE;
+        if (today.before(getEndDate()))
+            return ProposalStates.FINISHED;
+        return null;
     }
 
 	/**
