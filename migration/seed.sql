@@ -13,3 +13,7 @@ INSERT INTO `wholesaler`.`Brand` (`id`, `name` ) VALUES ('3', 'BGH');
 INSERT INTO `wholesaler`.`Category` (`id`, `name` ) VALUES ('1', 'PC Components');
 INSERT INTO `wholesaler`.`Category` (`id`, `name` ) VALUES ('2', 'Small home appliances');
 INSERT INTO `wholesaler`.`Category` (`id`, `name` ) VALUES ('3', 'Refrigerators');
+
+INSERT INTO `wholesaler`.`Product` (`id`, `name`, `gtin`, `brandId`, `categoryId`) VALUES ('4', 'comida para gatos', '3434', '2', '2');
+INSERT INTO `wholesaler`.`Product` (`id`, `name`, `gtin`, `brandId`, `categoryId`) VALUES ('5', 'teclado', '5689', '2', '3');
+INSERT INTO `wholesaler`.`Product` (`id`, `name`, `gtin`, `brandId`, `categoryId`) VALUES ('6', 'mesa', '33656456', '1', '2');
