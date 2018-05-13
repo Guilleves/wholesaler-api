@@ -13,3 +13,8 @@ INSERT INTO `wholesaler`.`brand` (`id`, `name` ) VALUES ('3', 'BGH');
 INSERT INTO `wholesaler`.`category` (`id`, `name` ) VALUES ('1', 'PC Components');
 INSERT INTO `wholesaler`.`category` (`id`, `name` ) VALUES ('2', 'Small home appliances');
 INSERT INTO `wholesaler`.`category` (`id`, `name` ) VALUES ('3', 'Refrigerators');
+
+UPDATE `wholesaler`.`product` SET `gtin` = '2342344' WHERE (`id` = '3');
+INSERT INTO `wholesaler`.`product` (`id`, `name`, `gtin`, `brandId`, `categoryId`) VALUES ('4', 'comida para gatos', '3434', '2', '2');
+INSERT INTO `wholesaler`.`product` (`id`, `name`, `gtin`, `brandId`, `categoryId`) VALUES ('5', 'teclado', '5689', '2', '3');
+INSERT INTO `wholesaler`.`product` (`id`, `name`, `gtin`, `brandId`, `categoryId`) VALUES ('6', 'mesa', '33656456', '1', '2');
