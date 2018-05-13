@@ -1,5 +1,7 @@
 package com.api.entities.models.organization;
 
+import java.util.Objects;
+
 public class GetOrganizationResponse {
     private int id;
     private String name, legalName, cuit, role;
@@ -102,4 +104,24 @@ public class GetOrganizationResponse {
 	public void setRole(String role) {
 		this.role = role;
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+
+        if (!(o instanceof GetOrganizationResponse)) {
+            return false;
+        }
+        GetOrganizationResponse organization = (GetOrganizationResponse) o;
+        return (id == organization.id &&
+                Objects.equals(name, organization.name) &&
+                Objects.equals(cuit, organization.cuit) &&
+                Objects.equals(legalName, organization.legalName) &&
+                Objects.equals(role, organization.role));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, cuit, legalName, role);
+    }
 }

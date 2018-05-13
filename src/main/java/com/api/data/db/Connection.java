@@ -1,14 +1,14 @@
 package com.api.data.db;
 
-// import java.io.IOException;
-// import java.io.InputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-// import java.util.Properties;
+import java.util.Properties;
 
 public class Connection {
-	// private Properties prop = new Properties();
-	// private InputStream input = null;
+	private Properties prop = new Properties();
+	private InputStream input = null;
 
 	private static Connection instancia;
 	public static Connection getInstancia() {
@@ -18,10 +18,9 @@ public class Connection {
 		return instancia;
 	}
 
-	private static String dbUrl = "jdbc:mysql://localhost:3306/wholesaler?useSSL=false";
-	private static String dbUser = "root";
-	private static String dbPassword = "root";
-	// private static String env = "DEV";
+	private static String dbUrl;
+	private static String dbUser;
+	private static String dbPassword;
 
 	private java.sql.Connection conn;
 	static int cantCon=0;
@@ -39,20 +38,12 @@ public class Connection {
 
 	public java.sql.Connection getConn() {
 		try {
-			/*input = Thread.currentThread().getContextClassLoader().getResourceAsStream("/config.properties");
+			input = getClass().getResourceAsStream("/config.properties");
 
 			prop.load(input);
-
-			if (env.equals("PRD")) {
-				dbUrl = prop.getProperty("db-url-prd");
-				dbUser = prop.getProperty("db-user-prd");
-				dbPassword = prop.getProperty("db-password-prd");
-			}
-			else if (env.equals("DEV")) {
-				dbUrl = prop.getProperty("db-url-dev");
-				dbUser = prop.getProperty("db-user-dev");
-				dbPassword = prop.getProperty("db-password-dev");
-			}*/
+			dbUrl = prop.getProperty("db-url");
+			dbUser = prop.getProperty("db-user");
+			dbPassword = prop.getProperty("db-password");
 
 			if (conn == null || !conn.isValid(3)) {
 				Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -60,7 +51,6 @@ public class Connection {
 			}
 
 			cantCon++;
-			System.out.println("Nueva conexión abierta -> cantidad de conexiones abiertas: " + cantCon);
 		}
 		catch (InstantiationException e) {
 			e.printStackTrace();
@@ -74,9 +64,9 @@ public class Connection {
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
-		/*catch (IOException e) {
+		catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 
 		return conn;
 	}
@@ -85,7 +75,6 @@ public class Connection {
 	public void closeConn() {
 		try {
 			cantCon--;
-			System.out.println("Se cerró una conexión -> cantidad de conexiones abiertas: " + cantCon);
 
 			if(cantCon==0)
 			conn.close();

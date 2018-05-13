@@ -146,5 +146,4 @@ public class Organization {
 	public void setUsers(ArrayList<User> users) {
 		this.users = users;
 	}
-
 }
