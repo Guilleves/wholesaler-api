@@ -24,6 +24,8 @@ public class ConsoleTest {
         userData = new UserDataAccess();
         productData = new ProductDataAccess();
         organizationData = new OrganizationDataAccess();
+        organizationData = new OrganizationDataAccess();
+        proposalData = new ProposalDataAccess();
 
         // *Comment para @guilleves* Acá iríamos haciendo el llamado a cada método y comentando los que van funcionando
         // getUser();
@@ -45,7 +47,7 @@ public class ConsoleTest {
         // getProducts();
 
         // #endregion
-        getProposals(null, 0);
+        getProposals(null, null);
 
         return;
     }
@@ -133,8 +135,6 @@ public class ConsoleTest {
     // #endregion
 
     private static void getProposals(String status, Integer supplierId) {
-        System.out.println("End of proposals list.");
-
         ArrayList<Proposal> proposals = proposalData.getProposals((String)status, (Integer)supplierId);
 
         for(Proposal proposal : proposals) {
