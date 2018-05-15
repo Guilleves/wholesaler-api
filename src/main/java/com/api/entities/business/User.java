@@ -1,6 +1,7 @@
 package com.api.entities.business;
 
 // #region Imports
+import com.api.entities.enums.OrganizationRoles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -58,13 +59,24 @@ public class User {
 		this.password = rs.getString("password");
 		this.email = rs.getString("email");
 
-        this.organization = new Organization(
-            rs.getInt("organizationId"),
-            rs.getString("organizationName"),
-            rs.getString("cuit"),
-            rs.getString("legalName"),
-            rs.getString("role")
-        );
+        if (rs.getString("role").equals(OrganizationRoles.SUPPLIER)) {
+            this.organization = new Supplier(
+                rs.getInt("organizationId"),
+                rs.getString("organizationName"),
+                rs.getString("cuit"),
+                rs.getString("legalName"),
+                rs.getString("role")
+            );
+        }
+        else {
+            this.organization = new Retail(
+                rs.getInt("organizationId"),
+                rs.getString("organizationName"),
+                rs.getString("cuit"),
+                rs.getString("legalName"),
+                rs.getString("role")
+            );
+        }
     }
 
 	/**
