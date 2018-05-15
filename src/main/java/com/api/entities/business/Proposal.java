@@ -168,6 +168,11 @@ public class Proposal {
         return null;
     }
 
+    public boolean isActive(){
+        Date today = new Date();
+        return this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate()));
+    }
+
 	/**
 	* Create string representation of Proposal for printing
 	* @return
