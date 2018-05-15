@@ -1,7 +1,12 @@
 package com.api.rest;
 
-// #region Imports
+// #region Import
 
+import com.api.entities.business.User;
+import com.api.rest.security.UserPrincipal;
+import com.api.entities.models.order.SaveOrderRequest;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Context;
 import com.api.entities.models.order.GetOrderRequest;
 import com.api.logic.business.OrderLogic;
 import javax.ws.rs.GET;
@@ -57,6 +62,21 @@ public class Orders {
 
         try {
             return Response.ok(ol.getOrder(request)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/")
+    public Response createOrder(@Context SecurityContext context, SaveOrderRequest request) {
+        try {
+            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            return Response.ok(ol.createOrder(request, user)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();

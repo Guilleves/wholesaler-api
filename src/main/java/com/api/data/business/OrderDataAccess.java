@@ -191,6 +191,100 @@ public class OrderDataAccess extends BaseDataAccess {
         return order;
     }
 
+    public Order registerOrder(Order order) {
+        java.sql.Connection conn = Connection.getInstancia().getConn();
+
+        try {
+            conn.setAutoCommit(false);
+
+            // All this messy code is to run everything as a transaction.
+            order = createOrder(order);
+
+            for (OrderLine ol : order.getOrderLines()) {
+                // TODO: IDK other way to avoid infinite loops, at least this way it works.
+                Order o = new Order();
+                o.setId(order.getId());
+                ol.setOrder(o);
+
+                // Would this do the trick? Damn java, you tha boss.
+                ol = createOrderLine(ol);
+            }
+
+            conn.commit();
+            conn.setAutoCommit(true);
+        }
+        catch(SQLException e1) {
+            try {
+                e1.printStackTrace();
+                conn.rollback();
+                conn.setAutoCommit(true);
+            }
+            catch(SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return order;
+    }
+
+    public Order createOrder(Order order) {
+        query = "INSERT INTO `Order` (dateOrdered, retailId) VALUES (?, ?);";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(order.getDateOrdered().getTime()));
+            ((PreparedStatement)statement).setInt(2, order.getRetail().getId());
+
+            ((PreparedStatement)statement).executeUpdate();
+
+            resultSet = statement.getGeneratedKeys();
+
+            // If it created the user, return the created id
+            if (resultSet.next()) {
+                order.setId(resultSet.getInt(1));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return order;
+    }
+
+    public OrderLine createOrderLine(OrderLine orderLine) {
+        query = "INSERT INTO OrderLine (proposalLineId, orderId, quantity) VALUES (?, ?, ?);";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, orderLine.getProposalLine().getId());
+            ((PreparedStatement)statement).setInt(2, orderLine.getOrder().getId());
+            ((PreparedStatement)statement).setInt(3, orderLine.getQuantity());
+
+            ((PreparedStatement)statement).executeUpdate();
+
+            resultSet = statement.getGeneratedKeys();
+
+            // If it created the user, return the created id
+            if (resultSet.next()) {
+                orderLine.setId(resultSet.getInt(1));
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return orderLine;
+    }
+
     // What on earth am I doing with my life...
     private ArrayList<Order> deserializeOrders(ResultSet resultSet) throws SQLException {
         Order order = null;

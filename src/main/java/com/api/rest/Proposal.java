@@ -3,8 +3,8 @@ package com.api.rest;
 // #region Imports
 
 import com.api.entities.business.User;
-import com.api.entities.models.proposal.SaveProposalRequest;
 import com.api.rest.security.UserPrincipal;
+import com.api.entities.models.proposal.SaveProposalRequest;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;

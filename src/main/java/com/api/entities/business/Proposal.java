@@ -23,8 +23,7 @@ public class Proposal {
 	*/
 	public Proposal(int id, Date beginDate, Date endDate, String title, String description, ArrayList<ProposalLine> proposalLines, Supplier supplier) {
 		super();
-        proposalLines = new ArrayList<ProposalLine>();
-        
+
 		this.id = id;
 		this.beginDate = beginDate;
 		this.endDate = endDate;

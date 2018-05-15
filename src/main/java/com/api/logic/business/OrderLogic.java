@@ -1,5 +1,11 @@
 package com.api.logic.business;
 
+import com.api.data.business.ProposalDataAccess;
+import com.api.entities.models.order.SaveOrderRequest.Line;
+import com.api.entities.enums.OrganizationRoles;
+import com.api.entities.business.User;
+import com.api.entities.business.Retail;
+import com.api.entities.models.order.SaveOrderRequest;
 import java.util.ArrayList;
 import com.api.entities.models.organization.GetOrganizationResponse;
 import com.api.entities.models.product.GetProductResponse;
@@ -12,10 +18,12 @@ import com.api.entities.models.order.GetOrderRequest;
 import com.api.data.business.OrderDataAccess;
 
 public class OrderLogic {
+    private ProposalDataAccess pda;
     private OrderDataAccess oda;
 
     public OrderLogic() {
-      oda = new OrderDataAccess();
+        pda = new ProposalDataAccess();
+        oda = new OrderDataAccess();
     }
 
     public ArrayList<GetOrderResponse> getOrders() throws ApiException {
@@ -63,6 +71,68 @@ public class OrderLogic {
                 order.getRetail().getRole()
             )
         );
+    }
+
+    public GetOrderResponse createOrder(SaveOrderRequest request, User loggedUser) throws ApiException {
+        Order order = new Order();
+
+        // Only suppliers can create Proposals
+        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL)))
+            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+
+        // Validate fields.
+        ApiException ex = validateSaveOrder(request);
+
+        if (!ex.isOk())
+            throw ex;
+
+        ArrayList<OrderLine> lines = new ArrayList<OrderLine>();
+
+        // For every line, get the product and validate its existence. Then add it to the proposal.
+        for(Line line : request.getLines()) {
+            OrderLine orderLine = new OrderLine();
+
+            orderLine.setProposalLine(pda.getProposalLine(line.getProposalLineId()));
+
+            if (orderLine.getProposalLine() == null)
+                throw new ApiException("At least one proposal line could not be found", Status.NOT_FOUND);
+
+            orderLine.setQuantity(line.getQuantity());
+
+            lines.add(orderLine);
+        }
+
+        // Set primitive data.
+        order.setDateOrdered(request.getDateOrdered());
+        order.setOrderLines(lines);
+        order.setRetail((Retail)loggedUser.getOrganization());
+
+        order = oda.registerOrder(order);
+
+        return new GetOrderResponse(
+            order.getId(),
+            order.getDateOrdered(),
+            getOrderLine(order.getOrderLines()),
+            new GetOrganizationResponse(
+                order.getRetail().getId(),
+                order.getRetail().getName(),
+                order.getRetail().getLegalName(),
+                order.getRetail().getCuit(),
+                order.getRetail().getRole()
+            )
+        );
+    }
+
+    private ApiException validateSaveOrder(SaveOrderRequest request) {
+        ApiException ex = new ApiException();
+
+        if (request.getDateOrdered() == null)
+            ex.addError("The field ordered date is required.");
+
+        if (request.getLines() == null || request.getLines().isEmpty())
+            ex.addError("At least a line order is needed.");
+
+        return ex;
     }
 
     private ArrayList<GetOrderResponse.OrderLine> getOrderLine(ArrayList<OrderLine> orderLines) {
