@@ -1,5 +1,6 @@
 package com.api.entities.business;
 
+import com.api.entities.enums.ProposalStates;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -9,6 +10,7 @@ public class Proposal {
     private String title, description;
     private ArrayList<ProposalLine> proposalLines;
     private Supplier supplier;
+
 
 	/**
 	* Default empty Proposal constructor
@@ -23,6 +25,7 @@ public class Proposal {
 	*/
 	public Proposal(int id, Date beginDate, Date endDate, String title, String description, ArrayList<ProposalLine> proposalLines, Supplier supplier) {
 		super();
+        proposalLines = new ArrayList<ProposalLine>();
 
 		this.id = id;
 		this.beginDate = beginDate;
@@ -153,13 +156,30 @@ public class Proposal {
         this.deletedAt = date;
     }
 
+    public String getState(){
+        Date today = new Date();
+
+        if (this.getBeginDate().after(today))
+            return ProposalStates.SCHEDULED;
+        if (this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate())))
+            return ProposalStates.ACTIVE;
+        if (today.before(getEndDate()))
+            return ProposalStates.FINISHED;
+        return null;
+    }
+
+    public boolean isActive(){
+        Date today = new Date();
+        return this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate()));
+    }
+
 	/**
 	* Create string representation of Proposal for printing
 	* @return
 	*/
 	@Override
 	public String toString() {
-		String string = "Proposal [id=" + id + ", title=" + title.toString() + ", beginDate=" + beginDate.toString() + ", endDate=" + endDate.toString() + ", description=" + description + "] ";
+		String string = "Proposal [id=" + id + ", title=" + title + ", beginDate=" + beginDate + ", endDate=" + endDate + ", description=" + description + "] ";
 
         string += "Lines [ ";
         for(ProposalLine pl : proposalLines) {

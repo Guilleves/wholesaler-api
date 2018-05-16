@@ -1,5 +1,7 @@
 package com.api.data;
 
+import com.api.entities.business.Proposal;
+import com.api.data.business.ProposalDataAccess;
 import com.api.entities.business.Organization;
 import com.api.entities.business.Supplier;
 import com.api.data.business.OrganizationDataAccess;
@@ -15,12 +17,15 @@ import com.api.data.business.UserDataAccess;
 public class ConsoleTest {
     private static UserDataAccess userData;
     private static ProductDataAccess productData;
+    private static ProposalDataAccess proposalData;
     private static OrganizationDataAccess organizationData;
 
     public static void main(String[] args) {
         userData = new UserDataAccess();
         productData = new ProductDataAccess();
         organizationData = new OrganizationDataAccess();
+        organizationData = new OrganizationDataAccess();
+        proposalData = new ProposalDataAccess();
 
         // *Comment para @guilleves* Acá iríamos haciendo el llamado a cada método y comentando los que van funcionando
         // getUser();
@@ -42,6 +47,7 @@ public class ConsoleTest {
         // getProducts();
 
         // #endregion
+        getProposals(null, null);
 
         return;
     }
@@ -127,6 +133,17 @@ public class ConsoleTest {
     // }
 
     // #endregion
+
+    private static void getProposals(String status, Integer supplierId) {
+        ArrayList<Proposal> proposals = proposalData.getProposals((String)status, (Integer)supplierId);
+
+        for(Proposal proposal : proposals) {
+            System.out.println(proposal.toString());
+        }
+
+        System.out.println("End of proposals list.");
+    }
+
 
     private static void getUser() {
         int userId = 2;

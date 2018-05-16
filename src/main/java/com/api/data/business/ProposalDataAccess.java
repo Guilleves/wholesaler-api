@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import com.api.entities.enums.ProposalStates;
 import com.api.entities.business.Supplier;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,35 +69,32 @@ public class ProposalDataAccess extends BaseDataAccess {
         return proposal;
     }
 
-    public ArrayList<Proposal> getProposals() {
+    public ArrayList<Proposal> getProposals(String status, Integer supplierId) {
         ArrayList<Proposal> proposals = new ArrayList<Proposal>();
 
-        // Eeeeeeeeeeeeeeeeeek...
-        query = "SELECT " +
-            "P.*, " +
-            "O.id as organizationId, " +
-            "O.name as organizationName, " +
-            "O.cuit, " +
-            "O.legalName, " +
-            "O.role, " +
-            "PL.id as proposalLineId, " +
-            "PL.price as price, " +
-            "Pr.id as productId, " +
-            "Pr.name as productName, " +
-            "Pr.gtin as gtin, " +
-            "B.id as brandId, " +
-            "B.name as brandName, " +
-            "C.id as categoryId, " +
-            "C.name as categoryName " +
-            "FROM " +
-            "Proposal P " +
-            "INNER JOIN Organization O ON P.supplierId = O.id " +
-            "INNER JOIN ProposalLine PL ON P.id = PL.proposalId " +
-            "INNER JOIN Product Pr ON PL.productId = Pr.id " +
-            "INNER JOIN Brand B ON Pr.brandId = B.id " +
-            "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "AND P.deletedAt IS NULL " +
-            "AND PL.deletedAt IS NULL;";
+        // works only when there's at least one document of each collection
+        query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
+
+        if (status != null) {
+            switch (status) {
+                case ProposalStates.ACTIVE:
+                    query = query.concat(" AND P.beginDate <= now() and P.endDate >= now()");
+                    break;
+                case ProposalStates.FINISHED:
+                    query = query.concat(" AND P.endDate < now()") ;
+                    break;
+                case ProposalStates.SCHEDULED:
+                    query = query.concat(" AND P.beginDate > now()");
+                    break;
+                default:
+                    break;
+            };
+        }
+
+        if (supplierId != null)
+            query = query.concat(" and P.supplierId = ") + supplierId;
+
+        query = query.concat(";");
 
         try {
             statement = Connection.getInstancia().getConn().createStatement();
