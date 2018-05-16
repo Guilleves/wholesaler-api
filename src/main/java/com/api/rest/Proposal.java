@@ -10,14 +10,13 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.api.entities.models.proposal.GetProposalRequest;
 
 import com.api.logic.business.ProposalLogic;
 
@@ -60,11 +59,9 @@ public class Proposal {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/{proposalId}")
-    public Response getProduct(@PathParam("proposalId") int proposalId) {
-        GetProposalRequest request = new GetProposalRequest(proposalId);
-
+    public Response getProposal(@PathParam("proposalId") int proposalId) {
         try {
-            return Response.ok(pl.getProposal(request)).build();
+            return Response.ok(pl.getProposal(proposalId)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -80,6 +77,21 @@ public class Proposal {
         try {
             User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
             return Response.ok(pl.saveProposal(request, user)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/{proposalId}")
+    public Response deleteProposal(@PathParam("proposalId") int proposalId, @Context SecurityContext context) {
+        try {
+            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            return Response.ok(pl.deleteProposal(proposalId, user)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
