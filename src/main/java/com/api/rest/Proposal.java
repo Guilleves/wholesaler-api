@@ -2,6 +2,7 @@ package com.api.rest;
 
 // #region Imports
 
+import javax.ws.rs.QueryParam;
 import com.api.entities.business.User;
 import com.api.entities.models.proposal.SaveProposalRequest;
 import com.api.rest.security.UserPrincipal;
@@ -45,9 +46,9 @@ public class Proposal {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProposals() {
+    public Response getProposals(@QueryParam("status") String status, @QueryParam("supplierId") Integer supplierId) {
         try {
-            return Response.ok(pl.getProposals()).build();
+            return Response.ok(pl.getProposals(status, supplierId)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();

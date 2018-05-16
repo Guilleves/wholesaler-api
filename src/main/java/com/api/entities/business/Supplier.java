@@ -10,12 +10,16 @@ import java.sql.SQLException;
 // #endregion
 
 public class Supplier extends Organization {
+	private ArrayList<Proposal> proposals;
 
 	/**
 	* Default empty Supplier constructor
 	*/
 	public Supplier() {
 		super();
+
+		proposals = new ArrayList<Proposal>();
+
         super.setRole(OrganizationRoles.SUPPLIER);
 	}
 
@@ -30,7 +34,9 @@ public class Supplier extends Organization {
 			organization.getLegalName(),
 			organization.getRole()
 		);
-		
+
+		proposals = new ArrayList<Proposal>();
+
         super.setRole(OrganizationRoles.SUPPLIER);
 	}
 
@@ -39,6 +45,7 @@ public class Supplier extends Organization {
 	*/
 	public Supplier(int id, String name, String cuit, String legalName, String role) {
 		super(id, name, cuit, legalName, role);
+		proposals = new ArrayList<Proposal>();
 	}
 
     /**
@@ -50,7 +57,6 @@ public class Supplier extends Organization {
     }
 
     public ArrayList<Proposal> getProposals(int organizationId) {
-      ProposalDataAccess pda = new ProposalDataAccess();
-      return pda.getProposalsBySupplier(organizationId);
+      return proposals;
     }
 }

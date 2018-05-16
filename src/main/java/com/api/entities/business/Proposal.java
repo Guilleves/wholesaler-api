@@ -179,7 +179,7 @@ public class Proposal {
 	*/
 	@Override
 	public String toString() {
-		String string = "Proposal [id=" + id + ", title=" + title.toString() + ", beginDate=" + beginDate.toString() + ", endDate=" + endDate.toString() + ", description=" + description + "] ";
+		String string = "Proposal [id=" + id + ", title=" + title + ", beginDate=" + beginDate + ", endDate=" + endDate + ", description=" + description + "] ";
 
         string += "Lines [ ";
         for(ProposalLine pl : proposalLines) {

@@ -1,7 +1,6 @@
 package com.api.logic.business;
 
 import com.api.entities.business.Supplier;
-import com.api.data.business.UserDataAccess;
 import com.api.entities.business.User;
 import com.api.entities.business.Product;
 import com.api.data.business.ProductDataAccess;
@@ -25,11 +24,11 @@ public class ProposalLogic {
         productDa = new ProductDataAccess();
     }
 
-    public ArrayList<GetProposalResponse> getProposals() throws ApiException {
-        ArrayList<Proposal> proposals = pda.getProposals();
+    public ArrayList<GetProposalResponse> getProposals(String status, Integer supplierId) throws ApiException {
+        ArrayList<Proposal> proposals = pda.getProposals(status, supplierId);
         ArrayList<GetProposalResponse> response = new ArrayList<GetProposalResponse>();
 
-        if (proposals == null)
+        if (proposals == null || proposals.isEmpty())
             throw new ApiException("Cound't find any proposal.", Status.NOT_FOUND);
 
         for(Proposal proposal : proposals) {

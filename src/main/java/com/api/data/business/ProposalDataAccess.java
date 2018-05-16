@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import com.api.entities.enums.ProposalStates;
 import com.api.entities.business.Supplier;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,15 +77,23 @@ public class ProposalDataAccess extends BaseDataAccess {
 
         if (status != null) {
             switch (status) {
-                case "active": query = query.concat(" AND P.beginDate <= now() and P.endDate <= now");
-                case "finished": query = query.concat(" AND P.beginDate <= now() and P.endDate > now") ;
-                case "scheduled": query = query.concat(" AND P.beginDate > now()");
-                default: break;
+                case ProposalStates.ACTIVE:
+                    query = query.concat(" AND P.beginDate <= now() and P.endDate >= now()");
+                    break;
+                case ProposalStates.FINISHED:
+                    query = query.concat(" AND P.endDate < now()") ;
+                    break;
+                case ProposalStates.SCHEDULED:
+                    query = query.concat(" AND P.beginDate > now()");
+                    break;
+                default:
+                    break;
             };
-        };
-        if (supplierId != null) {
+        }
+
+        if (supplierId != null)
             query = query.concat(" and P.supplierId = ") + supplierId;
-        };
+
         query = query.concat(";");
 
         try {
