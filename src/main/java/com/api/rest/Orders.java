@@ -1,13 +1,14 @@
 package com.api.rest;
 
-// #region Imports
+// #region Import
 
-import javax.ws.rs.QueryParam;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
-import com.api.entities.models.proposal.SaveProposalRequest;
+import com.api.entities.models.order.SaveOrderRequest;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Context;
+import com.api.entities.models.order.GetOrderRequest;
+import com.api.logic.business.OrderLogic;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,24 +18,20 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.api.entities.models.proposal.GetProposalRequest;
-
-import com.api.logic.business.ProposalLogic;
-
 import com.api.logic.validations.ApiException;
 
 import com.api.rest.security.Secured;
 
 // #endregion
 
-@Path("/proposals")
-public class Proposal {
-    private ProposalLogic pl;
+@Path("/orders")
+public class Orders {
+    private OrderLogic ol;
 
     // #region Constructors
 
-    public Proposal() {
-        pl = new ProposalLogic();
+    public Orders() {
+        ol = new OrderLogic();
     }
 
     // #endregion
@@ -46,9 +43,9 @@ public class Proposal {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProposals(@QueryParam("status") String status, @QueryParam("supplierId") Integer supplierId) {
+    public Response getOrders() {
         try {
-            return Response.ok(pl.getProposals(status, supplierId)).build();
+            return Response.ok(ol.getOrders()).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -59,12 +56,12 @@ public class Proposal {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
-    @Path("/{proposalId}")
-    public Response getProduct(@PathParam("proposalId") int proposalId) {
-        GetProposalRequest request = new GetProposalRequest(proposalId);
+    @Path("/{orderId}")
+    public Response getOrder(@PathParam("orderId") int orderId) {
+        GetOrderRequest request = new GetOrderRequest(orderId);
 
         try {
-            return Response.ok(pl.getProposal(request)).build();
+            return Response.ok(ol.getOrder(request)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -76,10 +73,10 @@ public class Proposal {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response saveProposal(@Context SecurityContext context, SaveProposalRequest request) {
+    public Response createOrder(@Context SecurityContext context, SaveOrderRequest request) {
         try {
             User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
-            return Response.ok(pl.saveProposal(request, user)).build();
+            return Response.ok(ol.createOrder(request, user)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();

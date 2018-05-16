@@ -1,7 +1,7 @@
 package com.api.logic.business;
 
 // #region Imports
-// import java.util.Properties;
+import java.util.Properties;
 
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
@@ -24,34 +24,33 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 // #endregion
 
 public class SecurityLogic {
-    // private Properties prop = new Properties();
-    private String securityPassword = "plzTrustMe!";
+    private Properties prop = new Properties();
 
     // #region Constructors
     public SecurityLogic () {
-        /*try {
+        try {
             // Read properties from external file.
-            prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("/config.properties"));
+            prop.load(getClass().getResourceAsStream("/config.properties"));
         }
         catch(IOException e) {
 
-        }*/
+        }
     }
     // #endregion
 
     // #region Tokens
     public String issueAuthToken(int userId) throws UnsupportedEncodingException, JWTCreationException {
-        //String password = prop.getProperty("security-password");
+        String password = prop.getProperty("security-password");
 
-        Algorithm algorithm = Algorithm.HMAC256(securityPassword);
+        Algorithm algorithm = Algorithm.HMAC256(password);
 
         return JWT.create().withIssuer("auth0").withClaim("id", userId).sign(algorithm);
     }
 
     public int validateToken(String token) throws UnsupportedEncodingException, JWTVerificationException, IOException {
-        //String password = prop.getProperty("security-password");
+        String password = prop.getProperty("security-password");
 
-        Algorithm algorithm = Algorithm.HMAC256(securityPassword);
+        Algorithm algorithm = Algorithm.HMAC256(password);
 
         //Reusable verifier instance
         JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();

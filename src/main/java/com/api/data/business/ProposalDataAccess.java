@@ -113,6 +113,53 @@ public class ProposalDataAccess extends BaseDataAccess {
         return proposals;
     }
 
+    public ProposalLine getProposalLine(int proposalLineId) {
+        ProposalLine proposalLine = null;
+
+        query = "SELECT " +
+        "PL.*, " +
+        "P.name as productName, " +
+        "P.gtin, " +
+        "O.id as supplierId, " +
+        "O.name as supplierName, " +
+        "O.cuit, " +
+        "O.legalName, " +
+        "O.role, " +
+        "Pr.title, " +
+        "Pr.description, " +
+        "Pr.beginDate, " +
+        "Pr.endDate, " +
+        "B.id as brandId, " +
+        "B.name as brandName, " +
+        "C.id as categoryId, " +
+        "C.name as categoryName " +
+        "FROM " +
+        "ProposalLine PL " +
+        "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+        "INNER JOIN Organization O ON Pr.supplierId = O.id " +
+        "INNER JOIN Product P ON P.id = PL.productId " +
+        "INNER JOIN Brand B ON P.brandId = B.id " +
+        "INNER JOIN Category C ON P.categoryId = C.id " +
+        "WHERE PL.id = ?";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, proposalLineId);
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
+
+            proposalLine = deserializeProposalLine(resultSet);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return proposalLine;
+    }
+
     public Proposal deleteProposal(Proposal proposal) {
         query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
         Date now = new Date();
@@ -377,6 +424,42 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
 
         return proposals;
+    }
+
+    private ProposalLine deserializeProposalLine(ResultSet resultSet) throws SQLException {
+        // Add all the lines with the products to the proposal.
+        ProposalLine line = new ProposalLine();
+
+        if (resultSet.next()) {
+            line.setId(resultSet.getInt("id"));
+            line.setPrice(resultSet.getFloat("price"));
+
+            line.setProduct(new Product(
+                resultSet.getInt("productId"),
+                resultSet.getString("productName"),
+                resultSet.getString("gtin"),
+                new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
+                new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
+            ));
+
+            line.setProposal(new Proposal(
+                resultSet.getInt("proposalId"),
+                resultSet.getTimestamp("beginDate"),
+                resultSet.getTimestamp("endDate"),
+                resultSet.getString("title"),
+                resultSet.getString("description"),
+                null,
+                new Supplier(
+                    resultSet.getInt("supplierId"),
+                    resultSet.getString("supplierName"),
+                    resultSet.getString("cuit"),
+                    resultSet.getString("legalName"),
+                    resultSet.getString("role")
+                )
+            ));
+        }
+        
+        return line;
     }
 
     // #endregion
