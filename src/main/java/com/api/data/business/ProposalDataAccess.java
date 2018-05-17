@@ -72,12 +72,7 @@ public class ProposalDataAccess extends BaseDataAccess {
     public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) {
         ArrayList<Proposal> proposals = new ArrayList<Proposal>();
 
-        int intSupplierId = 0;
-
-        if (supplierId != null)
-            intSupplierId = supplierId.intValue();
-
-        // works only when there's at least one document of each collection
+        // Works only when there's at least one row (document) of each table (collection) because of the inner join...
         query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
 
         if (status != null) {
@@ -96,27 +91,28 @@ public class ProposalDataAccess extends BaseDataAccess {
             };
         }
 
-        query = query.concat(" AND (? = 0 OR P.supplierId = ? )");
+        if (supplierId != null)
+            query += " AND P.supplierId = ?";
 
-        if (!(orderBy == null || orderBy.isEmpty())) {
-            query = query.concat(" ORDER BY ?");
-        }
+        if (orderBy != null)
+            query += " ORDER BY ?";
 
-        if (pageSize != null && pageIndex != null) {
-            query = query.concat(" LIMIT ?, ?");
-        }
+        if (pageSize != null && pageIndex != null)
+            query += " LIMIT ?, ?";
 
         query = query.concat(";");
 
         try {
             statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-            ((PreparedStatement)statement).setInt(1, intSupplierId);
-            ((PreparedStatement)statement).setInt(2, intSupplierId);
+            int paramIndex = 1;
 
-            int paramIndex = 3;
+            if (supplierId != null) {
+                ((PreparedStatement)statement).setInt(paramIndex, supplierId.intValue());
+                paramIndex++;
+            }
 
-            if (!(orderBy == null || orderBy.isEmpty())) {
+            if (orderBy != null) {
                 ((PreparedStatement)statement).setString(paramIndex, orderBy);
                 paramIndex ++;
             }
