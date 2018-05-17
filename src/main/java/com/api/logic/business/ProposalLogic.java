@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import com.api.entities.models.proposal.GetProposalsRequest;
 import com.api.entities.models.organization.GetOrganizationResponse;
 import com.api.entities.models.product.GetProductResponse;
 import com.api.entities.models.proposal.GetProposalsResponse;
@@ -28,8 +29,8 @@ public class ProposalLogic {
         productDa = new ProductDataAccess();
     }
 
-    public ArrayList<GetProposalsResponse> getProposals(String status, Integer supplierId) throws ApiException {
-        ArrayList<Proposal> proposals = pda.getProposals(status, supplierId);
+    public ArrayList<GetProposalsResponse> getProposals(GetProposalsRequest request) throws ApiException {
+        ArrayList<Proposal> proposals = pda.getProposals(request.getStatus(), request.getSupplierId(), request.getOrderBy(), request.getPageSize(), request.getPageIndex());
         ArrayList<GetProposalsResponse> response = new ArrayList<GetProposalsResponse>();
 
         if (proposals == null || proposals.isEmpty())

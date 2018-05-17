@@ -69,8 +69,13 @@ public class ProposalDataAccess extends BaseDataAccess {
         return proposal;
     }
 
-    public ArrayList<Proposal> getProposals(String status, Integer supplierId) {
+    public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) {
         ArrayList<Proposal> proposals = new ArrayList<Proposal>();
+
+        int intSupplierId = 0;
+
+        if (supplierId != null)
+            intSupplierId = supplierId.intValue();
 
         // works only when there's at least one document of each collection
         query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
@@ -91,15 +96,39 @@ public class ProposalDataAccess extends BaseDataAccess {
             };
         }
 
-        if (supplierId != null)
-            query = query.concat(" and P.supplierId = ") + supplierId;
+        query = query.concat(" AND (? = 0 OR P.supplierId = ? )");
+
+        if (!(orderBy == null || orderBy.isEmpty())) {
+            query = query.concat(" ORDER BY ?");
+        }
+
+        if (pageSize != null && pageIndex != null) {
+            query = query.concat(" LIMIT ?, ?");
+        }
 
         query = query.concat(";");
 
         try {
-            statement = Connection.getInstancia().getConn().createStatement();
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-            resultSet = statement.executeQuery(query);
+            ((PreparedStatement)statement).setInt(1, intSupplierId);
+            ((PreparedStatement)statement).setInt(2, intSupplierId);
+
+            int paramIndex = 3;
+
+            if (!(orderBy == null || orderBy.isEmpty())) {
+                ((PreparedStatement)statement).setString(paramIndex, orderBy);
+                paramIndex ++;
+            }
+
+            if (pageSize != null && pageIndex != null) {
+                ((PreparedStatement)statement).setInt(paramIndex, pageIndex);
+                paramIndex ++;
+                ((PreparedStatement)statement).setInt(paramIndex, pageSize);
+                paramIndex ++;
+            }
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
 
             proposals = deserializeProposals(resultSet);
         }
@@ -343,7 +372,7 @@ public class ProposalDataAccess extends BaseDataAccess {
             // If proposal didn't change (should be only one... but just in case)
             if (resultSet.getInt("id") != currentProposalId) {
                 proposal = new Proposal();
-                
+
                 proposal.setId(resultSet.getInt("id"));
                 proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
                 proposal.setEndDate(resultSet.getTimestamp("endDate"));
