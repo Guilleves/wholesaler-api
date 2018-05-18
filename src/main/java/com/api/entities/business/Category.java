@@ -3,7 +3,7 @@ package com.api.entities.business;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
-public class Category {
+public class Category implements BaseEntity{
     private int id;
     private String name;
 

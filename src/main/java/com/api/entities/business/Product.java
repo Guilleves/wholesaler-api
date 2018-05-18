@@ -4,7 +4,7 @@ import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Product {
+public class Product implements BaseEntity{
     private int id;
     private String name, gtin;
     private Brand brand;
@@ -35,17 +35,20 @@ public class Product {
     */
     public Product(ResultSet rs) throws SQLException {
         super();
-        this.id = rs.getInt("id");
-        this.name = rs.getString("name");
-        this.gtin = rs.getString("gtin");
-        this.brand = new Brand(
-            rs.getInt("brandId"),
-            rs.getString("brandName")
-        );
-        this.category = new Category(
-            rs.getInt("categoryId"),
-            rs.getString("categoryName")
-        );
+
+        if (rs.next()) {
+            this.id = rs.getInt("id");
+            this.name = rs.getString("name");
+            this.gtin = rs.getString("gtin");
+            this.brand = new Brand(
+                rs.getInt("brandId"),
+                rs.getString("brandName")
+            );
+            this.category = new Category(
+                rs.getInt("categoryId"),
+                rs.getString("categoryName")
+            );
+        }
     }
 
 	/**

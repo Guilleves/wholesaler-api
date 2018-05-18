@@ -4,7 +4,7 @@ import com.api.entities.enums.ProposalStates;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Proposal {
+public class Proposal implements BaseEntity {
     private int id;
     private Date beginDate, endDate, deletedAt;
     private String title, description;

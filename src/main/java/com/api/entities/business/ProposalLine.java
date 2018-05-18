@@ -2,7 +2,7 @@ package com.api.entities.business;
 
 import java.util.Date;
 
-public class ProposalLine {
+public class ProposalLine implements BaseEntity {
     private int id;
     private Proposal proposal;
     private Product product;

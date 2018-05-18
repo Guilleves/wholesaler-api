@@ -3,7 +3,7 @@ package com.api.entities.business;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Order {
+public class Order implements BaseEntity {
     private int id;
     private Date dateOrdered;
     private ArrayList<OrderLine> orderLines;

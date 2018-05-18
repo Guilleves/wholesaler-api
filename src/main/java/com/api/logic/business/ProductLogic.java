@@ -1,6 +1,7 @@
 package com.api.logic.business;
 
 // #region Imports
+import java.sql.SQLException;
 import com.api.entities.models.product.GetProductsByFilterResponse;
 import com.api.entities.models.product.GetProductsByFilterRequest;
 import com.api.entities.business.User;
@@ -38,107 +39,127 @@ public class ProductLogic {
     // #region ProductSetup
 
     public GetProductResponse getProduct(GetProductRequest request) throws ApiException {
-        // Fetch product.
-        Product product = pda.getProduct(request.getProductId());
+        try {
+            // Fetch product.
+            Product product = pda.getProduct(request.getProductId());
 
-        if (product == null)
-            throw new ApiException("Product was not found.", Status.NOT_FOUND);
+            if (product == null)
+                throw new ApiException("Product was not found.", Status.NOT_FOUND);
 
 
-        // Generate the response object.
-        GetProductResponse response = new GetProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getGtin(),
-            product.getBrand().getId(),
-            product.getBrand().getName(),
-            product.getCategory().getId(),
-            product.getCategory().getName()
-        );
+            // Generate the response object.
+            GetProductResponse response = new GetProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getGtin(),
+                product.getBrand().getId(),
+                product.getBrand().getName(),
+                product.getCategory().getId(),
+                product.getCategory().getName()
+            );
 
-        return response;
+            return response;
+        }
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     public ArrayList<GetProductResponse> getProducts() throws ApiException {
-        ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
+        try {
+            ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
 
-        // Fetch product list.
-        ArrayList<Product> products = pda.getProducts();
+            // Fetch product list.
+            ArrayList<Product> products = pda.getProducts();
 
-        if (products == null || products.isEmpty())
-            throw new ApiException("Couldn't find products.", Status.NOT_FOUND);
+            if (products == null || products.isEmpty())
+                throw new ApiException("Couldn't find products.", Status.NOT_FOUND);
 
-        // Generate the response object.
-        for (Product product : products) {
-            response.add(new GetProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getGtin(),
-                product.getBrand().getId(),
-                product.getBrand().getName(),
-                product.getCategory().getId(),
-                product.getCategory().getName()
-            ));
+            // Generate the response object.
+            for (Product product : products) {
+                response.add(new GetProductResponse(
+                    product.getId(),
+                    product.getName(),
+                    product.getGtin(),
+                    product.getBrand().getId(),
+                    product.getBrand().getName(),
+                    product.getCategory().getId(),
+                    product.getCategory().getName()
+                ));
+            }
+
+            return response;
         }
-
-        return response;
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     public ArrayList<GetProductsByFilterResponse>getProductsByFilter(GetProductsByFilterRequest request) throws ApiException {
-        ArrayList<GetProductsByFilterResponse> response = new ArrayList<GetProductsByFilterResponse>();
+        try {
+            ArrayList<GetProductsByFilterResponse> response = new ArrayList<GetProductsByFilterResponse>();
 
-        ArrayList<Product> products = pda.getProductsByFilter(request.getBrandId(), request.getCategoryId(), request.getKeyword());
+            ArrayList<Product> products = pda.getProductsByFilter(request.getBrandId(), request.getCategoryId(), request.getKeyword());
 
-        if (products == null || products.isEmpty())
-            throw new ApiException("There are no products that match this criteria.", Status.NOT_FOUND);
+            if (products == null || products.isEmpty())
+                throw new ApiException("There are no products that match this criteria.", Status.NOT_FOUND);
 
-        for (Product product : products) {
-            response.add(new GetProductsByFilterResponse(
-                product.getId(),
-                product.getName(),
-                product.getGtin(),
-                product.getBrand().getId(),
-                product.getBrand().getName(),
-                product.getCategory().getId(),
-                product.getCategory().getName()
-            ));
+            for (Product product : products) {
+                response.add(new GetProductsByFilterResponse(
+                    product.getId(),
+                    product.getName(),
+                    product.getGtin(),
+                    product.getBrand().getId(),
+                    product.getBrand().getName(),
+                    product.getCategory().getId(),
+                    product.getCategory().getName()
+                ));
+            }
+
+            return response;
         }
-
-        return response;
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     public SaveProductResponse saveProduct(SaveProductRequest request, User loggedUser) throws ApiException {
-        SaveProductResponse response = new SaveProductResponse();
+        try {
+            SaveProductResponse response = new SaveProductResponse();
 
-        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
-            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
-        // Search brand.
-        Brand brand = pda.getBrand(request.getBrandId());
+            // Search brand.
+            Brand brand = pda.getBrand(request.getBrandId());
 
-        // Search category.
-        Category category = pda.getCategory(request.getCategoryId());
+            // Search category.
+            Category category = pda.getCategory(request.getCategoryId());
 
-        // Validate fields.
-        ApiException ex = validateSaveProduct(request, brand, category);
+            // Validate fields.
+            ApiException ex = validateSaveProduct(request, brand, category);
 
-        if (!ex.isOk())
-            throw(ex);
+            if (!ex.isOk())
+                throw(ex);
 
-        Product product = new Product(
-            request.getId(),
-            request.getName(),
-            request.getGtin(),
-            brand,
-            category
-        );
+            Product product = new Product(
+                request.getId(),
+                request.getName(),
+                request.getGtin(),
+                brand,
+                category
+            );
 
-        if (product.getId() == 0)
-            pda.createProduct(product);
-        else
-            pda.updateProduct(product);
+            if (product.getId() == 0)
+                pda.createProduct(product);
+            else
+                pda.updateProduct(product);
 
-        return response;
+            return response;
+        }
+        catch (SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     // #endregion

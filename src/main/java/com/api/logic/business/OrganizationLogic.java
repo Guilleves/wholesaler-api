@@ -2,6 +2,7 @@ package com.api.logic.business;
 
 // #region Imports
 
+import java.sql.SQLException;
 import com.api.entities.models.organization.GetOrganizationsRequest;
 import com.api.entities.enums.OrganizationRoles;
 import com.api.entities.business.Supplier;
@@ -29,81 +30,96 @@ public class OrganizationLogic {
   }
 
   public GetOrganizationResponse saveOrganization(SaveOrganizationRequest request) throws ApiException {
-      GetOrganizationResponse response = new GetOrganizationResponse();
+      try {
+          GetOrganizationResponse response = new GetOrganizationResponse();
 
-      // Validate fields.
-      ApiException ex = validateSaveOrganization(request);
+          // Validate fields.
+          ApiException ex = validateSaveOrganization(request);
 
-      if (!ex.isOk())
-          throw(ex);
+          if (!ex.isOk())
+              throw(ex);
 
-      Organization organization;
+          Organization organization;
 
-      if (request.getRole().equals(OrganizationRoles.SUPPLIER))
-          organization = new Supplier();
-      else
-          organization = new Retail();
+          if (request.getRole().equals(OrganizationRoles.SUPPLIER))
+              organization = new Supplier();
+          else
+              organization = new Retail();
 
-      organization.setId(request.getId());
-      organization.setRole(request.getRole());
-      organization.setCuit(request.getCuit());
-      organization.setLegalName(request.getLegalName());
-      organization.setName(request.getName());
+          organization.setId(request.getId());
+          organization.setRole(request.getRole());
+          organization.setCuit(request.getCuit());
+          organization.setLegalName(request.getLegalName());
+          organization.setName(request.getName());
 
-      if (organization.getId() == 0)
-          organization = oda.createOrganization(organization);
-      else
-          oda.updateOrganization(organization);
+          if (organization.getId() == 0)
+              organization = oda.createOrganization(organization);
+          else
+              oda.updateOrganization(organization);
 
-      return response;
+          return response;
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
   }
 
   public GetOrganizationResponse getOrganization(GetOrganizationRequest request) throws ApiException {
-    Organization organization = oda.getOrganization(request.getOrganizationId());
+      try {
+          Organization organization = oda.getOrganization(request.getOrganizationId());
 
-    if (organization == null) {
-      throw new ApiException("Organization was not found.", Status.NOT_FOUND);
-    }
+          if (organization == null) {
+            throw new ApiException("Organization was not found.", Status.NOT_FOUND);
+          }
 
-    // Generate the response object.
-    GetOrganizationResponse response = new GetOrganizationResponse(
-        organization.getId(),
-        organization.getName(),
-        organization.getLegalName(),
-        organization.getCuit(),
-        organization.getRole()
-    );
+          // Generate the response object.
+          GetOrganizationResponse response = new GetOrganizationResponse(
+              organization.getId(),
+              organization.getName(),
+              organization.getLegalName(),
+              organization.getCuit(),
+              organization.getRole()
+          );
 
-    return response;
+          return response;
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
   }
 
   public ArrayList<GetOrganizationResponse> getOrganizations(GetOrganizationsRequest request) throws ApiException {
-    ArrayList<GetOrganizationResponse> response = new ArrayList<GetOrganizationResponse>();
+      try {
+          ArrayList<GetOrganizationResponse> response = new ArrayList<GetOrganizationResponse>();
 
-    // Fetch organization list.
-    ArrayList<Organization> organizations;
+          // Fetch organization list.
+          ArrayList<Organization> organizations;
 
-    if (request.getRole() == null || request.getRole().isEmpty())
-        organizations = oda.getOrganizations();
-    else
-        organizations = oda.getOrganizations(request.getRole());
+          if (request.getRole() == null || request.getRole().isEmpty())
+              organizations = oda.getOrganizations();
+          else
+              organizations = oda.getOrganizations(request.getRole());
 
-    if (organizations == null || organizations.isEmpty()) {
-      throw new ApiException("Couldn't find organizations.", Status.NOT_FOUND);
-    }
+          if (organizations == null || organizations.isEmpty()) {
+            throw new ApiException("Couldn't find organizations.", Status.NOT_FOUND);
+          }
 
-    // Generate the response object.
-    for (Organization organization : organizations) {
-      response.add(new GetOrganizationResponse(
-        organization.getId(),
-        organization.getName(),
-        organization.getLegalName(),
-        organization.getCuit(),
-        organization.getRole()
-      ));
-    }
+          // Generate the response object.
+          for (Organization organization : organizations) {
+            response.add(new GetOrganizationResponse(
+              organization.getId(),
+              organization.getName(),
+              organization.getLegalName(),
+              organization.getCuit(),
+              organization.getRole()
+            ));
+          }
 
-    return response;
+          return response;
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
   }
 
   private ApiException validateSaveOrganization(SaveOrganizationRequest request) {

@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import java.sql.SQLException;
 import com.api.data.business.ProposalDataAccess;
 import com.api.entities.models.order.SaveOrderRequest.Line;
 import com.api.entities.enums.OrganizationRoles;
@@ -27,7 +28,14 @@ public class OrderLogic {
     }
 
     public ArrayList<GetOrderResponse> getOrders() throws ApiException {
-        ArrayList<Order> orders = oda.getOrders();
+        ArrayList<Order> orders = null;
+
+        try {
+            orders = oda.getOrders();
+        }
+        catch(SQLException e) {
+            throw new ApiException(e);
+        }
 
         if (orders == null || orders.isEmpty())
             throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
@@ -53,7 +61,14 @@ public class OrderLogic {
     }
 
     public GetOrderResponse getOrder(GetOrderRequest request) throws ApiException {
-        Order order = oda.getOrder(request.getOrderId());
+        Order order = null;
+
+        try {
+            order = oda.getOrder(request.getOrderId());
+        }
+        catch(SQLException e) {
+            throw new ApiException(e);
+        }
 
         if (order == null)
             throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
@@ -74,53 +89,58 @@ public class OrderLogic {
     }
 
     public GetOrderResponse createOrder(SaveOrderRequest request, User loggedUser) throws ApiException {
-        Order order = new Order();
+        try {
+            Order order = new Order();
 
-        // Only suppliers can create Proposals
-        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL)))
-            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+            // Only suppliers can create Proposals
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
-        // Validate fields.
-        ApiException ex = validateSaveOrder(request);
+            // Validate fields.
+            ApiException ex = validateSaveOrder(request);
 
-        if (!ex.isOk())
-            throw ex;
+            if (!ex.isOk())
+                throw ex;
 
-        ArrayList<OrderLine> lines = new ArrayList<OrderLine>();
+            ArrayList<OrderLine> lines = new ArrayList<OrderLine>();
 
-        // For every line, get the product and validate its existence. Then add it to the proposal.
-        for(Line line : request.getLines()) {
-            OrderLine orderLine = new OrderLine();
+            // For every line, get the product and validate its existence. Then add it to the proposal.
+            for(Line line : request.getLines()) {
+                OrderLine orderLine = new OrderLine();
 
-            orderLine.setProposalLine(pda.getProposalLine(line.getProposalLineId()));
+                orderLine.setProposalLine(pda.getProposalLine(line.getProposalLineId()));
 
-            if (orderLine.getProposalLine() == null)
-                throw new ApiException("At least one proposal line could not be found", Status.NOT_FOUND);
+                if (orderLine.getProposalLine() == null)
+                    throw new ApiException("At least one proposal line could not be found", Status.NOT_FOUND);
 
-            orderLine.setQuantity(line.getQuantity());
+                orderLine.setQuantity(line.getQuantity());
 
-            lines.add(orderLine);
+                lines.add(orderLine);
+            }
+
+            // Set primitive data.
+            order.setDateOrdered(request.getDateOrdered());
+            order.setOrderLines(lines);
+            order.setRetail((Retail)loggedUser.getOrganization());
+
+            order = oda.registerOrder(order);
+
+            return new GetOrderResponse(
+                order.getId(),
+                order.getDateOrdered(),
+                getOrderLine(order.getOrderLines()),
+                new GetOrganizationResponse(
+                    order.getRetail().getId(),
+                    order.getRetail().getName(),
+                    order.getRetail().getLegalName(),
+                    order.getRetail().getCuit(),
+                    order.getRetail().getRole()
+                )
+            );
         }
-
-        // Set primitive data.
-        order.setDateOrdered(request.getDateOrdered());
-        order.setOrderLines(lines);
-        order.setRetail((Retail)loggedUser.getOrganization());
-
-        order = oda.registerOrder(order);
-
-        return new GetOrderResponse(
-            order.getId(),
-            order.getDateOrdered(),
-            getOrderLine(order.getOrderLines()),
-            new GetOrganizationResponse(
-                order.getRetail().getId(),
-                order.getRetail().getName(),
-                order.getRetail().getLegalName(),
-                order.getRetail().getCuit(),
-                order.getRetail().getRole()
-            )
-        );
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     private ApiException validateSaveOrder(SaveOrderRequest request) {
