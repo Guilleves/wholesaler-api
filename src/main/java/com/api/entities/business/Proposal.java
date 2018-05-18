@@ -156,21 +156,25 @@ public class Proposal {
         this.deletedAt = date;
     }
 
-    public String getState(){
-        Date today = new Date();
-
-        if (this.getBeginDate().after(today))
-            return ProposalStates.SCHEDULED;
-        if (this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate())))
-            return ProposalStates.ACTIVE;
-        if (today.before(getEndDate()))
-            return ProposalStates.FINISHED;
-        return null;
-    }
-
-    public boolean isActive(){
+    public boolean isActive() {
         Date today = new Date();
         return this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate()));
+    }
+
+    public String getStatus() {
+        Date today = new Date();
+
+        if (beginDate == null || beginDate == null)
+            return null;
+
+        if (beginDate.after(today))
+            return ProposalStates.SCHEDULED;
+        else if (endDate.after(today) && (beginDate.equals(today) || beginDate.before(today)))
+            return ProposalStates.ACTIVE;
+        else if (endDate.before(today))
+            return ProposalStates.FINISHED;
+        else
+            return null;
     }
 
 	/**
