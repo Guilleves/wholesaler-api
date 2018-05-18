@@ -2,7 +2,6 @@ package com.api.entities.models.proposal;
 
 // #region Imports
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.ArrayList;
 import java.util.Date;
 import java.io.Serializable;

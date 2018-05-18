@@ -52,10 +52,10 @@ public class ProposalDataAccess extends BaseDataAccess {
         return getOne(rs -> deserializeProposal(rs), query, proposalId);
     }
 
-    public ArrayList<Proposal> getProposals(String status, Integer supplierId) {
+    public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) {
         ArrayList<Proposal> proposals = new ArrayList<Proposal>();
 
-        // works only when there's at least one document of each collection
+        // Works only when there's at least one row (document) of each table (collection) because of the inner join...
         query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
 
         if (status != null) {
@@ -75,14 +75,39 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
 
         if (supplierId != null)
-            query = query.concat(" and P.supplierId = ") + supplierId;
+            query += " AND P.supplierId = ?";
+
+        if (orderBy != null)
+            query += " ORDER BY ?";
+
+        if (pageSize != null && pageIndex != null)
+            query += " LIMIT ?, ?";
 
         query = query.concat(";");
 
         try {
-            statement = Connection.getInstancia().getConn().createStatement();
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-            resultSet = statement.executeQuery(query);
+            int paramIndex = 1;
+
+            if (supplierId != null) {
+                ((PreparedStatement)statement).setInt(paramIndex, supplierId.intValue());
+                paramIndex++;
+            }
+
+            if (orderBy != null) {
+                ((PreparedStatement)statement).setString(paramIndex, orderBy);
+                paramIndex ++;
+            }
+
+            if (pageSize != null && pageIndex != null) {
+                ((PreparedStatement)statement).setInt(paramIndex, pageIndex);
+                paramIndex ++;
+                ((PreparedStatement)statement).setInt(paramIndex, pageSize);
+                paramIndex ++;
+            }
+
+            resultSet = ((PreparedStatement)statement).executeQuery();
 
             proposals = deserializeProposals(resultSet);
         }
@@ -261,6 +286,28 @@ public class ProposalDataAccess extends BaseDataAccess {
         return proposal;
     }
 
+    public boolean deleteProposal(int proposalId) {
+        int rowsModified = 0;
+
+        query = "UPDATE Proposal SET deletedAt = NOW() WHERE id = ?;";
+
+        try {
+            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ((PreparedStatement)statement).setInt(1, proposalId);
+
+
+            rowsModified = ((PreparedStatement)statement).executeUpdate();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            Connection.getInstancia().closeConn();
+        }
+
+        return rowsModified != 0;
+    }
+
     public ProposalLine createProposalLine(ProposalLine proposalLine) {
         query = "INSERT INTO ProposalLine (proposalId, productId, price) VALUES (?, ?, ?);";
 
@@ -295,7 +342,7 @@ public class ProposalDataAccess extends BaseDataAccess {
     // #region Privates
 
     private Proposal deserializeProposal(ResultSet resultSet) throws SQLException {
-        Proposal proposal = new Proposal();
+        Proposal proposal = null;
 
         int currentProposalId = 0;
 
@@ -303,6 +350,8 @@ public class ProposalDataAccess extends BaseDataAccess {
         while (resultSet.next()) {
             // If proposal didn't change (should be only one... but just in case)
             if (resultSet.getInt("id") != currentProposalId) {
+                proposal = new Proposal();
+
                 proposal.setId(resultSet.getInt("id"));
                 proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
                 proposal.setEndDate(resultSet.getTimestamp("endDate"));
