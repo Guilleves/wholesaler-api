@@ -18,11 +18,11 @@ public class BaseDataAccess {
     	ResultSet rs = null;
 
         try {
-        	// Dependiendo si tengo parámetros para la query abro un Statement o un PreparedStatement...
+        	// Create statement or preparedStatement.
         	if (parameters == null) {
         		st = Connection.getInstancia().getConn().createStatement();
 
-        		// ... y corre el query
+        		// ... execute the query.
                 rs = st.executeQuery(query);
         	}
         	else {
@@ -36,7 +36,7 @@ public class BaseDataAccess {
         			((PreparedStatement)st).setObject(i, parameter);
         		}
 
-        		// ... y corre el query
+        		// ... execute the query.
                 rs = ((PreparedStatement)st).executeQuery();
         	}
 
@@ -58,11 +58,9 @@ public class BaseDataAccess {
     	ResultSet rs = null;
 
         try {
-        	// Dependiendo si tengo parámetros para la query abro un Statement o un PreparedStatement...
         	if (parameters == null) {
         		st = Connection.getInstancia().getConn().createStatement();
 
-        		// ... y corre el query
                 rs = st.executeQuery(query);
         	}
         	else {
@@ -76,7 +74,6 @@ public class BaseDataAccess {
         			((PreparedStatement)st).setObject(i, parameter);
         		}
 
-        		// ... y corre el query
                 rs = ((PreparedStatement)st).executeQuery();
         	}
 
@@ -181,10 +178,10 @@ public class BaseDataAccess {
     		for (Object parameter : parameters) {
     			i++;
 
-    			((PreparedStatement)st).setObject(i, parameter);
+    			st.setObject(i, parameter);
     		}
 
-    		affectedRows = ((PreparedStatement)st).executeUpdate();
+    		affectedRows = st.executeUpdate();
 
     		if (affectedRows == 0) {
                 throw new SQLException("Creating user failed, no rows affected.");
@@ -219,7 +216,7 @@ public class BaseDataAccess {
     		for (Object parameter : parameters) {
     			i++;
 
-    			((PreparedStatement)preparedStatement).setObject(i, parameter);
+    			preparedStatement.setObject(i, parameter);
     		}
 
             preparedStatement.executeUpdate();

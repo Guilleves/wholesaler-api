@@ -38,7 +38,7 @@ public class ProductDataAccess extends BaseDataAccess {
         return getOne(rs -> new Product(rs), query, productId);
     }
 
-    public ArrayList<Product> getProducts() throws SQLException{
+    public ArrayList<Product> getProducts(int brandId, int categoryId, int pageIndex, int pageSize, String keyword, String orderBy) throws SQLException{
         String query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
@@ -47,24 +47,44 @@ public class ProductDataAccess extends BaseDataAccess {
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
             "INNER JOIN Category C ON P.categoryId = C.id " +
-            "WHERE P.deletedAt IS NULL;";
+            "WHERE P.deletedAt IS NULL";
 
-        return getMany(rs -> new Product(rs), query);
-    }
+        ArrayList<Object> parameters = new ArrayList<Object>();
 
-    public ArrayList<Product> getProductsByFilter(int brandId, int categoryId, String keyword) throws SQLException {
-        String query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE (p.brandId = ? or ? = 0) AND (p.categoryId = ? or ? = 0) AND (p.name LIKE ? or b.name LIKE ? or c.name LIKE ? or ? is null)";
+        if (brandId != 0) {
+            query += " AND B.id = ?";
+            parameters.add(brandId);
+        }
 
-        return getMany(rs -> new Product(rs), query,
-            brandId,
-            brandId,
-            categoryId,
-            categoryId,
-            '%' + keyword + '%',
-            '%' + keyword + '%',
-            '%' + keyword + '%',
-            keyword
-        );
+        if (categoryId != 0) {
+            query += " AND C.id = ?";
+            parameters.add(categoryId);
+        }
+
+        if (keyword != null && !keyword.isEmpty()) {
+             query += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?)";
+             parameters.add('%' + keyword + '%');
+             parameters.add('%' + keyword + '%');
+             parameters.add('%' + keyword + '%');
+        }
+
+        // this is not working...
+        /*if (orderBy != null && !orderBy.isEmpty()) {
+            query += " ORDER BY ?";
+            parameters.add(orderBy);
+        }*/
+
+        if (pageIndex != 0 && pageSize != 0) {
+            query += " LIMIT ?, ?";
+            parameters.add(pageIndex - 1);
+            parameters.add(pageSize);
+        }
+
+        query += ";";
+
+        System.out.println(query);
+
+        return getMany(rs -> new Product(rs), query, parameters.toArray());
     }
 
     public Product createProduct(Product product) throws SQLException{

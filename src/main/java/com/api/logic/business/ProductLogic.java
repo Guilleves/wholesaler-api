@@ -2,14 +2,12 @@ package com.api.logic.business;
 
 // #region Imports
 import java.sql.SQLException;
-import com.api.entities.models.product.GetProductsByFilterResponse;
-import com.api.entities.models.product.GetProductsByFilterRequest;
+import com.api.entities.models.product.GetProductsRequest;
 import com.api.entities.business.User;
 import com.api.entities.enums.OrganizationRoles;
 import javax.ws.rs.core.Response.Status;
 
 import com.api.entities.models.product.SaveProductRequest;
-import com.api.entities.models.product.SaveProductResponse;
 
 import java.util.ArrayList;
 
@@ -65,12 +63,19 @@ public class ProductLogic {
         }
     }
 
-    public ArrayList<GetProductResponse> getProducts() throws ApiException {
+    public ArrayList<GetProductResponse> getProducts(GetProductsRequest request) throws ApiException {
         try {
             ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
 
             // Fetch product list.
-            ArrayList<Product> products = pda.getProducts();
+            ArrayList<Product> products = pda.getProducts(
+                request.getBrandId(),
+                request.getCategoryId(),
+                request.getPageIndex(),
+                request.getPageSize(),
+                request.getKeyword(),
+                request.getOrderBy()
+            );
 
             if (products == null || products.isEmpty())
                 throw new ApiException("Couldn't find products.", Status.NOT_FOUND);
@@ -95,38 +100,8 @@ public class ProductLogic {
         }
     }
 
-    public ArrayList<GetProductsByFilterResponse>getProductsByFilter(GetProductsByFilterRequest request) throws ApiException {
+    public GetProductResponse createProduct(SaveProductRequest request, User loggedUser) throws ApiException {
         try {
-            ArrayList<GetProductsByFilterResponse> response = new ArrayList<GetProductsByFilterResponse>();
-
-            ArrayList<Product> products = pda.getProductsByFilter(request.getBrandId(), request.getCategoryId(), request.getKeyword());
-
-            if (products == null || products.isEmpty())
-                throw new ApiException("There are no products that match this criteria.", Status.NOT_FOUND);
-
-            for (Product product : products) {
-                response.add(new GetProductsByFilterResponse(
-                    product.getId(),
-                    product.getName(),
-                    product.getGtin(),
-                    product.getBrand().getId(),
-                    product.getBrand().getName(),
-                    product.getCategory().getId(),
-                    product.getCategory().getName()
-                ));
-            }
-
-            return response;
-        }
-        catch(SQLException ex) {
-            throw new ApiException(ex);
-        }
-    }
-
-    public SaveProductResponse saveProduct(SaveProductRequest request, User loggedUser) throws ApiException {
-        try {
-            SaveProductResponse response = new SaveProductResponse();
-
             if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
                 throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
@@ -150,10 +125,62 @@ public class ProductLogic {
                 category
             );
 
-            if (product.getId() == 0)
-                pda.createProduct(product);
-            else
-                pda.updateProduct(product);
+            product = pda.createProduct(product);
+
+            return new GetProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getGtin(),
+                product.getBrand().getId(),
+                product.getBrand().getName(),
+                product.getCategory().getId(),
+                product.getCategory().getName()
+            );
+        }
+        catch (SQLException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
+    public GetProductResponse updateProduct(SaveProductRequest request, User loggedUser) throws ApiException {
+        try {
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+
+            // Search brand.
+            Brand brand = pda.getBrand(request.getBrandId());
+
+            // Search category.
+            Category category = pda.getCategory(request.getCategoryId());
+
+            // Validate fields.
+            ApiException ex = validateSaveProduct(request, brand, category);
+
+            if (!ex.isOk())
+                throw(ex);
+
+            Product product = new Product(
+                request.getId(),
+                request.getName(),
+                request.getGtin(),
+                brand,
+                category
+            );
+
+            int amtOfRows = pda.updateProduct(product);
+
+            GetProductResponse response = new GetProductResponse();
+
+            if (amtOfRows != 0)
+                response = new GetProductResponse(
+                    product.getId(),
+                    product.getName(),
+                    product.getGtin(),
+                    product.getBrand().getId(),
+                    product.getBrand().getName(),
+                    product.getCategory().getId(),
+                    product.getCategory().getName()
+                );
 
             return response;
         }

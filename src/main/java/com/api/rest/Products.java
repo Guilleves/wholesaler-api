@@ -2,8 +2,9 @@ package com.api.rest;
 
 // #region Imports
 
+import com.api.entities.models.product.GetProductsRequest;
+import javax.ws.rs.PUT;
 import javax.ws.rs.QueryParam;
-import com.api.entities.models.product.GetProductsByFilterRequest;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
 import javax.ws.rs.core.SecurityContext;
@@ -47,19 +48,22 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProducts(@QueryParam("brandId") int brandId, @QueryParam("categoryId") int categoryId, @QueryParam("keyword") String keyword) {
-            GetProductsByFilterRequest request = new GetProductsByFilterRequest(brandId, categoryId, keyword);
+    public Response getProducts(@QueryParam("brandId") int brandId, @QueryParam("categoryId") int categoryId, @QueryParam("keyword") String keyword, @QueryParam("orderBy") String orderBy, @QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
+        GetProductsRequest request = new GetProductsRequest(
+            brandId,
+            categoryId,
+            pageIndex,
+            pageSize,
+            keyword,
+            orderBy
+        );
 
-            try {
-                if (brandId == 0 && categoryId == 0 && keyword == null) {
-                    return Response.ok(pl.getProducts()).build();
-                } else {
-                    return Response.ok(pl.getProductsByFilter(request)).build();
-                }
-            }
-            catch(ApiException e) {
-                return Response.status(e.getStatus()).entity(e.getErrors()).build();
-            }
+        try {
+            return Response.ok(pl.getProducts(request)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
     }
 
     @GET
@@ -83,16 +87,35 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response saveProduct(@Context SecurityContext context, SaveProductRequest request) {
+    public Response createProduct(@Context SecurityContext context, SaveProductRequest request) {
         try {
             User loggedUser = ((UserPrincipal)context.getUserPrincipal()).getUser();
-            pl.saveProduct(request, loggedUser);
+            pl.createProduct(request, loggedUser);
             return Response.ok().build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/{productId}")
+    public Response updateProduct(@PathParam("productId") int productId, @Context SecurityContext context, SaveProductRequest request) {
+        try {
+            request.setId(productId);
+
+            User loggedUser = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            pl.updateProduct(request, loggedUser);
+            return Response.ok().build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
 
     // #endregion
 }
