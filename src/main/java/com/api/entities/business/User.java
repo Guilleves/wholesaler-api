@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 // #endregion
 
-public class User {
+public class User implements BaseEntity {
     private int id;
     private String firstName, lastName, username, password, email;
     private Organization organization;

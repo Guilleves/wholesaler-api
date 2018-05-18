@@ -1,10 +1,6 @@
 package com.api.data.business;
 
 // #region Imports
-import com.api.data.db.Connection;
-
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
@@ -15,10 +11,8 @@ import com.api.entities.business.User;
 public class UserDataAccess extends BaseDataAccess {
     // #region UserSetup
 
-    public ArrayList<User> getUsers() {
-        ArrayList<User> users = new ArrayList<User>();
-
-        query = "SELECT " +
+    public ArrayList<User> getUsers() throws SQLException {
+        String query = "SELECT " +
             "U.*, " +
             "O.id as organizationId, " +
             "O.name as organizationName, " +
@@ -28,29 +22,11 @@ public class UserDataAccess extends BaseDataAccess {
             "FROM User U " +
             "INNER JOIN Organization O on U.organizationId = O.id;";
 
-        try {
-            statement = Connection.getInstancia().getConn().createStatement();
-
-            resultSet = statement.executeQuery(query);
-
-            while(resultSet.next()) {
-                users.add(new User(resultSet));
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return users;
+        return getMany(rs -> new User(rs), query);
     }
 
-    public User getUser(int id) {
-        User user = null;
-
-        query = "SELECT " +
+    public User getUser(int id) throws SQLException {
+        String query = "SELECT " +
             "U.*, " +
             "O.id as organizationId, " +
             "O.name as organizationName, " +
@@ -61,30 +37,11 @@ public class UserDataAccess extends BaseDataAccess {
             "INNER JOIN Organization O on U.organizationId = O.id " +
             "WHERE U.id = ?;";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, id);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            if (resultSet.next()) {
-                user = new User(resultSet);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return user;
+        return getOne(rs -> new User(rs), query, id);
     }
 
-    public User getUser(String username) {
-        User user = null;
-
-        query = "SELECT " +
+    public User getUser(String username) throws SQLException {
+        String query = "SELECT " +
             "U.*, " +
             "O.id as organizationId, " +
             "O.name as organizationName, " +
@@ -95,113 +52,40 @@ public class UserDataAccess extends BaseDataAccess {
             "INNER JOIN Organization O on U.organizationId = O.id " +
             "WHERE U.username = ?;";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, username);
+            return getOne(rs -> new User(rs), query, username);
+    }
 
-            resultSet = ((PreparedStatement)statement).executeQuery();
+    public User createUser(User user) throws SQLException {
+        String query = "INSERT INTO User (firstName, lastName, username, email, password) VALUES (?, ?, ?, ?, ?);";
 
-            if (resultSet.next()) {
-                user = new User(resultSet);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
+        user.setId(create(query,
+            user.getFirstName(),
+            user.getLastName(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getPassword()
+        ));
 
         return user;
     }
 
-    public int createUser(User user) {
-        int id = 0;
+    public int updateUser(User user) throws SQLException {
+        String query = "UPDATE User SET firstName = ?, lastName = ?, username = ?, email = ?, password = ? WHERE id = ?;";
 
-        query = "INSERT INTO User (firstName, lastName, username, email, password) VALUES (?, ?, ?, ?, ?);";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, user.getFirstName());
-            ((PreparedStatement)statement).setString(2, user.getLastName());
-            ((PreparedStatement)statement).setString(3, user.getUsername());
-            ((PreparedStatement)statement).setString(4, user.getEmail());
-            ((PreparedStatement)statement).setString(5, user.getPassword());
-
-            ((PreparedStatement)statement).executeUpdate();
-
-            resultSet = statement.getGeneratedKeys();
-
-            // If it created the user, return the created id
-            if (resultSet.next()) {
-                id = resultSet.getInt(1);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return id;
+        return update(query,
+            user.getFirstName(),
+            user.getLastName(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getPassword(),
+            user.getId()
+        );
     }
 
-    public int updateUser(User user) {
-        int id = 0;
+    public ArrayList<User> getUsersByOrganization(int organizationId) throws SQLException {
+        String query = "SELECT * FROM User u WHERE u.organizationId = ?;";
 
-        query = "UPDATE User SET firstName = ?, lastName = ?, username = ?, email = ?, password = ? WHERE id = ?;";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, user.getFirstName());
-            ((PreparedStatement)statement).setString(2, user.getLastName());
-            ((PreparedStatement)statement).setString(3, user.getUsername());
-            ((PreparedStatement)statement).setString(4, user.getEmail());
-            ((PreparedStatement)statement).setString(5, user.getPassword());
-            ((PreparedStatement)statement).setInt(6, user.getId());
-
-            ((PreparedStatement)statement).executeUpdate();
-
-            resultSet = statement.getGeneratedKeys();
-
-            // If it updated the user, return the updated id
-            if (resultSet.next()) {
-                id = resultSet.getInt(1);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return id;
-    }
-
-    public ArrayList<User> getUsersByOrganization(int organizationId) {
-        ArrayList<User> users = new ArrayList<User>();
-        query = "SELECT * FROM User u WHERE u.organizationId = ?;";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, organizationId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            while(resultSet.next()) {
-                users.add(new User(resultSet));
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return users;
+        return getMany(rs -> new User(rs), query, organizationId);
     }
 
     // #endregion

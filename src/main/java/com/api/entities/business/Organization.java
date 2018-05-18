@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 // #endregion
 
-public class Organization {
+public class Organization implements BaseEntity {
     private int id;
     private String name, cuit, legalName, role;
     private ArrayList<User> users;
@@ -44,12 +44,6 @@ public class Organization {
         this.cuit = rs.getString("cuit");
         this.legalName = rs.getString("legalName");
     }
-
-
-  public ArrayList<User> getUsers(int organizationId) {
-    UserDataAccess uda = new UserDataAccess();
-    return uda.getUsersByOrganization(organizationId);
-  }
 
 	/**
 	* Returns value of id

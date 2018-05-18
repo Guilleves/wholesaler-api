@@ -12,11 +12,6 @@ import java.sql.Statement;
 // #endregion
 
 public class BaseDataAccess {
-    protected PreparedStatement preparedStatement;
-    protected Statement statement = null;
-    protected ResultSet resultSet = null;
-    protected String query = null;
-
     protected <T extends BaseEntity> ArrayList<T> getManyWithoutStatement(DBToObject<ArrayList<T>> converter, String query, Object... parameters) throws SQLException {
         ArrayList<T> ResList = new ArrayList<>();
     	Statement st = null;
@@ -214,18 +209,22 @@ public class BaseDataAccess {
     protected int create(String query, Object... parameters) throws SQLException {
         int insertedId = 0;
 
+        PreparedStatement preparedStatement = null;
+
         try {
             preparedStatement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-            int paramCount = 1;
+            int i = 0;
 
-            for (Object parameter : parameters) {
-                preparedStatement.setObject(paramCount, parameter);
-            }
+    		for (Object parameter : parameters) {
+    			i++;
+
+    			((PreparedStatement)preparedStatement).setObject(i, parameter);
+    		}
 
             preparedStatement.executeUpdate();
 
-            resultSet = statement.getGeneratedKeys();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
             if (resultSet.next()) {
                 insertedId = resultSet.getInt(1);

@@ -1,6 +1,6 @@
 package com.api.entities.business;
 
-public class OrderLine {
+public class OrderLine implements BaseEntity {
     private int id, quantity;
     private Order order;
     private ProposalLine proposalLine;

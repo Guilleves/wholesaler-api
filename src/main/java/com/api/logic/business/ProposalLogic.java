@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import java.sql.SQLException;
 import com.api.entities.models.proposal.GetProposalsRequest;
 import com.api.entities.models.organization.GetOrganizationResponse;
 import com.api.entities.models.product.GetProductResponse;
@@ -30,153 +31,173 @@ public class ProposalLogic {
     }
 
     public ArrayList<GetProposalsResponse> getProposals(GetProposalsRequest request) throws ApiException {
-        ArrayList<Proposal> proposals = pda.getProposals(request.getStatus(), request.getSupplierId(), request.getOrderBy(), request.getPageSize(), request.getPageIndex());
-        ArrayList<GetProposalsResponse> response = new ArrayList<GetProposalsResponse>();
+        try {
+            ArrayList<Proposal> proposals = pda.getProposals(request.getStatus(), request.getSupplierId(), request.getOrderBy(), request.getPageSize(), request.getPageIndex());
+            ArrayList<GetProposalsResponse> response = new ArrayList<GetProposalsResponse>();
 
-        if (proposals == null || proposals.isEmpty())
-            throw new ApiException("Cound't find any proposal.", Status.NOT_FOUND);
+            if (proposals == null || proposals.isEmpty())
+                throw new ApiException("Cound't find any proposal.", Status.NOT_FOUND);
 
-        for(Proposal proposal : proposals) {
-            response.add(new GetProposalsResponse(
+            for(Proposal proposal : proposals) {
+                response.add(new GetProposalsResponse(
+                    proposal.getId(),
+                    proposal.getTitle(),
+                    proposal.getDescription(),
+                    proposal.getStatus(),
+                    proposal.getBeginDate(),
+                    proposal.getEndDate()
+                ));
+            }
+
+            return response;
+        }
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
+    public GetProposalResponse getProposal(int proposalId) throws ApiException {
+        try {
+            Proposal proposal = pda.getProposal(proposalId);
+
+            if (proposal == null)
+                throw new ApiException("Proposal not found.", Status.NOT_FOUND);
+
+            ArrayList<GetProposalResponse.Line> responseLines = new ArrayList<GetProposalResponse.Line>();
+
+            for(ProposalLine line : proposal.getProposalLines()) {
+                responseLines.add(new GetProposalResponse.Line(
+                    line.getId(),
+                    new GetProductResponse (
+                        line.getProduct().getId(),
+                        line.getProduct().getName(),
+                        line.getProduct().getGtin(),
+                        line.getProduct().getBrand().getId(),
+                        line.getProduct().getBrand().getName(),
+                        line.getProduct().getCategory().getId(),
+                        line.getProduct().getCategory().getName()
+                    ),
+                    line.getPrice()
+                ));
+            }
+
+            return new GetProposalResponse(
                 proposal.getId(),
                 proposal.getTitle(),
                 proposal.getDescription(),
                 proposal.getStatus(),
                 proposal.getBeginDate(),
-                proposal.getEndDate()
-            ));
+                proposal.getEndDate(),
+                responseLines,
+                new GetOrganizationResponse(
+                    proposal.getSupplier().getId(),
+                    proposal.getSupplier().getName(),
+                    proposal.getSupplier().getLegalName(),
+                    proposal.getSupplier().getCuit(),
+                    proposal.getSupplier().getRole()
+                )
+            );
         }
-
-        return response;
-    }
-
-    public GetProposalResponse getProposal(int proposalId) throws ApiException {
-        Proposal proposal = pda.getProposal(proposalId);
-
-        if (proposal == null)
-            throw new ApiException("Proposal not found.", Status.NOT_FOUND);
-
-        ArrayList<GetProposalResponse.Line> responseLines = new ArrayList<GetProposalResponse.Line>();
-
-        for(ProposalLine line : proposal.getProposalLines()) {
-            responseLines.add(new GetProposalResponse.Line(
-                line.getId(),
-                new GetProductResponse (
-                    line.getProduct().getId(),
-                    line.getProduct().getName(),
-                    line.getProduct().getGtin(),
-                    line.getProduct().getBrand().getId(),
-                    line.getProduct().getBrand().getName(),
-                    line.getProduct().getCategory().getId(),
-                    line.getProduct().getCategory().getName()
-                ),
-                line.getPrice()
-            ));
+        catch(SQLException ex) {
+            throw new ApiException(ex);
         }
-
-        return new GetProposalResponse(
-            proposal.getId(),
-            proposal.getTitle(),
-            proposal.getDescription(),
-            proposal.getStatus(),
-            proposal.getBeginDate(),
-            proposal.getEndDate(),
-            responseLines,
-            new GetOrganizationResponse(
-                proposal.getSupplier().getId(),
-                proposal.getSupplier().getName(),
-                proposal.getSupplier().getLegalName(),
-                proposal.getSupplier().getCuit(),
-                proposal.getSupplier().getRole()
-            )
-        );
     }
 
     public DeleteProposalResponse deleteProposal(int proposalId, User loggedUser) throws ApiException {
-        // Only suppliers can delete Proposals
-        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
-            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+        try {
+            // Only suppliers can delete Proposals
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
-        return new DeleteProposalResponse(pda.deleteProposal(proposalId));
+            return new DeleteProposalResponse(pda.deleteProposal(proposalId));
+        }
+        catch (SQLException ex) {
+                throw new ApiException(ex);
+        }
     }
 
     public GetProposalResponse saveProposal(SaveProposalRequest request, User loggedUser) throws ApiException {
-        Proposal proposal = new Proposal();
+        try {
+            Proposal proposal = new Proposal();
 
-        // Only suppliers can create Proposals
-        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
-            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+            // Only suppliers can create Proposals
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
 
-        // Validate fields.
-        ApiException ex = validateSaveProposal(request);
+            // Validate fields.
+            ApiException ex = validateSaveProposal(request);
 
-        if (!ex.isOk())
-            throw ex;
+            if (!ex.isOk())
+                throw ex;
 
-        ArrayList<ProposalLine> lines = new ArrayList<ProposalLine>();
+            ArrayList<ProposalLine> lines = new ArrayList<ProposalLine>();
 
-        // For every line, get the product and validate its existence. Then add it to the proposal.
-        for(Line line : request.getLines()) {
-            Product product = productDa.getProduct(line.getProductId());
+            // For every line, get the product and validate its existence. Then add it to the proposal.
+            for(Line line : request.getLines()) {
+                Product product = productDa.getProduct(line.getProductId());
 
-            if (product == null)
-                throw new ApiException("One of the selected prodcuts coudn't be found.", Status.NOT_FOUND);
+                if (product == null)
+                    throw new ApiException("One of the selected prodcuts coudn't be found.", Status.NOT_FOUND);
 
-            ProposalLine proposalLine = new ProposalLine();
+                ProposalLine proposalLine = new ProposalLine();
 
-            proposalLine.setProduct(product);
-            proposalLine.setPrice(line.getPrice());
+                proposalLine.setProduct(product);
+                proposalLine.setPrice(line.getPrice());
 
-            // Are we supporting this? Proposal, with lines with proposal with lines with... etc. Don't think so.
-            //proposalLine.setProposal(proposal);
+                // Are we supporting this? Proposal, with lines with proposal with lines with... etc. Don't think so.
+                //proposalLine.setProposal(proposal);
 
-            lines.add(proposalLine);
+                lines.add(proposalLine);
+            }
+
+            // Set primitive data.
+            proposal.setSupplier(new Supplier(loggedUser.getOrganization()));
+            proposal.setTitle(request.getTitle());
+            proposal.setDescription(request.getDescription());
+            proposal.setBeginDate(request.getBeginDate());
+            proposal.setEndDate(request.getEndDate());
+            proposal.setProposalLines(lines);
+
+            Proposal createdProposal = pda.registerProposal(proposal);
+
+            ArrayList<GetProposalResponse.Line> responseLines = new ArrayList<GetProposalResponse.Line>();
+
+            for(ProposalLine line : createdProposal.getProposalLines()) {
+                responseLines.add(new GetProposalResponse.Line(
+                    line.getId(),
+                    new GetProductResponse (
+                        line.getProduct().getId(),
+                        line.getProduct().getName(),
+                        line.getProduct().getGtin(),
+                        line.getProduct().getBrand().getId(),
+                        line.getProduct().getBrand().getName(),
+                        line.getProduct().getCategory().getId(),
+                        line.getProduct().getCategory().getName()
+                    ),
+                    line.getPrice()
+                ));
+            }
+
+            return new GetProposalResponse(
+                createdProposal.getId(),
+                createdProposal.getTitle(),
+                createdProposal.getDescription(),
+                createdProposal.getStatus(),
+                createdProposal.getBeginDate(),
+                createdProposal.getEndDate(),
+                responseLines,
+                new GetOrganizationResponse(
+                    createdProposal.getSupplier().getId(),
+                    createdProposal.getSupplier().getName(),
+                    createdProposal.getSupplier().getLegalName(),
+                    createdProposal.getSupplier().getCuit(),
+                    createdProposal.getSupplier().getRole()
+                )
+            );
         }
-
-        // Set primitive data.
-        proposal.setSupplier(new Supplier(loggedUser.getOrganization()));
-        proposal.setTitle(request.getTitle());
-        proposal.setDescription(request.getDescription());
-        proposal.setBeginDate(request.getBeginDate());
-        proposal.setEndDate(request.getEndDate());
-        proposal.setProposalLines(lines);
-
-        Proposal createdProposal = pda.registerProposal(proposal);
-
-        ArrayList<GetProposalResponse.Line> responseLines = new ArrayList<GetProposalResponse.Line>();
-
-        for(ProposalLine line : createdProposal.getProposalLines()) {
-            responseLines.add(new GetProposalResponse.Line(
-                line.getId(),
-                new GetProductResponse (
-                    line.getProduct().getId(),
-                    line.getProduct().getName(),
-                    line.getProduct().getGtin(),
-                    line.getProduct().getBrand().getId(),
-                    line.getProduct().getBrand().getName(),
-                    line.getProduct().getCategory().getId(),
-                    line.getProduct().getCategory().getName()
-                ),
-                line.getPrice()
-            ));
+        catch(SQLException ex) {
+            throw new ApiException(ex);
         }
-
-        return new GetProposalResponse(
-            createdProposal.getId(),
-            createdProposal.getTitle(),
-            createdProposal.getDescription(),
-            createdProposal.getStatus(),
-            createdProposal.getBeginDate(),
-            createdProposal.getEndDate(),
-            responseLines,
-            new GetOrganizationResponse(
-                createdProposal.getSupplier().getId(),
-                createdProposal.getSupplier().getName(),
-                createdProposal.getSupplier().getLegalName(),
-                createdProposal.getSupplier().getCuit(),
-                createdProposal.getSupplier().getRole()
-            )
-        );
     }
 
     private ApiException validateSaveProposal(SaveProposalRequest request) {

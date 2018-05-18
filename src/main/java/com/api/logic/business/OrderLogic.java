@@ -89,58 +89,58 @@ public class OrderLogic {
     }
 
     public GetOrderResponse createOrder(SaveOrderRequest request, User loggedUser) throws ApiException {
-        Order order = new Order();
-
-        // Only suppliers can create Proposals
-        if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL)))
-            throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
-
-        // Validate fields.
-        ApiException ex = validateSaveOrder(request);
-
-        if (!ex.isOk())
-            throw ex;
-
-        ArrayList<OrderLine> lines = new ArrayList<OrderLine>();
-
-        // For every line, get the product and validate its existence. Then add it to the proposal.
-        for(Line line : request.getLines()) {
-            OrderLine orderLine = new OrderLine();
-
-            orderLine.setProposalLine(pda.getProposalLine(line.getProposalLineId()));
-
-            if (orderLine.getProposalLine() == null)
-                throw new ApiException("At least one proposal line could not be found", Status.NOT_FOUND);
-
-            orderLine.setQuantity(line.getQuantity());
-
-            lines.add(orderLine);
-        }
-
-        // Set primitive data.
-        order.setDateOrdered(request.getDateOrdered());
-        order.setOrderLines(lines);
-        order.setRetail((Retail)loggedUser.getOrganization());
-
         try {
-            order = oda.registerOrder(order);
-        }
-        catch(SQLException sqlEx) {
-            throw new ApiException(sqlEx);
-        }
+            Order order = new Order();
 
-        return new GetOrderResponse(
-            order.getId(),
-            order.getDateOrdered(),
-            getOrderLine(order.getOrderLines()),
-            new GetOrganizationResponse(
-                order.getRetail().getId(),
-                order.getRetail().getName(),
-                order.getRetail().getLegalName(),
-                order.getRetail().getCuit(),
-                order.getRetail().getRole()
-            )
-        );
+            // Only suppliers can create Proposals
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+
+            // Validate fields.
+            ApiException ex = validateSaveOrder(request);
+
+            if (!ex.isOk())
+                throw ex;
+
+            ArrayList<OrderLine> lines = new ArrayList<OrderLine>();
+
+            // For every line, get the product and validate its existence. Then add it to the proposal.
+            for(Line line : request.getLines()) {
+                OrderLine orderLine = new OrderLine();
+
+                orderLine.setProposalLine(pda.getProposalLine(line.getProposalLineId()));
+
+                if (orderLine.getProposalLine() == null)
+                    throw new ApiException("At least one proposal line could not be found", Status.NOT_FOUND);
+
+                orderLine.setQuantity(line.getQuantity());
+
+                lines.add(orderLine);
+            }
+
+            // Set primitive data.
+            order.setDateOrdered(request.getDateOrdered());
+            order.setOrderLines(lines);
+            order.setRetail((Retail)loggedUser.getOrganization());
+
+            order = oda.registerOrder(order);
+
+            return new GetOrderResponse(
+                order.getId(),
+                order.getDateOrdered(),
+                getOrderLine(order.getOrderLines()),
+                new GetOrganizationResponse(
+                    order.getRetail().getId(),
+                    order.getRetail().getName(),
+                    order.getRetail().getLegalName(),
+                    order.getRetail().getCuit(),
+                    order.getRetail().getRole()
+                )
+            );
+        }
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     private ApiException validateSaveOrder(SaveOrderRequest request) {

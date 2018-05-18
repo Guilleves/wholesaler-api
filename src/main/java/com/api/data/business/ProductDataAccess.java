@@ -2,6 +2,7 @@ package com.api.data.business;
 
 // #region Imports
 
+import java.sql.ResultSet;
 import java.util.Date;
 import com.api.entities.business.Category;
 import com.api.entities.business.Brand;
@@ -23,8 +24,7 @@ public class ProductDataAccess extends BaseDataAccess {
     // #region ProductSetup
 
     public Product getProduct(int productId) throws SQLException{
-        // Eeeeeeeeeeeeeeeeeek...
-        query = "SELECT " +
+        String query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
             "C.name as categoryName " +
@@ -39,7 +39,7 @@ public class ProductDataAccess extends BaseDataAccess {
     }
 
     public ArrayList<Product> getProducts() throws SQLException{
-        query = "SELECT " +
+        String query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
             "C.name as categoryName " +
@@ -52,8 +52,23 @@ public class ProductDataAccess extends BaseDataAccess {
         return getMany(rs -> new Product(rs), query);
     }
 
+    public ArrayList<Product> getProductsByFilter(int brandId, int categoryId, String keyword) throws SQLException {
+        String query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE (p.brandId = ? or ? = 0) AND (p.categoryId = ? or ? = 0) AND (p.name LIKE ? or b.name LIKE ? or c.name LIKE ? or ? is null)";
+
+        return getMany(rs -> new Product(rs), query,
+            brandId,
+            brandId,
+            categoryId,
+            categoryId,
+            '%' + keyword + '%',
+            '%' + keyword + '%',
+            '%' + keyword + '%',
+            keyword
+        );
+    }
+
     public Product createProduct(Product product) throws SQLException{
-        query = "INSERT INTO Product (name, gtin, brandId, categoryId) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO Product (name, gtin, brandId, categoryId) VALUES (?, ?, ?, ?);";
 
         product.setId(create(query,
             product.getName(),
@@ -66,29 +81,27 @@ public class ProductDataAccess extends BaseDataAccess {
     }
 
     public int updateProduct(Product product) throws SQLException {
-        int rowsModified = 0;
+        String query = "UPDATE Product SET name = ?, gtin = ?, brandId = ?, categoryId = ? WHERE id = ?;";
 
-        query = "UPDATE Product SET name = ?, gtin = ?, brandId = ?, categoryId = ? WHERE id = ?;";
-
-        rowsModified = update(query,
+        return update(query,
             product.getName(),
             product.getGtin(),
             product.getBrand().getId(),
             product.getCategory().getId(),
             product.getId()
         );
-
-        return rowsModified;
     }
 
     public boolean validateGtin(String gtin) {
-        query = "SELECT * FROM product WHERE gtin = ?";
+        PreparedStatement statement;
+        ResultSet resultSet;
+        String query = "SELECT * FROM product WHERE gtin = ?";
 
         try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, gtin);
+            statement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, gtin);
 
-            resultSet = ((PreparedStatement)statement).executeQuery();
+            resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 return true;
@@ -105,7 +118,7 @@ public class ProductDataAccess extends BaseDataAccess {
     }
 
     public boolean deleteProduct(Product product) throws SQLException {
-        query = "UPDATE Product SET deletedAt = ? WHERE id = ?;";
+        String query = "UPDATE Product SET deletedAt = ? WHERE id = ?;";
         Date now = new Date();
 
         int rowsEdited = update(query,
@@ -121,7 +134,7 @@ public class ProductDataAccess extends BaseDataAccess {
     // #region BrandInfo
 
     public Brand getBrand(int brandId) throws SQLException {
-        query = "SELECT * FROM Brand WHERE id = ?";
+        String query = "SELECT * FROM Brand WHERE id = ?";
 
         return getOne(rs -> new Brand(rs), query, brandId);
     }
@@ -131,7 +144,7 @@ public class ProductDataAccess extends BaseDataAccess {
     // #region CategoryInfo
 
     public Category getCategory(int categoryId) throws SQLException{
-        query = "SELECT * FROM Category WHERE id = ?";
+        String query = "SELECT * FROM Category WHERE id = ?";
 
         return getOne(rs -> new Category(rs), query, categoryId);
     }

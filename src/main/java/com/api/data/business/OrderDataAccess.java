@@ -12,15 +12,13 @@ import com.api.entities.business.OrderLine;
 import com.api.entities.business.Retail;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import com.api.data.db.Connection;
-import java.sql.PreparedStatement;
 import com.api.entities.business.Order;
 
 public class OrderDataAccess extends BaseDataAccess {
     public Order getOrder(int orderId) throws SQLException {
         // Eeeeeeeeeeeeeeeeeek...
-        query = "SELECT " +
+        String query = "SELECT " +
             "O.*, " +
             "P.id as proposalId, " +
             "P.id as proposalTitle, " +
@@ -60,7 +58,7 @@ public class OrderDataAccess extends BaseDataAccess {
 
     public ArrayList<Order> getOrders() throws SQLException{
         // Eeeeeeeeeeeeeeeeeek...
-        query = "SELECT " +
+        String query = "SELECT " +
             "O.*, " +
             "P.id as proposalId, " +
             "P.id as proposalTitle, " +
@@ -137,7 +135,7 @@ public class OrderDataAccess extends BaseDataAccess {
     }
 
     public Order createOrder(Order order) throws SQLException{
-        query = "INSERT INTO `Order` (dateOrdered, retailId) VALUES (?, ?);";
+        String query = "INSERT INTO `Order` (dateOrdered, retailId) VALUES (?, ?);";
 
         order.setId(this.create(query,
             new Timestamp(order.getDateOrdered().getTime()),
@@ -148,7 +146,7 @@ public class OrderDataAccess extends BaseDataAccess {
     }
 
     public OrderLine createOrderLine(OrderLine orderLine) throws SQLException {
-        query = "INSERT INTO OrderLine (proposalLineId, orderId, quantity) VALUES (?, ?, ?);";
+        String query = "INSERT INTO OrderLine (proposalLineId, orderId, quantity) VALUES (?, ?, ?);";
 
         orderLine.setId(this.create(query,
             orderLine.getProposalLine().getId(),

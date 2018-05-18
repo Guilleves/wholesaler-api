@@ -10,10 +10,8 @@ import com.api.entities.business.ProposalLine;
 import com.api.entities.business.Product;
 import com.api.entities.business.Category;
 import com.api.entities.business.Brand;
-import java.sql.Statement;
 import java.sql.SQLException;
 import com.api.data.db.Connection;
-import java.sql.PreparedStatement;
 import com.api.entities.business.Proposal;
 
 public class ProposalDataAccess extends BaseDataAccess {
@@ -22,7 +20,7 @@ public class ProposalDataAccess extends BaseDataAccess {
 
     public Proposal getProposal(int proposalId) throws SQLException {
         // Eeeeeeeeeeeeeeeeeek...
-        query = "SELECT " +
+        String query = "SELECT " +
             "P.*, " +
             "O.id as organizationId, " +
             "O.name as organizationName, " +
@@ -49,14 +47,12 @@ public class ProposalDataAccess extends BaseDataAccess {
             "AND P.deletedAt IS NULL " +
             "AND PL.deletedAt IS NULL;";
 
-        return getOne(rs -> deserializeProposal(rs), query, proposalId);
+        return getOneWithoutStatement(rs -> deserializeProposal(rs), query, proposalId);
     }
 
-    public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) {
-        ArrayList<Proposal> proposals = new ArrayList<Proposal>();
-
+    public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {
         // Works only when there's at least one row (document) of each table (collection) because of the inner join...
-        query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
+        String query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
 
         if (status != null) {
             switch (status) {
@@ -85,46 +81,26 @@ public class ProposalDataAccess extends BaseDataAccess {
 
         query = query.concat(";");
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        ArrayList<Object> parameters = new ArrayList<Object>();
 
-            int paramIndex = 1;
-
-            if (supplierId != null) {
-                ((PreparedStatement)statement).setInt(paramIndex, supplierId.intValue());
-                paramIndex++;
-            }
-
-            if (orderBy != null) {
-                ((PreparedStatement)statement).setString(paramIndex, orderBy);
-                paramIndex ++;
-            }
-
-            if (pageSize != null && pageIndex != null) {
-                ((PreparedStatement)statement).setInt(paramIndex, pageIndex);
-                paramIndex ++;
-                ((PreparedStatement)statement).setInt(paramIndex, pageSize);
-                paramIndex ++;
-            }
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            proposals = deserializeProposals(resultSet);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
+        if (supplierId != null) {
+            parameters.add(supplierId);
         }
 
-        return proposals;
+        if (orderBy != null) {
+            parameters.add(orderBy);
+        }
+
+        if (pageSize != null && pageIndex != null) {
+            parameters.add(pageIndex);
+            parameters.add(pageSize);
+        }
+
+        return getManyWithoutStatement(rs -> deserializeProposals(rs), query, parameters.toArray());
     }
 
-    public ProposalLine getProposalLine(int proposalLineId) {
-        ProposalLine proposalLine = null;
-
-        query = "SELECT " +
+    public ProposalLine getProposalLine(int proposalLineId) throws SQLException {
+        String query = "SELECT " +
         "PL.*, " +
         "P.name as productName, " +
         "P.gtin, " +
@@ -150,70 +126,27 @@ public class ProposalDataAccess extends BaseDataAccess {
         "INNER JOIN Category C ON P.categoryId = C.id " +
         "WHERE PL.id = ?";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, proposalLineId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            proposalLine = deserializeProposalLine(resultSet);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return proposalLine;
+        return getOneWithoutStatement(rs -> deserializeProposalLine(rs), query, proposalLineId);
     }
 
-    public Proposal deleteProposal(Proposal proposal) {
-        query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
+    public boolean deleteProposal(int proposalId) throws SQLException {
+        String query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
         Date now = new Date();
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
-            ((PreparedStatement)statement).setInt(2, proposal.getId());
-
-            int editionAmt = ((PreparedStatement)statement).executeUpdate();
-
-            if (editionAmt == 1)
-                proposal.setDeletedAt(now);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return proposal;
+        return update(query,
+            new java.sql.Timestamp(now.getTime()),
+            proposalId
+        ) != 0;
     }
 
-    public ProposalLine deleteProposalLine(ProposalLine proposalLine) {
-        query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
+    public boolean deleteProposalLine(int proposalLineId) throws SQLException{
+        String query = "UPDATE Proposal SET deletedAt = ? WHERE id = ?;";
         Date now = new Date();
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
-            ((PreparedStatement)statement).setInt(2, proposalLine.getId());
-
-            int editionAmt = ((PreparedStatement)statement).executeUpdate();
-
-            if (editionAmt == 1)
-                proposalLine.setDeletedAt(now);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return proposalLine;
+        return update(query,
+            new java.sql.Timestamp(now.getTime()),
+            proposalLineId
+        ) != 0;
     }
 
     public Proposal registerProposal(Proposal proposal) {
@@ -255,83 +188,28 @@ public class ProposalDataAccess extends BaseDataAccess {
         return proposal;
     }
 
-    public Proposal createProposal(Proposal proposal) {
-        query = "INSERT INTO Proposal (beginDate, endDate, description, supplierId, title) VALUES (?, ?, ?, ?, ?);";
+    public Proposal createProposal(Proposal proposal) throws SQLException {
+        String query = "INSERT INTO Proposal (beginDate, endDate, description, supplierId, title) VALUES (?, ?, ?, ?, ?);";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(proposal.getBeginDate().getTime()));
-            ((PreparedStatement)statement).setTimestamp(2, new java.sql.Timestamp(proposal.getEndDate().getTime()));
-            ((PreparedStatement)statement).setString(3, proposal.getDescription());
-            ((PreparedStatement)statement).setInt(4, proposal.getSupplier().getId());
-            ((PreparedStatement)statement).setString(5, proposal.getTitle());
-
-
-            ((PreparedStatement)statement).executeUpdate();
-
-            resultSet = statement.getGeneratedKeys();
-
-            // If it created the user, return the created id
-            if (resultSet.next()) {
-                proposal.setId(resultSet.getInt(1));
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
+        proposal.setId(create(query,
+            new java.sql.Timestamp(proposal.getBeginDate().getTime()),
+            new java.sql.Timestamp(proposal.getEndDate().getTime()),
+            proposal.getDescription(),
+            proposal.getSupplier().getId(),
+            proposal.getTitle()
+        ));
 
         return proposal;
     }
 
-    public boolean deleteProposal(int proposalId) {
-        int rowsModified = 0;
+    public ProposalLine createProposalLine(ProposalLine proposalLine) throws SQLException {
+        String query = "INSERT INTO ProposalLine (proposalId, productId, price) VALUES (?, ?, ?);";
 
-        query = "UPDATE Proposal SET deletedAt = NOW() WHERE id = ?;";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, proposalId);
-
-
-            rowsModified = ((PreparedStatement)statement).executeUpdate();
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return rowsModified != 0;
-    }
-
-    public ProposalLine createProposalLine(ProposalLine proposalLine) {
-        query = "INSERT INTO ProposalLine (proposalId, productId, price) VALUES (?, ?, ?);";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, proposalLine.getProposal().getId());
-            ((PreparedStatement)statement).setInt(2, proposalLine.getProduct().getId());
-            ((PreparedStatement)statement).setFloat(3, proposalLine.getPrice());
-
-            ((PreparedStatement)statement).executeUpdate();
-
-            resultSet = statement.getGeneratedKeys();
-
-            // If it created the user, return the created id
-            if (resultSet.next()) {
-                proposalLine.setId(resultSet.getInt(1));
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
+        proposalLine.setId(create(query,
+            proposalLine.getProposal().getId(),
+            proposalLine.getProduct().getId(),
+            proposalLine.getPrice()
+        ));
 
         return proposalLine;
     }
@@ -434,28 +312,6 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
 
         return new ArrayList<Proposal>(proposals.values());
-    }
-
-    public ArrayList<Proposal> getProposalsBySupplier(int organizationId) {
-        ArrayList<Proposal> proposals = null;
-        query = "SELECT P.*, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.supplier = ? ;";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, organizationId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            proposals = deserializeProposals(resultSet);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return proposals;
     }
 
     private ProposalLine deserializeProposalLine(ResultSet resultSet) throws SQLException {
