@@ -20,9 +20,7 @@ public class ProposalDataAccess extends BaseDataAccess {
 
     // #region Proposal setup
 
-    public Proposal getProposal(int proposalId) {
-        Proposal proposal = null;
-
+    public Proposal getProposal(int proposalId) throws SQLException {
         // Eeeeeeeeeeeeeeeeeek...
         query = "SELECT " +
             "P.*, " +
@@ -51,22 +49,7 @@ public class ProposalDataAccess extends BaseDataAccess {
             "AND P.deletedAt IS NULL " +
             "AND PL.deletedAt IS NULL;";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, proposalId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            proposal = deserializeProposal(resultSet);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return proposal;
+        return getOne(rs -> deserializeProposal(rs), query, proposalId);
     }
 
     public ArrayList<Proposal> getProposals(String status, Integer supplierId) {
@@ -458,7 +441,7 @@ public class ProposalDataAccess extends BaseDataAccess {
                 )
             ));
         }
-        
+
         return line;
     }
 

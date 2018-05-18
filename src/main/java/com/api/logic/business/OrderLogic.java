@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import java.sql.SQLException;
 import com.api.data.business.ProposalDataAccess;
 import com.api.entities.models.order.SaveOrderRequest.Line;
 import com.api.entities.enums.OrganizationRoles;
@@ -27,7 +28,14 @@ public class OrderLogic {
     }
 
     public ArrayList<GetOrderResponse> getOrders() throws ApiException {
-        ArrayList<Order> orders = oda.getOrders();
+        ArrayList<Order> orders = null;
+
+        try {
+            orders = oda.getOrders();
+        }
+        catch(SQLException e) {
+            throw new ApiException(e);
+        }
 
         if (orders == null || orders.isEmpty())
             throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
@@ -53,7 +61,14 @@ public class OrderLogic {
     }
 
     public GetOrderResponse getOrder(GetOrderRequest request) throws ApiException {
-        Order order = oda.getOrder(request.getOrderId());
+        Order order = null;
+
+        try {
+            order = oda.getOrder(request.getOrderId());
+        }
+        catch(SQLException e) {
+            throw new ApiException(e);
+        }
 
         if (order == null)
             throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
@@ -107,7 +122,12 @@ public class OrderLogic {
         order.setOrderLines(lines);
         order.setRetail((Retail)loggedUser.getOrganization());
 
-        order = oda.registerOrder(order);
+        try {
+            order = oda.registerOrder(order);
+        }
+        catch(SQLException sqlEx) {
+            throw new ApiException(sqlEx);
+        }
 
         return new GetOrderResponse(
             order.getId(),

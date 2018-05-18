@@ -22,9 +22,7 @@ public class ProductDataAccess extends BaseDataAccess {
 
     // #region ProductSetup
 
-    public Product getProduct(int productId) {
-        Product product = null;
-
+    public Product getProduct(int productId) throws SQLException{
         // Eeeeeeeeeeeeeeeeeek...
         query = "SELECT " +
             "P.*, " +
@@ -37,29 +35,10 @@ public class ProductDataAccess extends BaseDataAccess {
             "WHERE P.id = ? " +
             "AND P.deletedAt IS NULL;";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, productId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            if (resultSet.next()) {
-                product = new Product(resultSet);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return product;
+        return getOne(rs -> new Product(rs), query, productId);
     }
 
-    public ArrayList<Product> getProducts() {
-        ArrayList<Product> products = new ArrayList<Product>();
-
+    public ArrayList<Product> getProducts() throws SQLException{
         query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
@@ -70,86 +49,36 @@ public class ProductDataAccess extends BaseDataAccess {
             "INNER JOIN Category C ON P.categoryId = C.id " +
             "WHERE P.deletedAt IS NULL;";
 
-        try {
-            statement = Connection.getInstancia().getConn().createStatement();
-
-            resultSet = statement.executeQuery(query);
-
-            while(resultSet.next()) {
-                products.add(new Product(resultSet));
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return products;
+        return getMany(rs -> new Product(rs), query);
     }
 
-    public int createProduct(Product product) {
-        int id = 0;
-
+    public Product createProduct(Product product) throws SQLException{
         query = "INSERT INTO Product (name, gtin, brandId, categoryId) VALUES (?, ?, ?, ?);";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, product.getName());
-            ((PreparedStatement)statement).setString(2, product.getGtin());
-            ((PreparedStatement)statement).setInt(3, product.getBrand().getId());
-            ((PreparedStatement)statement).setInt(4, product.getCategory().getId());
+        product.setId(create(query,
+            product.getName(),
+            product.getGtin(),
+            product.getBrand().getId(),
+            product.getCategory().getId())
+        );
 
-            ((PreparedStatement)statement).executeUpdate();
-
-            resultSet = statement.getGeneratedKeys();
-
-            // If it created the user, return the created id
-            if (resultSet.next()) {
-                id = resultSet.getInt(1);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return id;
+        return product;
     }
 
-    public int updateProduct(Product product) {
-        int id = 0;
+    public int updateProduct(Product product) throws SQLException {
+        int rowsModified = 0;
 
         query = "UPDATE Product SET name = ?, gtin = ?, brandId = ?, categoryId = ? WHERE id = ?;";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setString(1, product.getName());
-            ((PreparedStatement)statement).setString(2, product.getGtin());
-            ((PreparedStatement)statement).setInt(3, product.getBrand().getId());
-            ((PreparedStatement)statement).setInt(4, product.getCategory().getId());
-            ((PreparedStatement)statement).setInt(5, product.getId());
+        rowsModified = update(query,
+            product.getName(),
+            product.getGtin(),
+            product.getBrand().getId(),
+            product.getCategory().getId(),
+            product.getId()
+        );
 
-            ((PreparedStatement)statement).executeUpdate();
-
-            resultSet = statement.getGeneratedKeys();
-
-            // If it updated the user, return the updated id
-            if (resultSet.next()) {
-                id = resultSet.getInt(1);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return id;
+        return rowsModified;
     }
 
     public boolean validateGtin(String gtin) {
@@ -175,117 +104,36 @@ public class ProductDataAccess extends BaseDataAccess {
         return false;
     }
 
-    public Product deleteProduct(Product product) {
+    public boolean deleteProduct(Product product) throws SQLException {
         query = "UPDATE Product SET deletedAt = ? WHERE id = ?;";
         Date now = new Date();
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setTimestamp(1, new java.sql.Timestamp(now.getTime()));
-            ((PreparedStatement)statement).setInt(2, product.getId());
+        int rowsEdited = update(query,
+            new java.sql.Timestamp(now.getTime()),
+            product.getId()
+        );
 
-            int editionAmt = ((PreparedStatement)statement).executeUpdate();
-
-            if (editionAmt == 1)
-                product.setDeletedAt(now);
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return product;
+        return rowsEdited != 0;
     }
 
     // #endregion
 
     // #region BrandInfo
 
-    public Brand getBrand(int brandId) {
-        Brand brand = null;
-
+    public Brand getBrand(int brandId) throws SQLException {
         query = "SELECT * FROM Brand WHERE id = ?";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, brandId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            if (resultSet.next()) {
-                brand = new Brand(resultSet);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return brand;
+        return getOne(rs -> new Brand(rs), query, brandId);
     }
 
     // #endregion
 
     // #region CategoryInfo
 
-    public Category getCategory(int categoryId) {
-        Category category = null;
-
+    public Category getCategory(int categoryId) throws SQLException{
         query = "SELECT * FROM Category WHERE id = ?";
 
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, categoryId);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            if (resultSet.next()) {
-                category = new Category(resultSet);
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return category;
-    }
-
-    public ArrayList<Product> getProductsByFilter(int brandId, int categoryId, String keyword) {
-        ArrayList<Product> products = new ArrayList<Product>();
-        query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE (p.brandId = ? or ? = 0) AND (p.categoryId = ? or ? = 0) AND (p.name LIKE ? or b.name LIKE ? or c.name LIKE ? or ? is null)";
-
-        try {
-            statement = (PreparedStatement)Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ((PreparedStatement)statement).setInt(1, brandId);
-            ((PreparedStatement)statement).setInt(2, brandId);
-            ((PreparedStatement)statement).setInt(3, categoryId);
-            ((PreparedStatement)statement).setInt(4, categoryId);
-            ((PreparedStatement)statement).setString(5, '%' + keyword + '%');
-            ((PreparedStatement)statement).setString(6, '%' + keyword + '%');
-            ((PreparedStatement)statement).setString(7, '%' + keyword + '%');
-            ((PreparedStatement)statement).setString(8, keyword);
-
-            resultSet = ((PreparedStatement)statement).executeQuery();
-
-            while(resultSet.next()) {
-                products.add(new Product(resultSet));
-            }
-        }
-        catch(SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return products;
+        return getOne(rs -> new Category(rs), query, categoryId);
     }
     // #endregion
 }
