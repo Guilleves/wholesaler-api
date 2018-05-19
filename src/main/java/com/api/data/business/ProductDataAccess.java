@@ -1,6 +1,7 @@
 package com.api.data.business;
 
 // #region Imports
+import com.api.entities.business.Ranking;
 
 import java.sql.ResultSet;
 import java.util.Date;
@@ -82,9 +83,44 @@ public class ProductDataAccess extends BaseDataAccess {
 
         query += ";";
 
-        System.out.println(query);
-
         return getMany(rs -> new Product(rs), query, parameters.toArray());
+    }
+
+    public ArrayList<Ranking> mostUsedByProposal() throws SQLException {
+        ArrayList<Ranking> products = new ArrayList<Ranking>();
+
+        Statement statement;
+        ResultSet resultSet;
+
+        String query = "SELECT " +
+            "P.*, " +
+            "B.name as brandName, " +
+            "C.name as categoryName, " +
+            "COUNT(*) as `count` " +
+            "FROM " +
+            "Product P " +
+            "INNER JOIN Brand B ON P.brandId = B.id " +
+            "INNER JOIN Category C ON P.categoryId = C.id " +
+            "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
+            "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+            "WHERE P.deletedAt IS NULL " +
+            "GROUP BY P.id " +
+            "ORDER BY COUNT(*) DESC;";
+
+        try {
+            statement = Connection.getInstancia().getConn().createStatement();
+
+            resultSet = statement.executeQuery(query);
+
+            while(resultSet.next()) {
+                products.add(new Ranking(resultSet.getInt("count"), new Product(resultSet)));
+            }
+        }
+        catch(SQLException ex) {
+            throw ex;
+        }
+
+        return products;
     }
 
     public Product createProduct(Product product) throws SQLException{
@@ -112,7 +148,7 @@ public class ProductDataAccess extends BaseDataAccess {
         );
     }
 
-    public boolean validateGtin(String gtin) {
+    public boolean validateGtin(String gtin) throws SQLException {
         PreparedStatement statement;
         ResultSet resultSet;
         String query = "SELECT * FROM product WHERE gtin = ?";
@@ -128,7 +164,7 @@ public class ProductDataAccess extends BaseDataAccess {
             }
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         finally {
             Connection.getInstancia().closeConn();

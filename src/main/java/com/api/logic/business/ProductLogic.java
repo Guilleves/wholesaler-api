@@ -1,6 +1,9 @@
 package com.api.logic.business;
 
 // #region Imports
+
+import com.api.entities.business.Ranking;
+import com.api.entities.models.product.GetRankingResponse;
 import java.sql.SQLException;
 import com.api.entities.models.product.GetProductsRequest;
 import com.api.entities.business.User;
@@ -100,6 +103,36 @@ public class ProductLogic {
         }
     }
 
+    public ArrayList<GetRankingResponse> mostUsedByProposal() throws ApiException {
+        try {
+            ArrayList<Ranking> products = pda.mostUsedByProposal();
+
+            if (products == null || products.isEmpty())
+                throw new ApiException("Product was not found.", Status.NOT_FOUND);
+
+            ArrayList<GetRankingResponse> response = new ArrayList<GetRankingResponse>();
+
+            // Generate the response object.
+            for (Ranking product : products) {
+                response.add(new GetRankingResponse(
+                    ((Product)product.getEntity()).getId(),
+                    product.getCount(),
+                    ((Product)product.getEntity()).getName(),
+                    ((Product)product.getEntity()).getGtin(),
+                    ((Product)product.getEntity()).getBrand().getId(),
+                    ((Product)product.getEntity()).getBrand().getName(),
+                    ((Product)product.getEntity()).getCategory().getId(),
+                    ((Product)product.getEntity()).getCategory().getName()
+                ));
+            }
+
+            return response;
+        }
+        catch(SQLException e) {
+            throw new ApiException(e);
+        }
+    }
+
     public GetProductResponse createProduct(SaveProductRequest request, User loggedUser) throws ApiException {
         try {
             if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
@@ -193,7 +226,7 @@ public class ProductLogic {
 
     // #region Validation
 
-    private ApiException validateSaveProduct(SaveProductRequest product, Brand brand, Category category) {
+    private ApiException validateSaveProduct(SaveProductRequest product, Brand brand, Category category) throws SQLException {
         ApiException ex = new ApiException();
 
         if (pda.validateGtin(product.getGtin()))
