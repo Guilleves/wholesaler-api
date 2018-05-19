@@ -86,10 +86,10 @@ public class Products {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
-    @Path("/proposal-ranking")
-    public Response getProduct() {
+    @Path("/ranking")
+    public Response getProduct(@QueryParam("type") String type, @QueryParam("supplierId") int supplierId) {
         try {
-            return Response.ok(pl.mostUsedByProposal()).build();
+            return Response.ok(pl.mostUsedByProposal(supplierId)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();

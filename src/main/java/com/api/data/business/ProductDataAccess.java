@@ -86,12 +86,7 @@ public class ProductDataAccess extends BaseDataAccess {
         return getMany(rs -> new Product(rs), query, parameters.toArray());
     }
 
-    public ArrayList<Ranking> mostUsedByProposal() throws SQLException {
-        ArrayList<Ranking> products = new ArrayList<Ranking>();
-
-        Statement statement;
-        ResultSet resultSet;
-
+    public ArrayList<Ranking> mostUsedByProposal(int supplierId) throws SQLException {
         String query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
@@ -104,23 +99,15 @@ public class ProductDataAccess extends BaseDataAccess {
             "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
             "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
             "WHERE P.deletedAt IS NULL " +
+            "AND Pr.supplierId = ? " +
             "GROUP BY P.id " +
             "ORDER BY COUNT(*) DESC;";
 
-        try {
-            statement = Connection.getInstancia().getConn().createStatement();
+        return getMany(rs -> deserializeRanking(rs), query, supplierId);
+    }
 
-            resultSet = statement.executeQuery(query);
-
-            while(resultSet.next()) {
-                products.add(new Ranking(resultSet.getInt("count"), new Product(resultSet)));
-            }
-        }
-        catch(SQLException ex) {
-            throw ex;
-        }
-
-        return products;
+    private Ranking deserializeRanking(ResultSet rs) throws SQLException {
+        return new Ranking(rs.getInt("count"), new Product(rs));
     }
 
     public Product createProduct(Product product) throws SQLException{
