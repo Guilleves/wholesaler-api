@@ -1,6 +1,6 @@
 package com.api.entities.business;
 
-public class Ranking {
+public class Ranking implements BaseEntity {
     private int count;
     private BaseEntity entity;
 
