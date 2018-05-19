@@ -36,19 +36,17 @@ public class Product implements BaseEntity{
     public Product(ResultSet rs) throws SQLException {
         super();
 
-        if (rs.next()) {
-            this.id = rs.getInt("id");
-            this.name = rs.getString("name");
-            this.gtin = rs.getString("gtin");
-            this.brand = new Brand(
-                rs.getInt("brandId"),
-                rs.getString("brandName")
-            );
-            this.category = new Category(
-                rs.getInt("categoryId"),
-                rs.getString("categoryName")
-            );
-        }
+        this.id = rs.getInt("id");
+        this.name = rs.getString("name");
+        this.gtin = rs.getString("gtin");
+        this.brand = new Brand(
+            rs.getInt("brandId"),
+            rs.getString("brandName")
+        );
+        this.category = new Category(
+            rs.getInt("categoryId"),
+            rs.getString("categoryName")
+        );
     }
 
 	/**

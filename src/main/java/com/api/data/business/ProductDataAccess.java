@@ -1,6 +1,7 @@
 package com.api.data.business;
 
 // #region Imports
+import com.api.entities.business.Ranking;
 
 import java.sql.ResultSet;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class ProductDataAccess extends BaseDataAccess {
         return getOne(rs -> new Product(rs), query, productId);
     }
 
-    public ArrayList<Product> getProducts() throws SQLException{
+    public ArrayList<Product> getProducts(int brandId, int categoryId, int pageIndex, int pageSize, String keyword, String orderBy) throws SQLException{
         String query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
@@ -47,24 +48,79 @@ public class ProductDataAccess extends BaseDataAccess {
             "Product P " +
             "INNER JOIN Brand B ON P.brandId = B.id " +
             "INNER JOIN Category C ON P.categoryId = C.id " +
-            "WHERE P.deletedAt IS NULL;";
+            "WHERE P.deletedAt IS NULL";
 
-        return getMany(rs -> new Product(rs), query);
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
+        if (brandId != 0) {
+            query += " AND B.id = ?";
+            parameters.add(brandId);
+        }
+
+        if (categoryId != 0) {
+            query += " AND C.id = ?";
+            parameters.add(categoryId);
+        }
+
+        if (keyword != null && !keyword.isEmpty()) {
+             query += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?)";
+             parameters.add('%' + keyword + '%');
+             parameters.add('%' + keyword + '%');
+             parameters.add('%' + keyword + '%');
+        }
+
+        // this is not working...
+        /*if (orderBy != null && !orderBy.isEmpty()) {
+            query += " ORDER BY ?";
+            parameters.add(orderBy);
+        }*/
+
+        if (pageIndex != 0 && pageSize != 0) {
+            query += " LIMIT ?, ?";
+            parameters.add(pageIndex - 1);
+            parameters.add(pageSize);
+        }
+
+        query += ";";
+
+        return getMany(rs -> new Product(rs), query, parameters.toArray());
     }
 
-    public ArrayList<Product> getProductsByFilter(int brandId, int categoryId, String keyword) throws SQLException {
-        String query = "SELECT p.*, b.name as brandName, c.name as categoryName FROM Product p INNER JOIN Brand b on p.brandId = b.id  INNER JOIN Category c on p.categoryId = c.id WHERE (p.brandId = ? or ? = 0) AND (p.categoryId = ? or ? = 0) AND (p.name LIKE ? or b.name LIKE ? or c.name LIKE ? or ? is null)";
+    public ArrayList<Ranking> mostUsedByProposal() throws SQLException {
+        ArrayList<Ranking> products = new ArrayList<Ranking>();
 
-        return getMany(rs -> new Product(rs), query,
-            brandId,
-            brandId,
-            categoryId,
-            categoryId,
-            '%' + keyword + '%',
-            '%' + keyword + '%',
-            '%' + keyword + '%',
-            keyword
-        );
+        Statement statement;
+        ResultSet resultSet;
+
+        String query = "SELECT " +
+            "P.*, " +
+            "B.name as brandName, " +
+            "C.name as categoryName, " +
+            "COUNT(*) as `count` " +
+            "FROM " +
+            "Product P " +
+            "INNER JOIN Brand B ON P.brandId = B.id " +
+            "INNER JOIN Category C ON P.categoryId = C.id " +
+            "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
+            "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+            "WHERE P.deletedAt IS NULL " +
+            "GROUP BY P.id " +
+            "ORDER BY COUNT(*) DESC;";
+
+        try {
+            statement = Connection.getInstancia().getConn().createStatement();
+
+            resultSet = statement.executeQuery(query);
+
+            while(resultSet.next()) {
+                products.add(new Ranking(resultSet.getInt("count"), new Product(resultSet)));
+            }
+        }
+        catch(SQLException ex) {
+            throw ex;
+        }
+
+        return products;
     }
 
     public Product createProduct(Product product) throws SQLException{
@@ -92,7 +148,7 @@ public class ProductDataAccess extends BaseDataAccess {
         );
     }
 
-    public boolean validateGtin(String gtin) {
+    public boolean validateGtin(String gtin) throws SQLException {
         PreparedStatement statement;
         ResultSet resultSet;
         String query = "SELECT * FROM product WHERE gtin = ?";
@@ -108,7 +164,7 @@ public class ProductDataAccess extends BaseDataAccess {
             }
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         finally {
             Connection.getInstancia().closeConn();
