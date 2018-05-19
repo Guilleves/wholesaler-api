@@ -7,6 +7,39 @@
     <version>1.0-SNAPSHOT</version>
     <name>RESTSample Maven Webapp</name>
     <url>http://maven.apache.org</url>
+
+    <!-- Profile configuration -->
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <!-- The development profile is active by default -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <build.profile.id>dev</build.profile.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>local</id>
+            <properties>
+                <build.profile.id>local</build.profile.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <build.profile.id>prod</build.profile.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <build.profile.id>test</build.profile.id>
+            </properties>
+        </profile>
+    </profiles>
+
     <repositories>
         <repository>
             <id>maven2-repository.java.net</id>
@@ -19,6 +52,8 @@
     <properties>
         <jersey2.version>2.6</jersey2.version>
         <jaxrs.version>2.1</jaxrs.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
@@ -44,7 +79,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
+            <version>5.1.46</version>
         </dependency>
 
         <dependency>
@@ -57,6 +92,15 @@
 
     <build>
         <finalName>RESTSample</finalName>
+        <filters>
+            <filter>profiles/${build.profile.id}.config.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
@@ -72,8 +116,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
