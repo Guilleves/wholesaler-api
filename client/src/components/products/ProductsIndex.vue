@@ -1,7 +1,7 @@
 <template id="">
   <div class="">
     holis somos los productos
-    <div v-for="product in products">
+    <div v-for="product in products" >
       {{ product.name }}
     </div>
   </div>
@@ -18,19 +18,18 @@ export default {
     }
   },
   mounted: function() {
-    // var self = this;
-    var config = {
+    const config = {
       headers: {
         "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImlkIjo1fQ.GR8v-RyugBdtq21_XliVpG6DJypCkFxr1zI7YcwIntE",
         "Content-Type": "application/json"
       }
     }
     Axios.get('/products', {}, config)
-    .then(function(response) {
+    .then((response) => {
       this.products = response.data;
       console.log(response);
-    }.bind(this))
-    .catch(function(error) {
+    })
+    .catch((error) => {
       console.log(error);
     })
   }
