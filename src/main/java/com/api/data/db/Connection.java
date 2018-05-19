@@ -1,6 +1,5 @@
 package com.api.data.db;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -32,11 +31,11 @@ public class Connection {
 			conn=null;
 		}
 		catch(ClassNotFoundException e) {
-			e.printStackTrace();
+			conn=null;
 		}
 	}
 
-	public java.sql.Connection getConn() {
+	public java.sql.Connection getConn() throws SQLException {
 		try {
 			input = getClass().getResourceAsStream("/config.properties");
 
@@ -52,36 +51,19 @@ public class Connection {
 
 			cantCon++;
 		}
-		catch (InstantiationException e) {
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
+		catch (Exception e) {
+			throw new SQLException(e.getCause());
 		}
 
 		return conn;
 	}
 
 	//Cerrar conexión y manejo de errores
-	public void closeConn() {
-		try {
-			cantCon--;
+	public void closeConn() throws SQLException {
+		cantCon--;
 
-			if(cantCon==0)
-			conn.close();
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
+		if(cantCon==0)
+		conn.close();
 	}
 
 	public void beginTransaction() throws SQLException {

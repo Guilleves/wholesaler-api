@@ -149,7 +149,7 @@ public class ProposalDataAccess extends BaseDataAccess {
         ) != 0;
     }
 
-    public Proposal registerProposal(Proposal proposal) {
+    public Proposal registerProposal(Proposal proposal) throws SQLException {
         java.sql.Connection conn = Connection.getInstancia().getConn();
 
         try {
@@ -173,12 +173,12 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
         catch(SQLException e1) {
             try {
-                e1.printStackTrace();
                 conn.rollback();
                 conn.setAutoCommit(true);
+                throw e1;
             }
             catch(SQLException e2) {
-                e2.printStackTrace();
+                throw e2;
             }
         }
         finally {
