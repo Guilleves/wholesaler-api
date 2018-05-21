@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import com.api.entities.models.order.GetOrdersRequest;
 import java.sql.SQLException;
 import com.api.data.business.ProposalDataAccess;
 import com.api.entities.models.order.SaveOrderRequest.Line;
@@ -27,11 +28,18 @@ public class OrderLogic {
         oda = new OrderDataAccess();
     }
 
-    public ArrayList<GetOrderResponse> getOrders() throws ApiException {
+    public ArrayList<GetOrderResponse> getOrders(GetOrdersRequest request) throws ApiException {
         ArrayList<Order> orders = null;
 
         try {
-            orders = oda.getOrders();
+            orders = oda.getOrders(
+                request.getFromDate(),
+                request.getToDate(),
+                request.getRetailId(),
+                request.getOrderBy(),
+                request.getPageSize(),
+                request.getPageIndex()
+            );
         }
         catch(SQLException e) {
             throw new ApiException(e);
