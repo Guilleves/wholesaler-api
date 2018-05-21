@@ -1,1 +1,1 @@
-mvn -T 1C install -Pdev tomcat7:run
+mvn -T 1C clean install -Pdev tomcat7:run

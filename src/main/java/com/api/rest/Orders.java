@@ -2,6 +2,10 @@ package com.api.rest;
 
 // #region Import
 
+import com.api.rest.util.DateParameter;
+import com.api.entities.models.order.GetOrdersRequest;
+import java.util.Date;
+import javax.ws.rs.QueryParam;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
 import com.api.entities.models.order.SaveOrderRequest;
@@ -43,9 +47,18 @@ public class Orders {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getOrders() {
+    public Response getOrders(@QueryParam("retailId") int retailId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") int pageSize, @QueryParam("pageIndex") int pageIndex) {
+        GetOrdersRequest request = new GetOrdersRequest(
+            orderBy,
+            pageIndex,
+            pageSize,
+            retailId,
+            fromDate == null ? null : fromDate.getDate(),
+            toDate == null ? null : toDate.getDate()
+        );
+
         try {
-            return Response.ok(ol.getOrders()).build();
+            return Response.ok(ol.getOrders(request)).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();

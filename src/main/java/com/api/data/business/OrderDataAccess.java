@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class OrderDataAccess extends BaseDataAccess {
         return this.getOneWithoutStatement(rs -> deserializeOrder(rs), query, orderId);
     }
 
-    public ArrayList<Order> getOrders() throws SQLException{
+    public ArrayList<Order> getOrders(Date fromDate, Date toDate, int retailId, String orderBy, int pageSize, int pageIndex) throws SQLException{
         // Eeeeeeeeeeeeeeeeeek...
         String query = "SELECT " +
             "O.*, " +
@@ -90,9 +91,40 @@ public class OrderDataAccess extends BaseDataAccess {
             "INNER JOIN Product Pr ON PL.productId = Pr.id " +
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
             "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "WHERE PL.deletedAt IS NULL;";
+            "WHERE PL.deletedAt IS NULL";
 
-        return getManyWithoutStatement(rs -> deserializeOrders(rs), query);
+            ArrayList<Object> parameters = new ArrayList<Object>();
+
+            if (fromDate != null) {
+                query += " AND O.dateOrdered > ?";
+                parameters.add(fromDate);
+            }
+
+            if (toDate != null) {
+                query += " AND O.dateOrdered < ?";
+                parameters.add(toDate);
+            }
+
+            if (retailId != 0) {
+                query += " AND O.retailId = ?";
+                parameters.add(retailId);
+            }
+
+            // this is not working...
+            /*if (orderBy != null && !orderBy.isEmpty()) {
+                query += " ORDER BY ?";
+                parameters.add(orderBy);
+            }*/
+
+            if (pageIndex != 0 && pageSize != 0) {
+                query += " LIMIT ?, ?";
+                parameters.add(pageIndex - 1);
+                parameters.add(pageSize);
+            }
+
+            query += ";";
+
+        return getManyWithoutStatement(rs -> deserializeOrders(rs), query, parameters.toArray());
     }
 
     public Order registerOrder(Order order) throws SQLException{
