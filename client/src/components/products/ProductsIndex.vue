@@ -1,37 +1,37 @@
 <template id="">
   <div class="">
     holis somos los productos
-    <div v-for="product in products" >
+    <div v-for="product in products" v-bind:key="product.id">
       {{ product.name }}
     </div>
   </div>
 </template>
 
 <script>
-import Axios from 'axios';
+    import API from './../../helpers/api.js';
+    import * as session from "./../../helpers/session.js";
 
-export default {
-  name: 'products-index',
-  data: () => {
-    return {
-      products: []
-    }
-  },
-  mounted: function() {
-    const config = {
-      headers: {
-        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImlkIjo1fQ.GR8v-RyugBdtq21_XliVpG6DJypCkFxr1zI7YcwIntE",
-        "Content-Type": "application/json"
+    export default {
+      name: 'products-index',
+      data: () => {
+        return {
+          products: []
+        }
+      },
+      mounted: function() {
+          // This must be done on login
+          session.set({
+              token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImlkIjo1fQ.GR8v-RyugBdtq21_XliVpG6DJypCkFxr1zI7YcwIntE"
+          });
+
+          new API("http://localhost:9090/")
+            .get('/products')
+            .then((response) => {
+                this.products = response.data;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
       }
     }
-    Axios.get('/products', {}, config)
-    .then((response) => {
-      this.products = response.data;
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
-}
 </script>
