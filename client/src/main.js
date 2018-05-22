@@ -9,7 +9,9 @@ Vue.config.productionTip = false;
 // Vue.http.options.crossOrigin = true
 
 Vue.use(VueRouter);
-Vue.use(Buefy);
+Vue.use(Buefy, {
+    defaultIconPack: 'fas'
+});
 
 new Vue({
   render: h => h(App),
