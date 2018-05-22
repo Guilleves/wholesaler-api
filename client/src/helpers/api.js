@@ -1,16 +1,16 @@
-import axios from 'axios';
+import Axios from 'axios';
 import * as session from "./session.js";
 
 class API {
-    constructor (uri) {
+    constructor () {
         let headers = { "Content-Type": "application/json" };
         let token = session.getToken();
 
         if (token)
             Object.assign(headers, { "Authorization": "Bearer " + token });
 
-        this.axios = axios.create({
-          baseURL: uri,
+        this.axios = Axios.create({
+          baseURL: "http://localhost:9090/",
           timeout: 1000,
           headers: headers
         });

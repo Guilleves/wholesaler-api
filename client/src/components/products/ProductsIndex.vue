@@ -4,6 +4,8 @@
     <div v-for="product in products" v-bind:key="product.id">
       {{ product.name }}
     </div>
+    <b-table :data="products" columns="name"></b-table>
+
   </div>
 </template>
 
@@ -24,7 +26,7 @@
               token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImlkIjo1fQ.GR8v-RyugBdtq21_XliVpG6DJypCkFxr1zI7YcwIntE"
           });
 
-          new API("http://localhost:9090/")
+          new API()
             .get('/products')
             .then((response) => {
                 this.products = response.data;
