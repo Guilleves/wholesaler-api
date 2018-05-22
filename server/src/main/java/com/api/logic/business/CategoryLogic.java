@@ -2,6 +2,8 @@ package com.api.logic.business;
 
 // #region Imports
 
+import com.api.entities.models.category.GetCategoriesRequest;
+import com.api.entities.models.category.GetCategoriesResponse;
 import com.api.data.business.CategoryDataAccess;
 import com.api.entities.business.Category;
 import java.sql.SQLException;
@@ -24,10 +26,7 @@ public class CategoryLogic {
             ArrayList<GetCategoriesResponse> response = new ArrayList<GetCategoriesResponse>();
 
             // Fetch product list.
-            ArrayList<Category> categories = bda.getCategories(
-                request.getId(),
-                request.getName()
-            );
+            ArrayList<Category> categories = bda.getCategories();
 
             if (categories == null || categories.isEmpty())
                 throw new ApiException("Couldn't find any categories.", Status.NOT_FOUND);
