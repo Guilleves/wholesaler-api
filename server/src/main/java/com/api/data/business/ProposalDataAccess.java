@@ -70,31 +70,45 @@ public class ProposalDataAccess extends BaseDataAccess {
             };
         }
 
-        if (supplierId != null)
-            query += " AND P.supplierId = ?";
-
-        if (orderBy != null)
-            query += " ORDER BY ?";
-
-        if (pageSize != null && pageIndex != null)
-            query += " LIMIT ?, ?";
-
-        query = query.concat(";");
-
         ArrayList<Object> parameters = new ArrayList<Object>();
 
         if (supplierId != null) {
+            query += " AND P.supplierId = ?";
             parameters.add(supplierId);
         }
 
+        // We do this to avoid query injection.
         if (orderBy != null) {
-            parameters.add(orderBy);
+            switch (orderBy) {
+                case "beginDate":
+                    query += " ORDER BY P.beginDate";
+                    break;
+                case "endDate":
+                    query += " ORDER BY P.endDate";
+                    break;
+                case "title":
+                    query += " ORDER BY P.title";
+                    break;
+                case "description":
+                    query += " ORDER BY P.description";
+                    break;
+                case "supplier":
+                    query += " ORDER BY P.supplierId";
+                    break;
+                default:
+                    break;
+            };
         }
 
+        System.out.println(query);
+
         if (pageSize != null && pageIndex != null) {
+            query += " LIMIT ?, ?";
             parameters.add(pageIndex);
             parameters.add(pageSize);
         }
+
+        query = query.concat(";");
 
         return getManyWithoutStatement(rs -> deserializeProposals(rs), query, parameters.toArray());
     }
