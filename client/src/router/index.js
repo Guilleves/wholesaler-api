@@ -2,7 +2,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import HelloWorld from '@/components/dashboard/HelloWorld.vue';
 import ProductsIndex from '@/components/products/ProductsIndex.vue';
-import Login from '@/components/login/Login.vue';
+import Login from '@/components/users/Login.vue';
+import Signup from '@/components/users/Signup.vue';
 
 Vue.use(Router);
 
@@ -17,6 +18,10 @@ export default new Router({
         path: "/login",
         name: "Login",
         component: Login
+    }, {
+        path: "/signup",
+        name: "Signup",
+        component: Signup
     }, {
       path: '/products',
       name: 'ProductsIndex',
