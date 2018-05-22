@@ -35,7 +35,7 @@
 
                         <b-field grouped position="is-left">
                             <p class="control" position="is-right">
-                                <button class="button">
+                                <button class="button" type="button" @click="redirectSignup()">
                                     Create an account
                                 </button>
                                 <button class="button">
@@ -88,6 +88,9 @@ export default {
                 .catch((error) => {
                     this.notifications = error.response.data;
                 });
+        },
+        redirectSignup: function() {
+            this.$router.push("signup");
         }
     }
 }

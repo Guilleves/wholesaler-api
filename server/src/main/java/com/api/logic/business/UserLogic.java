@@ -135,6 +135,9 @@ public class UserLogic {
 
     public LoginResponse signup(SaveUserRequest request) throws ApiException {
         try {
+            if (!request.getPassword().equals(request.getRepeatPassword()))
+                throw new ApiException("Passwords don't match.");
+
             User user = new User(
                 0,
                 request.getFirstName(),
@@ -149,6 +152,19 @@ public class UserLogic {
 
             if (dbUser != null)
                 throw new ApiException("This username is taken");
+
+            // Validate.
+            ApiException ex = validateSaveUser(user);
+
+            if (!ex.isOk())
+                throw ex;
+
+            try {
+                user.setPassword(sl.encryptPassword(user.getPassword()));
+            } // Dunno if should specify the exception, since I'll handle all of them equally
+            catch(Exception e) {
+                throw new ApiException(e);
+            }
 
             User createdUser = uda.createUser(user);
 
@@ -252,6 +268,12 @@ public class UserLogic {
 
         if (user.getLastName() == null || user.getLastName().isEmpty())
         sr.addError("El apellido es un campo obligatorio");
+
+        if (user.getPassword() == null || user.getPassword().isEmpty())
+        sr.addError("La contraseña es un campo obligatorio");
+
+        if (user.getEmail() == null || user.getEmail().isEmpty())
+        sr.addError("El email es un campo obligatorio");
 
         return sr;
     }

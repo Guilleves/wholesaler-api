@@ -10,7 +10,7 @@ public class SaveUserRequest implements Serializable {
     static final long serialVersionUID = 0L;
 
     private int userId;
-    private String username, firstName, lastName, email, password;
+    private String username, firstName, lastName, email, password, repeatPassword;
 
 	/**
 	* Default empty SaveUserRequest constructor
@@ -22,7 +22,7 @@ public class SaveUserRequest implements Serializable {
 	/**
 	* Default SaveUserRequest constructor
 	*/
-	public SaveUserRequest(int userId, String username, String firstName, String lastName, String email, String password) {
+	public SaveUserRequest(int userId, String username, String firstName, String lastName, String email, String password, String repeatPassword) {
 		super();
 		this.userId = userId;
 		this.username = username;
@@ -30,6 +30,7 @@ public class SaveUserRequest implements Serializable {
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
+		this.repeatPassword = repeatPassword;
 	}
 
 	/**
@@ -126,5 +127,21 @@ public class SaveUserRequest implements Serializable {
 	*/
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	/**
+	* Returns value of repeatPassword
+	* @return
+	*/
+	public String getRepeatPassword() {
+		return repeatPassword;
+	}
+
+	/**
+	* Sets new value of repeatPassword
+	* @param
+	*/
+	public void setRepeatPassword(String repeatPassword) {
+		this.repeatPassword = repeatPassword;
 	}
 }
