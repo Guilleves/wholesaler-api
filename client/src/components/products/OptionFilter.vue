@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="">
-    <b-field label="Rounded">
-      <b-select :placeholder="'Select a ' + this.filter" rounded>
+    <b-field :label="'Select a ' + this.filter" >
+      <b-select :placeholder="'Filter by ' + this.filter" rounded @input="selectOption($event)">
         <option
           v-for="option in options"
           :value="option.id"
@@ -19,14 +19,21 @@ import * as session from "./../../helpers/session.js";
 export default {
   name: "option-filter",
   props: {
-    filter: String
+    filter: String,
+    optionType: String
   },
   data: function() {
     return {
       options: [],
       selectedOption: ""
     }
-  }
+  },
+  methods: {
+    selectOption: function(event){
+      this.selected = event;
+      this.$emit('selected', {[this.optionType]: event});
+    }
+  },
   mounted: function(){
     session.set({
       token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImlkIjo1fQ.GR8v-RyugBdtq21_XliVpG6DJypCkFxr1zI7YcwIntE"
