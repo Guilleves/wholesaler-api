@@ -1,16 +1,16 @@
 <template lang="html">
   <div class="">
     <b-field :label="'Select a ' + this.filter" >
-      <b-select :placeholder="'Filter by ' + this.filter" rounded @input="selectOption($event)">
+      <b-select :placeholder="this.placeholder" rounded @input="selectOption($event)">
         <option
           v-for="option in options"
           :value="option.id"
           :key="option.id">
           {{ option.name }}
-      </option>
-    </b-select>
-  </b-field>
-</div>
+        </option>
+      </b-select>
+    </b-field>
+  </div>
 </template>
 
 <script>
@@ -20,7 +20,8 @@ export default {
   name: "option-filter",
   props: {
     filter: String,
-    optionType: String
+    optionType: String,
+    placeholder: String
   },
   data: function() {
     return {

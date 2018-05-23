@@ -1,9 +1,17 @@
 <template id="">
   <div>
     <div>
-      <keyword-search></keyword-search>
-      <option-filter option-type="brandId" filter="brands" @selected="buildSearchCriteria($event)"></option-filter>
-      <option-filter option-type="categoryId" filter="categories" @selected="buildSearchCriteria($event)"></option-filter>
+      <keyword-search @input="buildSearchCriteria($event)"></keyword-search>
+      <option-filter
+        option-type="brandId"
+        filter="brands"
+        placeholder="Select a brand"
+        @selected="buildSearchCriteria($event)"></option-filter>
+      <option-filter
+        option-type="categoryId"
+        filter="categories"
+        placeholder="Select a category"
+        @selected="buildSearchCriteria($event)"></option-filter>
     </div>
     <div>
       <b-table :data="formattedProducts" :columns="columns"></b-table>
@@ -60,14 +68,14 @@ export default {
     KeywordSearch
   },
   methods: {
-    buildSearchCriteria: (param) => {
-      debugger
+    buildSearchCriteria: function(param) {
       Object.assign(this.searchCriteria, param);
-      getProducts({brandId: 2}).then((response) => {
+      getProducts(this.searchCriteria).then((response) => {
         this.products = response.data;
-        this.formattedProducts = this.formatResponseIntoTable(self.products);
+        this.formattedProducts = this.formatResponseIntoTable(this.products);
       })
       .catch((error) => {
+        this.formattedProducts = [];
         console.log(error);
       });;
     },

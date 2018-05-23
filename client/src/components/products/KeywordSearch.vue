@@ -1,7 +1,12 @@
 <template lang="html">
-  <div class="">
+  <div>
     <b-field label="Search by name">
-      <b-input placeholder="Product's name" v-model="name" rounded></b-input>
+      <b-input
+        icon-pack="fas"
+        icon="search"
+        placeholder="Product's name"
+        @input="addKeyword($event)"
+        rounded></b-input>
     </b-field>
   </div>
 </template>
@@ -12,6 +17,11 @@ export default {
   data: function(){
     return {
       name: ""
+    }
+  },
+  methods: {
+    addKeyword: function(event) {
+      this.$emit('input', {keyword: event})
     }
   }
 }
