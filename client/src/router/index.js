@@ -24,6 +24,10 @@ export default new Router({
                 path: 'products',
                 name: 'ProductsIndex',
                 component: ProductsIndex
+            }, {
+              path: '/products/new_product',
+              name: 'NewProduct',
+              component: NewProduct
             }]
         }, {
             path: "/login",
@@ -33,10 +37,6 @@ export default new Router({
             path: "/signup",
             name: "Signup",
             component: Signup
-        }, {
-          path: '/products/new_product',
-          name: 'NewProduct',
-          component: NewProduct
         }
     ]
 });
