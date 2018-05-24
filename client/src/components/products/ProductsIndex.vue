@@ -32,7 +32,6 @@
 
 <script>
 import API from './../../helpers/api.js';
-import * as session from "./../../helpers/session.js";
 import OptionFilter from "./OptionFilter.vue";
 import KeywordSearch from "./KeywordSearch.vue";
 
@@ -88,7 +87,7 @@ export default {
       .catch((error) => {
         this.formattedProducts = [];
         console.log(error);
-      });;
+      });
     },
     formatResponseIntoTable: function(products) {
       let formattedResponse = products.map(product => {
@@ -107,10 +106,6 @@ export default {
     }
   },
   mounted : function() {
-    // This must be done on login
-    session.set({
-      token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImlkIjo1fQ.GR8v-RyugBdtq21_XliVpG6DJypCkFxr1zI7YcwIntE"
-    });
     var self = this;
     getProducts().then((response) => {
       self.products = response.data;
