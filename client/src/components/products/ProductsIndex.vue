@@ -3,21 +3,21 @@
       <div class="container">
         <div class="columns">
           <div class="column is-two-fifths">
-            <keyword-search @input="buildSearchCriteria($event)"></keyword-search>
+            <ws-keyword-search @input="buildSearchCriteria($event)"></ws-keyword-search>
           </div>
           <div class="column">
-            <option-filter
+            <ws-option-filter
             option-type="brandId"
             filter="brands"
             placeholder="Select a brand"
-            @selected="buildSearchCriteria($event)"></option-filter>
+            @selected="buildSearchCriteria($event)"></ws-option-filter>
           </div>
           <div class="column">
-            <option-filter
+            <ws-option-filter
               option-type="categoryId"
               filter="categories"
               placeholder="Select a category"
-              @selected="buildSearchCriteria($event)"></option-filter>
+              @selected="buildSearchCriteria($event)"></ws-option-filter>
           </div>
         </div>
       </div>
@@ -29,8 +29,8 @@
 
 <script>
 import API from './../../helpers/api.js';
-import OptionFilter from "./OptionFilter.vue";
-import KeywordSearch from "./KeywordSearch.vue";
+import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
+import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 
 function getProducts(data){
   return new API().get('/products', data);
@@ -71,8 +71,8 @@ export default {
     }
   },
   components: {
-    OptionFilter,
-    KeywordSearch
+    WsOptionFilter,
+    WsKeywordSearch
   },
   methods: {
     buildSearchCriteria: function(param) {

@@ -79,7 +79,8 @@ export default {
     name: 'Main',
     props: {
         msg: String
-    }, mounted: function () {
+    },
+    beforeMount: function () {
         if (!Session.getToken())
             this.$router.push("/login");
     }
