@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "keyword-search",
+  name: "ws-keyword-search",
   data: function(){
     return {
       name: ""
