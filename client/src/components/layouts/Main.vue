@@ -73,16 +73,14 @@
 </template>
 
 <script>
-import * as Session from "./../../helpers/session.js";
+import * as Session from './../../helpers/session.js';
 
 export default {
     name: 'Main',
     props: {
         msg: String
     }, mounted: function () {
-        if (Session.getToken())
-            this.$router.push("/home");
-        else
+        if (!Session.getToken())
             this.$router.push("/login");
     }
 }
