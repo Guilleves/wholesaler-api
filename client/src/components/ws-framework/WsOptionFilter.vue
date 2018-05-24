@@ -17,7 +17,7 @@
 import API from './../../helpers/api.js';
 
 export default {
-  name: "option-filter",
+  name: "ws-option-filter",
   props: {
     filter: String,
     optionType: String,
