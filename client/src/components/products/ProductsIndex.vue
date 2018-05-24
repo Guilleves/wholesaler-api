@@ -1,22 +1,30 @@
 <template id="">
-  <div>
-    <div>
-      <keyword-search @input="buildSearchCriteria($event)"></keyword-search>
-      <option-filter
-        option-type="brandId"
-        filter="brands"
-        placeholder="Select a brand"
-        @selected="buildSearchCriteria($event)"></option-filter>
-      <option-filter
-        option-type="categoryId"
-        filter="categories"
-        placeholder="Select a category"
-        @selected="buildSearchCriteria($event)"></option-filter>
-    </div>
-    <div>
-      <b-table :data="formattedProducts" :columns="columns"></b-table>
-    </div>
-  </div>
+    <section class="section">
+      <div class="container">
+        <div class="columns">
+          <div class="column is-two-fifths">
+            <keyword-search @input="buildSearchCriteria($event)"></keyword-search>
+          </div>
+          <div class="column">
+            <option-filter
+            option-type="brandId"
+            filter="brands"
+            placeholder="Select a brand"
+            @selected="buildSearchCriteria($event)"></option-filter>
+          </div>
+          <div class="column">
+            <option-filter
+              option-type="categoryId"
+              filter="categories"
+              placeholder="Select a category"
+              @selected="buildSearchCriteria($event)"></option-filter>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <b-table :data="formattedProducts" :columns="columns"></b-table>
+      </div>
+    </section>
 </template>
 
 <script>

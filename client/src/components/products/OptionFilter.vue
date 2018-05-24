@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="">
-    <b-field :label="'Select a ' + this.filter" >
-      <b-select :placeholder="this.placeholder" rounded @input="selectOption($event)">
+    <b-field :label="this.placeholder" >
+      <b-select expanded :placeholder="this.placeholder" rounded @input="selectOption($event)">
         <option
           v-for="option in options"
           :value="option.id"
