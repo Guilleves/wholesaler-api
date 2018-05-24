@@ -19,6 +19,9 @@
               placeholder="Select a category"
               @selected="buildSearchCriteria($event)"></option-filter>
           </div>
+          <div class="column">
+            <button class="button is-primary" slot="trigger" @click="newProduct()">New product</button>
+          </div>
         </div>
       </div>
       <div class="container">
@@ -99,6 +102,9 @@ export default {
       });
       return formattedResponse;
     },
+    newProduct: function(){
+      this.$router.push("products/new_product")
+    }
   },
   mounted : function() {
     // This must be done on login
