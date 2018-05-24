@@ -202,14 +202,14 @@ public class UserLogic {
             User dbUser = uda.getUser(username);
 
             if (dbUser == null)
-                throw ex.addError("User was not found.");
+                throw ex.addError("Invalid username or password.");
 
             // First, try to authenticate against the db.
             try {
                 couldAuthenticate = sl.validatePassword(password, dbUser.getPassword());
             }
             catch(Exception e) {
-                throw ex.addError(e);
+                throw new ApiException("Invalid username or password.");
             }
 
             // If the password comparison succeed.
@@ -222,6 +222,8 @@ public class UserLogic {
                     throw ex.addError(e);
                 }
             }
+            else
+                throw new ApiException("Invalid username or password.");
 
             return response;
         }
