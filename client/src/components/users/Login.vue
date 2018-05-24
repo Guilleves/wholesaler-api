@@ -83,9 +83,11 @@ export default {
                 .then((response) => {
                     Session.set(response.data);
                     this.notifications = [];
-                    this.$router.push("products");
+                    this.$toast.open("Logged in");
+                    this.$router.push("/");
                 })
                 .catch((error) => {
+                    this.$toast.open("Please try again");
                     this.notifications = error.response.data;
                 });
         },
