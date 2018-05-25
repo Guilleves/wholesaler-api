@@ -48,7 +48,7 @@ public class Products {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getProducts(@QueryParam("brandId") int brandId, @QueryParam("categoryId") int categoryId, @QueryParam("keyword") String keyword, @QueryParam("orderBy") String orderBy, @QueryParam("pageIndex") int pageIndex, @QueryParam("pageSize") int pageSize) {
+    public Response getProducts(@QueryParam("brandId") Integer brandId, @QueryParam("categoryId") Integer categoryId, @QueryParam("keyword") String keyword, @QueryParam("orderBy") String orderBy, @QueryParam("pageIndex") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
         GetProductsRequest request = new GetProductsRequest(
             brandId,
             categoryId,

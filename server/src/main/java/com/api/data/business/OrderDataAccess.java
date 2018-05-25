@@ -57,7 +57,9 @@ public class OrderDataAccess extends BaseDataAccess {
         return this.getOneWithoutStatement(rs -> deserializeOrder(rs), query, orderId);
     }
 
-    public ArrayList<Order> getOrders(Date fromDate, Date toDate, int retailId, String orderBy, int pageSize, int pageIndex) throws SQLException{
+    public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException{
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
         // Eeeeeeeeeeeeeeeeeek...
         String query = "SELECT " +
             "O.*, " +
@@ -82,9 +84,17 @@ public class OrderDataAccess extends BaseDataAccess {
             "B.name as brandName, " +
             "C.id as categoryId, " +
             "C.name as categoryName " +
-            "FROM " +
-            "`Order` O " +
-            "INNER JOIN Organization R ON R.id = O.retailId " +
+            "FROM ";
+
+        if (pageIndex != null && pageSize != null) {
+            query += "(SELECT * FROM `Order` LIMIT ?, ?) as O ";
+            parameters.add(pageIndex * pageSize);
+            parameters.add(pageSize);
+        }
+        else
+            query += "`Order` O ";
+
+        query += "INNER JOIN Organization R ON R.id = O.retailId " +
             "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
             "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
             "INNER JOIN Proposal P ON PL.proposalId = P.id " +
@@ -92,8 +102,6 @@ public class OrderDataAccess extends BaseDataAccess {
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
             "INNER JOIN Category C ON Pr.categoryId = C.id " +
             "WHERE PL.deletedAt IS NULL";
-
-            ArrayList<Object> parameters = new ArrayList<Object>();
 
             if (fromDate != null) {
                 query += " AND O.dateOrdered > ?";
@@ -105,26 +113,52 @@ public class OrderDataAccess extends BaseDataAccess {
                 parameters.add(toDate);
             }
 
-            if (retailId != 0) {
+            if (retailId != null) {
                 query += " AND O.retailId = ?";
                 parameters.add(retailId);
-            }
-
-            // this is not working...
-            /*if (orderBy != null && !orderBy.isEmpty()) {
-                query += " ORDER BY ?";
-                parameters.add(orderBy);
-            }*/
-
-            if (pageIndex != 0 && pageSize != 0) {
-                query += " LIMIT ?, ?";
-                parameters.add(pageIndex - 1);
-                parameters.add(pageSize);
             }
 
             query += ";";
 
         return getManyWithoutStatement(rs -> deserializeOrders(rs), query, parameters.toArray());
+    }
+
+    public int countSearch(Date fromDate, Date toDate, Integer retailId) throws SQLException{
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
+        // Eeeeeeeeeeeeeeeeeek...
+        String query = "SELECT COUNT(*) as size " +
+            "FROM " +
+            "( SELECT O.* FROM `Order` O " +
+            "INNER JOIN Organization R ON R.id = O.retailId " +
+            "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
+            "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+            "INNER JOIN Proposal P ON PL.proposalId = P.id " +
+            "INNER JOIN Product Pr ON PL.productId = Pr.id " +
+            "INNER JOIN Brand B ON Pr.brandId = B.id " +
+            "INNER JOIN Category C ON Pr.categoryId = C.id " +
+            "WHERE PL.deletedAt IS NULL";
+
+            if (fromDate != null) {
+                query += " AND O.dateOrdered > ?";
+                parameters.add(fromDate);
+            }
+
+            if (toDate != null) {
+                query += " AND O.dateOrdered < ?";
+                parameters.add(toDate);
+            }
+
+            if (retailId != null) {
+                query += " AND O.retailId = ?";
+                parameters.add(retailId);
+            }
+
+            query += " GROUP BY O.id) as x";
+
+            query += ";";
+
+        return getInt(query, parameters.toArray());
     }
 
     public Order registerOrder(Order order) throws SQLException{

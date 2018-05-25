@@ -128,6 +128,44 @@ public class BaseDataAccess {
         return result;
     }
 
+    protected int getInt(String query, Object... parameters) throws SQLException {
+    	int result = 0;
+    	Statement st = null;
+    	ResultSet rs = null;
+
+        try {
+        	if (parameters == null) {
+        		st = Connection.getInstancia().getConn().createStatement();
+
+                rs = st.executeQuery(query);
+        	}
+        	else {
+        		st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+        		int i = 0;
+
+        		for (Object parameter : parameters) {
+        			i++;
+
+        			((PreparedStatement)st).setObject(i, parameter);
+        		}
+
+                rs = ((PreparedStatement)st).executeQuery();
+        	}
+
+            if (rs.next())
+                result = rs.getInt(1);
+        }
+        catch (SQLException ex) {
+        	throw ex;
+        }
+		finally {
+			Connection.getInstancia().closeConn();
+		}
+
+        return result;
+    }
+
     protected <T extends BaseEntity> T getOneWithoutStatement(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
         T result = null;
         Statement st = null;

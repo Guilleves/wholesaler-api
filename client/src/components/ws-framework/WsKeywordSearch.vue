@@ -1,6 +1,6 @@
 <template lang="html">
   <div>
-    <b-field label="Search by name">
+    <b-field>
       <b-input
         icon-pack="fas"
         icon="search"

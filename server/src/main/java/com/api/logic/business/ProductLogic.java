@@ -3,6 +3,7 @@ package com.api.logic.business;
 // #region Imports
 
 import com.api.entities.business.Ranking;
+import com.api.entities.models.BaseSearchResponse;
 import com.api.entities.models.product.GetRankingResponse;
 import java.sql.SQLException;
 import com.api.entities.models.product.GetProductsRequest;
@@ -66,7 +67,7 @@ public class ProductLogic {
         }
     }
 
-    public ArrayList<GetProductResponse> getProducts(GetProductsRequest request) throws ApiException {
+    public BaseSearchResponse getProducts(GetProductsRequest request) throws ApiException {
         try {
             ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
 
@@ -96,7 +97,7 @@ public class ProductLogic {
                 ));
             }
 
-            return response;
+            return new BaseSearchResponse(pda.countSearch(request.getBrandId(), request.getCategoryId(), request.getKeyword()), response);
         }
         catch(SQLException ex) {
             throw new ApiException(ex);
