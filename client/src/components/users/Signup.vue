@@ -112,7 +112,9 @@ export default {
                 this.$router.push("products");
             })
             .catch((error) => {
+              if (error.response)
                 this.notifications = error.response.data;
+              console.log(error);
             });
         },
         redirectLogin: function() {

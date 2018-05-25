@@ -69,8 +69,8 @@
 
 <script>
 import API from '@/helpers/api.js';
-import OptionFilter from "@/components/products/OptionFilter.vue";
-import KeywordSearch from "@/components/products/KeywordSearch.vue";
+import OptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
+import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 
 export default {
     name: 'proposals-index',
