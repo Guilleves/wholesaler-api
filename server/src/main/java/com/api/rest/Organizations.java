@@ -2,6 +2,7 @@ package com.api.rest;
 
 // #region Imports
 
+import com.api.entities.models.organization.GetSuppliersResponse;
 import javax.ws.rs.QueryParam;
 import com.api.entities.models.organization.GetOrganizationsRequest;
 import com.api.entities.models.organization.SaveOrganizationRequest;
@@ -49,6 +50,20 @@ public class Organizations {
 
         try {
             return Response.ok(ol.getOrganizations(request)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/suppliers")
+    public Response getSuppliers() {
+        try {
+            return Response.ok(ol.getSuppliers()).build();
         }
         catch(ApiException e) {
             return Response.status(e.getStatus()).entity(e.getErrors()).build();

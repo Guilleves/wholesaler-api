@@ -1,36 +1,44 @@
 package com.api.entities.models.product;
-import java.io.Serializable;
+import com.api.entities.models.BaseSearchRequest;
 
-public class GetProductsRequest implements Serializable {
+public class GetProductsRequest extends BaseSearchRequest {
     static final long serialVersionUID = 0L;
-    private int brandId, categoryId, pageIndex, pageSize;
-    private String keyword, orderBy;
+
+    private Integer brandId, categoryId;
+    private String keyword;
 
 	/**
-	* Default empty GetProductsByFilterRequest constructor
+	* Default empty GetProductsRequest constructor
 	*/
 	public GetProductsRequest() {
 		super();
 	}
 
 	/**
-	* Default GetProductsByFilterRequest constructor
+	* Default GetProductsRequest constructor
 	*/
-	public GetProductsRequest(int brandId, int categoryId, int pageIndex, int pageSize, String keyword, String orderBy) {
+	public GetProductsRequest(Integer brandId, Integer categoryId, String keyword) {
 		super();
 		this.brandId = brandId;
 		this.categoryId = categoryId;
-		this.pageIndex = pageIndex;
-		this.pageSize = pageSize;
 		this.keyword = keyword;
-		this.orderBy = orderBy;
+	}
+
+    /**
+	* Default GetProductsRequest constructor
+	*/
+	public GetProductsRequest(Integer brandId, Integer categoryId, Integer pageIndex, Integer pageSize, String keyword, String orderBy) {
+		super(orderBy, pageIndex, pageSize);
+		this.brandId = brandId;
+		this.categoryId = categoryId;
+		this.keyword = keyword;
 	}
 
 	/**
 	* Returns value of brandId
 	* @return
 	*/
-	public int getBrandId() {
+	public Integer getBrandId() {
 		return brandId;
 	}
 
@@ -38,7 +46,7 @@ public class GetProductsRequest implements Serializable {
 	* Sets new value of brandId
 	* @param
 	*/
-	public void setBrandId(int brandId) {
+	public void setBrandId(Integer brandId) {
 		this.brandId = brandId;
 	}
 
@@ -46,7 +54,7 @@ public class GetProductsRequest implements Serializable {
 	* Returns value of categoryId
 	* @return
 	*/
-	public int getCategoryId() {
+	public Integer getCategoryId() {
 		return categoryId;
 	}
 
@@ -54,40 +62,8 @@ public class GetProductsRequest implements Serializable {
 	* Sets new value of categoryId
 	* @param
 	*/
-	public void setCategoryId(int categoryId) {
+	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
-	}
-
-	/**
-	* Returns value of pageIndex
-	* @return
-	*/
-	public int getPageIndex() {
-		return pageIndex;
-	}
-
-	/**
-	* Sets new value of pageIndex
-	* @param
-	*/
-	public void setPageIndex(int pageIndex) {
-		this.pageIndex = pageIndex;
-	}
-
-	/**
-	* Returns value of pageSize
-	* @return
-	*/
-	public int getPageSize() {
-		return pageSize;
-	}
-
-	/**
-	* Sets new value of pageSize
-	* @param
-	*/
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
 	}
 
 	/**
@@ -104,21 +80,5 @@ public class GetProductsRequest implements Serializable {
 	*/
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
-	}
-
-	/**
-	* Returns value of orderBy
-	* @return
-	*/
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	/**
-	* Sets new value of orderBy
-	* @param
-	*/
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
 	}
 }

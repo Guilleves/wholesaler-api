@@ -1,6 +1,8 @@
 package com.api.entities.models.product;
 
-public class GetProductResponse {
+import com.api.entities.models.BaseSearchResponse;
+
+public class GetProductResponse implements BaseSearchResponse.SearchItem {
     private int id;
     private String name, gtin;
     private Brand brand;

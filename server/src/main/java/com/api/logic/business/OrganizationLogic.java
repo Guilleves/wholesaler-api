@@ -2,6 +2,7 @@ package com.api.logic.business;
 
 // #region Imports
 
+import com.api.entities.models.organization.GetSuppliersResponse;
 import java.sql.SQLException;
 import com.api.entities.models.organization.GetOrganizationsRequest;
 import com.api.entities.enums.OrganizationRoles;
@@ -61,6 +62,31 @@ public class OrganizationLogic {
       }
       catch(SQLException ex) {
           throw new ApiException(ex);
+      }
+  }
+
+  public ArrayList<GetSuppliersResponse> getSuppliers() throws ApiException {
+      try {
+          ArrayList<GetSuppliersResponse> response = new ArrayList<GetSuppliersResponse>();
+
+          // Fetch product list.
+          ArrayList<Organization> suppliers = oda.getOrganizations(OrganizationRoles.SUPPLIER);
+
+          if (suppliers == null || suppliers.isEmpty())
+              throw new ApiException("Couldn't find any supplier.", Status.NOT_FOUND);
+
+          // Generate the response object.
+          for (Organization supplier : suppliers) {
+              response.add(new GetSuppliersResponse(
+                  supplier.getId(),
+                  supplier.getName()
+              ));
+          }
+
+          return response;
+      }
+      catch(SQLException e) {
+          throw new ApiException(e);
       }
   }
 

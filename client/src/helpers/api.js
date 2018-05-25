@@ -11,7 +11,7 @@ class API {
 
         this.axios = Axios.create({
           baseURL: "http://localhost:9090/",
-          timeout: 1000,
+          timeout: 20000,
           headers: headers
         });
     }

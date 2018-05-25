@@ -22,10 +22,10 @@
             <div class="hero-body">
                 <div class="container has-text-centered">
                     <h1 class="title">
-                        Products
+                        Proposals
                     </h1>
                     <h2 class="subtitle">
-                        View, create or delete products
+                        View, create or delete proposals
                     </h2>
                 </div>
             </div>
@@ -33,56 +33,56 @@
         <section class="section">
             <div class="container">
                 <div class="columns">
-                    <div class="column is-two-fifths">
-                        <keyword-search @input="buildSearchCriteria($event)"></keyword-search>
+                    <div class="column">
+                        <option-filter
+                        option-type="status"
+                        :static-options="[{'id': 'scheduled', 'name': 'Schduled'},
+                        {'id': 'active', 'name': 'Active'},
+                        {'id': 'finished', 'name': 'Finished'}]"
+                        filter="status"
+                        placeholder="Select a status"
+                        @selected="buildSearchCriteria($event)" />
                     </div>
                     <div class="column">
                         <option-filter
-                        option-type="brandId"
-                        filter="brands"
-                        placeholder="Select a brand"
-                        @selected="buildSearchCriteria($event)"></option-filter>
-                    </div>
-                    <div class="column">
-                        <option-filter
-                        option-type="categoryId"
-                        filter="categories"
-                        placeholder="Select a category"
-                        @selected="buildSearchCriteria($event)"></option-filter>
+                        option-type="supplierId"
+                        filter="organizations/suppliers"
+                        placeholder="Select a supplier"
+                        @selected="buildSearchCriteria($event)" />
                     </div>
                 </div>
             </div>
             <div class="container">
                 <b-table
-                :data="formattedProducts"
+                :data="formattedProposals"
                 :columns="columns"
                 :loading="loading"
                 backend-pagination
                 :paginated="true"
                 :per-page="pageSize"
                 :total="total"
-                @page-change="onPageChange"/>
+                @page-change="onPageChange"></b-table>
             </div>
         </section>
     </div>
 </template>
 
 <script>
-import API from './../../helpers/api.js';
-import OptionFilter from "./OptionFilter.vue";
-import KeywordSearch from "./KeywordSearch.vue";
+import API from '@/helpers/api.js';
+import OptionFilter from "@/components/products/OptionFilter.vue";
+import KeywordSearch from "@/components/products/KeywordSearch.vue";
 
 export default {
-    name: 'products-index',
+    name: 'proposals-index',
     data: () => {
         return {
             total: 0,
             loading: false,
             pageIndex: 1,
-            pageSize: 5,
+            pageSize: 10,
             searchCriteria: {},
-            products: [],
-            formattedProducts: [],
+            proposals: [],
+            formattedProposals: [],
             columns: [
                 {
                     field: 'id',
@@ -91,21 +91,20 @@ export default {
                     numeric: true
                 },
                 {
-                    field: 'name',
-                    label: 'Name',
+                    field: 'title',
+                    label: 'Title',
                 },
                 {
-                    field: 'gtin',
-                    label: 'GTIN',
+                    field: 'description',
+                    label: 'Description',
                 },
                 {
-                    field: 'brand',
-                    label: 'Brand',
-                    centered: true
+                    field: 'beginDate',
+                    label: 'Begin Date',
                 },
                 {
-                    field: 'category',
-                    label: 'Category',
+                    field: 'endDate',
+                    label: 'End Date'
                 }
             ]
         }
@@ -115,38 +114,38 @@ export default {
         KeywordSearch
     },
     watch: {
-        products: function(val) {
-            this.formattedProducts = val.map(product => {
+        proposals: function(val) {
+            this.formattedProposals = val.map(proposal => {
                 return {
-                    id: product.id,
-                    name: product.name,
-                    gtin: product.gtin,
-                    brand: product.brand.name,
-                    category: product.category.name
+                    id: proposal.id,
+                    title: proposal.title,
+                    description: proposal.description,
+                    beginDate: proposal.beginDate,
+                    endDate: proposal.endDate
                 }
             });
         }
     },
     methods: {
-        buildSearchCriteria(param) {
-            Object.assign(this.searchCriteria, param);
-            this.getProducts();
-        },
-        getProducts() {
+        getProposals() {
             let self = this;
 
             this.loading = true;
 
-            return new API().get('/products', this.searchCriteria).then((response) => {
-                self.products = response.data.items;
+            return new API().get('/proposals', this.searchCriteria).then((response) => {
+                self.proposals = response.data.items;
                 self.total = response.data.size;
                 self.loading = false;
             }).catch(() => {
-                self.$toast.open("Couldn't find products.");
-                self.products = [];
+                self.$toast.open("Couldn't find proposals.");
+                self.proposals = [];
                 self.total = 0;
                 self.loading = false;
             });
+        },
+        buildSearchCriteria(param) {
+            Object.assign(this.searchCriteria, param);
+            this.getProposals();
         },
         onPageChange(page) {
             this.pageIndex = page - 1;
@@ -157,7 +156,7 @@ export default {
         }
     },
     mounted : function() {
-        this.getProducts();
+        this.getProposals();
     }
 }
 </script>

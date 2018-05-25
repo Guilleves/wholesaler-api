@@ -1,8 +1,11 @@
 package com.api.entities.models.proposal;
 
-public class GetProposalsRequest {
-    private String orderBy, status;
-    private Integer pageIndex, pageSize, supplierId;
+import com.api.entities.models.BaseSearchRequest;
+
+public class GetProposalsRequest extends BaseSearchRequest {
+    static final long serialVersionUID = 0L;
+    private String status;
+    private Integer supplierId;
 
 	/**
 	* Default empty GetProposalsRequest constructor
@@ -14,30 +17,17 @@ public class GetProposalsRequest {
 	/**
 	* Default GetProposalsRequest constructor
 	*/
-	public GetProposalsRequest(String orderBy, String status, Integer pageIndex, Integer pageSize, Integer supplierId) {
+	public GetProposalsRequest(String status, Integer supplierId) {
 		super();
-		this.orderBy = orderBy;
 		this.status = status;
-		this.pageIndex = pageIndex;
-		this.pageSize = pageSize;
 		this.supplierId = supplierId;
 	}
 
-	/**
-	* Returns value of orderBy
-	* @return
-	*/
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	/**
-	* Sets new value of orderBy
-	* @param
-	*/
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
-	}
+    public GetProposalsRequest(String orderBy, String status, Integer pageIndex, Integer pageSize, Integer supplierId) {
+        super(orderBy, pageIndex, pageSize);
+        this.status = status;
+        this.supplierId = supplierId;
+    }
 
 	/**
 	* Returns value of status
@@ -53,38 +43,6 @@ public class GetProposalsRequest {
 	*/
 	public void setStatus(String status) {
 		this.status = status;
-	}
-
-	/**
-	* Returns value of pageIndex
-	* @return
-	*/
-	public Integer getPageIndex() {
-		return pageIndex;
-	}
-
-	/**
-	* Sets new value of pageIndex
-	* @param
-	*/
-	public void setPageIndex(Integer pageIndex) {
-		this.pageIndex = pageIndex;
-	}
-
-	/**
-	* Returns value of pageSize
-	* @return
-	*/
-	public Integer getPageSize() {
-		return pageSize;
-	}
-
-	/**
-	* Sets new value of pageSize
-	* @param
-	*/
-	public void setPageSize(Integer pageSize) {
-		this.pageSize = pageSize;
 	}
 
 	/**
