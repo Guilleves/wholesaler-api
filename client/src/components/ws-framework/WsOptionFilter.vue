@@ -33,6 +33,7 @@ export default {
     selectOption: function(event){
       this.selected = event;
       this.$emit('selected', {[this.optionType]: event});
+      this.$emit('input', event);
     }
   },
   mounted: function(){
