@@ -6,7 +6,7 @@ public class SaveProductRequest implements Serializable {
     static final long serialVersionUID = 0L;
 
     private int id, brandId, categoryId;
-    private String name, gtin;
+    private String name, gtin, description;
 
 	/**
 	* Default empty SaveProductRequest constructor
@@ -18,13 +18,14 @@ public class SaveProductRequest implements Serializable {
 	/**
 	* Default SaveProductRequest constructor
 	*/
-	public SaveProductRequest(int id, int brandId, int categoryId, String name, String gtin) {
+	public SaveProductRequest(int id, int brandId, int categoryId, String name, String gtin, String description) {
 		super();
 		this.id = id;
 		this.brandId = brandId;
 		this.categoryId = categoryId;
 		this.name = name;
-		this.gtin = gtin;
+    this.gtin = gtin;
+		this.description = description;
 	}
 
 	/**
@@ -106,4 +107,12 @@ public class SaveProductRequest implements Serializable {
 	public void setGtin(String gtin) {
 		this.gtin = gtin;
 	}
+
+  public String getDescription(){
+    return description;
+  }
+
+  public void setDescription(String description){
+    this.description = description;
+  }
 }

@@ -2,7 +2,7 @@ package com.api.entities.models.product;
 
 public class GetProductResponse {
     private int id;
-    private String name, gtin;
+    private String name, gtin, description;
     private Brand brand;
     private Category category;
 
@@ -16,11 +16,12 @@ public class GetProductResponse {
 	/**
 	* Default GetProductResponse constructor
 	*/
-	public GetProductResponse(int id, String name, String gtin, int brandId, String brandName, int categoryId, String categoryName) {
+	public GetProductResponse(int id, String name, String gtin, String description, int brandId, String brandName, int categoryId, String categoryName) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.gtin = gtin;
+    this.gtin = gtin;
+		this.description = description;
 		this.brand = new Brand(brandId, brandName);
 		this.category = new Category(categoryId, categoryName);
 	}
@@ -72,6 +73,14 @@ public class GetProductResponse {
 	public void setGtin(String gtin) {
 		this.gtin = gtin;
 	}
+
+  public String getDescription(){
+    return description;
+  }
+
+  public void setDescription(String description){
+    this.description = description;
+  }
 
 	/**
 	* Returns value of brand

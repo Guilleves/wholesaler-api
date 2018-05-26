@@ -111,11 +111,12 @@ public class ProductDataAccess extends BaseDataAccess {
     }
 
     public Product createProduct(Product product) throws SQLException{
-        String query = "INSERT INTO Product (name, gtin, brandId, categoryId) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO Product (name, gtin, description, brandId, categoryId) VALUES (?, ?, ?, ?, ?);";
 
         product.setId(create(query,
             product.getName(),
             product.getGtin(),
+            product.getDescription(),
             product.getBrand().getId(),
             product.getCategory().getId())
         );
@@ -124,11 +125,12 @@ public class ProductDataAccess extends BaseDataAccess {
     }
 
     public int updateProduct(Product product) throws SQLException {
-        String query = "UPDATE Product SET name = ?, gtin = ?, brandId = ?, categoryId = ? WHERE id = ?;";
+        String query = "UPDATE Product SET name = ?, gtin = ?, description = ?, brandId = ?, categoryId = ? WHERE id = ?;";
 
         return update(query,
             product.getName(),
             product.getGtin(),
+            product.getDescription(),
             product.getBrand().getId(),
             product.getCategory().getId(),
             product.getId()
