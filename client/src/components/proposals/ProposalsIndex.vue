@@ -1,37 +1,47 @@
 <template id="">
     <section class="section">
         <div class="container">
-            <b-field grouped position="is-right">
-                <p class="control">
-                    <router-link class="button is-rounded is-primary" to="/proposals/new">
-                        <span class="icon">
-                            <i class="fas fa-plus"></i>
-                        </span>
-                        <span>New proposal</span>
-                    </router-link>
-                </p>
-            </b-field>
+
             <div class="columns">
-                <div class="column">
-                    <option-filter
-                    option-type="status"
-                    :static-options="[{'id': 'scheduled', 'name': 'Schduled'},
-                    {'id': 'active', 'name': 'Active'},
-                    {'id': 'finished', 'name': 'Finished'}]"
-                    filter="status"
-                    placeholder="Select a status"
-                    @selected="buildSearchCriteria($event)" />
+                <div class="column is-three-fifths">
+                    <div class="columns">
+                        <div class="column">
+                            <option-filter
+                            option-type="status"
+                            :static-options="[{'id': 'scheduled', 'name': 'Schduled'},
+                            {'id': 'active', 'name': 'Active'},
+                            {'id': 'finished', 'name': 'Finished'}]"
+                            filter="status"
+                            placeholder="Select a status"
+                            @selected="buildSearchCriteria($event)" />
+                        </div>
+                        <div class="column">
+                            <option-filter
+                            option-type="supplierId"
+                            filter="organizations/suppliers"
+                            placeholder="Select a supplier"
+                            @selected="buildSearchCriteria($event)" />
+                        </div>
+                        <div class="column">
+                            <b-switch v-model="showDeleted">
+                                Show deleted proposals
+                            </b-switch>
+                        </div>
+                    </div>
                 </div>
                 <div class="column">
-                    <option-filter
-                    option-type="supplierId"
-                    filter="organizations/suppliers"
-                    placeholder="Select a supplier"
-                    @selected="buildSearchCriteria($event)" />
+                    <b-field grouped position="is-right">
+                        <p class="control">
+                            <router-link class="button is-rounded is-primary" to="/proposals/new">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span>New proposal</span>
+                            </router-link>
+                        </p>
+                    </b-field>
                 </div>
             </div>
-        </div>
-        <div class="container">
             <ws-table
             :columns="columns"
             :fetch="getProposals"
@@ -52,6 +62,7 @@ export default {
     name: 'proposals-index',
     data: () => {
         return {
+            showDeleted: false,
             searchCriteria: {},
             columns: [{
                 field: 'id',
@@ -76,8 +87,8 @@ export default {
                 id: proposal.id,
                 title: proposal.title,
                 description: proposal.description,
-                beginDate: new Date(proposal.beginDate),
-                endDate: new Date(proposal.endDate)
+                beginDate: new Date(proposal.beginDate).toLocaleDateString(),
+                endDate: new Date(proposal.endDate).toLocaleDateString()
             }
         },
         getProposals(searchCriteria) {

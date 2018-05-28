@@ -109,7 +109,7 @@ export default {
             .then((response) => {
                 Session.set(response.data);
                 this.notifications = [];
-                this.$router.push("products");
+                this.$router.push("home");
             })
             .catch((error) => {
               if (error.response)
