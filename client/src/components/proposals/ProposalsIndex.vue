@@ -1,6 +1,16 @@
 <template id="">
     <section class="section">
         <div class="container">
+            <b-field grouped position="is-right">
+                <p class="control">
+                    <router-link class="button is-rounded is-primary" to="/proposals/new">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span>New proposal</span>
+                    </router-link>
+                </p>
+            </b-field>
             <div class="columns">
                 <div class="column">
                     <option-filter
@@ -26,7 +36,8 @@
             :columns="columns"
             :fetch="getProposals"
             :filters="searchCriteria"
-            :format="format" />
+            :format="format"
+            @select="onSelect"/>
         </div>
     </section>
 </template>
@@ -65,8 +76,8 @@ export default {
                 id: proposal.id,
                 title: proposal.title,
                 description: proposal.description,
-                beginDate: proposal.beginDate,
-                endDate: proposal.endDate
+                beginDate: new Date(proposal.beginDate),
+                endDate: new Date(proposal.endDate)
             }
         },
         getProposals(searchCriteria) {
@@ -74,6 +85,9 @@ export default {
         },
         buildSearchCriteria(param) {
             this.searchCriteria = Object.assign({}, this.searchCriteria, param);
+        },
+        onSelect(proposal) {
+            this.$router.push("/proposals/" + proposal.id);
         }
     }
 }

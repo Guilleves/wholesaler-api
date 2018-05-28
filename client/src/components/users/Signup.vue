@@ -81,8 +81,8 @@
 </template>
 
 <script>
-import API from "./../../helpers/api.js";
-import * as Session from "./../../helpers/session.js";
+import API from "@/helpers/api.js";
+import * as Session from "@/helpers/session.js";
 
 export default {
     name: 'signup',
