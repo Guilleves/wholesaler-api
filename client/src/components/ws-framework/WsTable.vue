@@ -1,6 +1,8 @@
 <template lang="html">
     <div>
         <b-table
+            hoverable
+            selectable
             :data="formattedData"
             :columns="columns"
             :loading="loading"
@@ -8,7 +10,8 @@
             :paginated="true"
             :per-page="pageSize"
             :total="total"
-            @page-change="onPageChange" />
+            @page-change="onPageChange"
+            @select="onSelect" />
     </div>
 </template>
 
@@ -22,7 +25,8 @@ export default {
             pageIndex: 1,
             pageSize: 5,
             data: [],
-            formattedData: []
+            formattedData: [],
+            selected: {}
         }
     },
     props: {
@@ -64,6 +68,9 @@ export default {
             });
 
             this.getData(this.filters);
+        },
+        onSelect(selected) {
+            this.$emit('select', selected);
         }
     },
     mounted: function() {

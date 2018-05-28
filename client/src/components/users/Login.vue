@@ -84,7 +84,7 @@ export default {
                 Session.set(response.data);
                 this.notifications = [];
                 this.$toast.open("Logged in");
-                this.$router.push("/");
+                this.$router.push("home");
             })
             .catch((error) => {
                 this.$toast.open("Please try again");
