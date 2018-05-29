@@ -59,8 +59,9 @@
 </template>
 
 <script>
-import API from "./../../helpers/api.js";
-import * as Session from "./../../helpers/session.js";
+import API from "@/helpers/api.js";
+import * as Session from "@/helpers/session.js";
+import * as Notifier from "@/helpers/notifier.js";
 
 export default {
     name: 'login',
@@ -83,11 +84,12 @@ export default {
             .then((response) => {
                 Session.set(response.data);
                 this.notifications = [];
-                this.$toast.open("Logged in");
+                Notifier.info("Logged in");
                 this.$router.push("home");
             })
             .catch((error) => {
-                this.$toast.open("Please try again");
+                console.log(error);
+                Notifier.error("Please try again");
                 this.notifications = error.response.data;
             });
         },

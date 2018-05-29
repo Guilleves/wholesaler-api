@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import * as Notifier from "@/helpers/notifier.js";
+
 export default {
     name: "ws-table",
     data: function() {
@@ -54,7 +56,7 @@ export default {
                 self.total = response.data.size;
                 self.loading = false;
             }).catch(() => {
-                self.$toast.open("Couldn't find any item.");
+                Notifier.error("Couldn't find any item.");
                 self.data = [];
                 self.total = 0;
                 self.loading = false;

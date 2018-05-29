@@ -99,6 +99,14 @@ export default {
         },
         onSelect(proposal) {
             this.$router.push("/proposals/" + proposal.id);
+        },
+        formatBrands(data) {
+            return data.items.map(brand => {
+                return {
+                    id: brand.id,
+                    name: brand.name
+                }
+            });
         }
     }
 }

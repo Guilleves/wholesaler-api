@@ -41,6 +41,7 @@
                         option-type="brandId"
                         filter="brands"
                         placeholder="Select a brand"
+                        :format="formatBrands"
                         @selected="buildSearchCriteria($event)" />
                     </div>
                     <div class="column">
@@ -106,6 +107,14 @@ export default {
         },
         buildSearchCriteria(param) {
             this.searchCriteria = Object.assign({}, this.searchCriteria, param);
+        },
+        formatBrands(data) {
+            return data.items.map(brand => {
+                return {
+                    id: brand.id,
+                    name: brand.name
+                }
+            });
         }
     }
 }

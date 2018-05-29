@@ -22,7 +22,8 @@ export default {
         filter: String,
         optionType: String,
         placeholder: String,
-        staticOptions: Array
+        staticOptions: Array,
+        format: Function
     },
     data: function() {
         return {
@@ -46,7 +47,10 @@ export default {
         new API()
         .get('/' + self.filter, )
         .then((response) => {
-            self.options = response.data;
+            if (self.format)
+                self.options = self.format(response.data);
+            else
+                self.options = response.data;
         })
         .catch((error) => {
             console.log(error);
