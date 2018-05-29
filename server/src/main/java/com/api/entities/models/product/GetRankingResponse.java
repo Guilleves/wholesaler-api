@@ -2,7 +2,7 @@ package com.api.entities.models.product;
 
 public class GetRankingResponse {
     private int id, count;
-    private String name, gtin;
+    private String name, gtin, description;
     private Brand brand;
     private Category category;
 
@@ -16,12 +16,13 @@ public class GetRankingResponse {
 	/**
 	* Default GetProductResponse constructor
 	*/
-	public GetRankingResponse(int id, int count, String name, String gtin, int brandId, String brandName, int categoryId, String categoryName) {
+	public GetRankingResponse(int id, int count, String name, String gtin, String description, int brandId, String brandName, int categoryId, String categoryName) {
 		super();
 		this.id = id;
-        this.count = count;
+    this.count = count;
 		this.name = name;
-		this.gtin = gtin;
+    this.gtin = gtin;
+		this.description = description;
 		this.brand = new Brand(brandId, brandName);
 		this.category = new Category(categoryId, categoryName);
 	}
@@ -90,6 +91,13 @@ public class GetRankingResponse {
 		this.gtin = gtin;
 	}
 
+  public String getDescription(){
+    return description;
+  }
+
+  public void setDescription(String description){
+    this.description = description;
+  }
 	/**
 	* Returns value of brand
 	* @return

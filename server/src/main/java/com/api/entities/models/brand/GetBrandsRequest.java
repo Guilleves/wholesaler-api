@@ -1,7 +1,7 @@
 package com.api.entities.models.brand;
-import java.io.Serializable;
+import com.api.entities.models.BaseSearchRequest;
 
-public class GetBrandsRequest implements Serializable {
+public class GetBrandsRequest extends BaseSearchRequest {
     static final long serialVersionUID = 0L;
     private int id;
     private String name;

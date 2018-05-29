@@ -1,6 +1,7 @@
 package com.api.logic.business;
 
 import java.sql.SQLException;
+import com.api.entities.models.BaseSearchResponse;
 import com.api.entities.models.proposal.GetProposalsRequest;
 import com.api.entities.models.organization.GetOrganizationResponse;
 import com.api.entities.models.product.GetProductResponse;
@@ -30,9 +31,10 @@ public class ProposalLogic {
         productDa = new ProductDataAccess();
     }
 
-    public ArrayList<GetProposalsResponse> getProposals(GetProposalsRequest request) throws ApiException {
+    public BaseSearchResponse getProposals(GetProposalsRequest request) throws ApiException {
         try {
             ArrayList<Proposal> proposals = pda.getProposals(request.getStatus(), request.getSupplierId(), request.getOrderBy(), request.getPageSize(), request.getPageIndex());
+
             ArrayList<GetProposalsResponse> response = new ArrayList<GetProposalsResponse>();
 
             if (proposals == null || proposals.isEmpty())
@@ -49,7 +51,7 @@ public class ProposalLogic {
                 ));
             }
 
-            return response;
+            return new BaseSearchResponse(pda.countSearch(request.getStatus(), request.getSupplierId()), response);
         }
         catch(SQLException ex) {
             throw new ApiException(ex);
@@ -72,6 +74,7 @@ public class ProposalLogic {
                         line.getProduct().getId(),
                         line.getProduct().getName(),
                         line.getProduct().getGtin(),
+                        line.getProduct().getDescription(),
                         line.getProduct().getBrand().getId(),
                         line.getProduct().getBrand().getName(),
                         line.getProduct().getCategory().getId(),
@@ -169,6 +172,7 @@ public class ProposalLogic {
                         line.getProduct().getId(),
                         line.getProduct().getName(),
                         line.getProduct().getGtin(),
+                        line.getProduct().getDescription(),
                         line.getProduct().getBrand().getId(),
                         line.getProduct().getBrand().getName(),
                         line.getProduct().getCategory().getId(),
@@ -203,7 +207,7 @@ public class ProposalLogic {
     private ApiException validateSaveProposal(SaveProposalRequest request) {
         ApiException ex = new ApiException();
 
-        if (request.getTitle() == null)
+        if (request.getTitle() == null || request.getTitle().isEmpty())
             ex.addError("Title can't be empty.");
 
         if (request.getBeginDate() == null)
@@ -212,7 +216,7 @@ public class ProposalLogic {
         if (request.getEndDate() == null)
             ex.addError("End date cannot be empty.");
 
-        if (request.getBeginDate().after(request.getEndDate()))
+        if (request.getBeginDate() != null && request.getEndDate() != null && request.getBeginDate().after(request.getEndDate()))
             ex.addError("Begin date cannot be greater than end date.");
 
         return ex;

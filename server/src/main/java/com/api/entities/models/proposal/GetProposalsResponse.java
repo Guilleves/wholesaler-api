@@ -1,8 +1,9 @@
 package com.api.entities.models.proposal;
 
+import com.api.entities.models.BaseSearchResponse;
 import java.util.Date;
 
-public class GetProposalsResponse {
+public class GetProposalsResponse implements BaseSearchResponse.SearchItem {
     private int id;
     private String title, description, status;
     private Date beginDate, endDate;

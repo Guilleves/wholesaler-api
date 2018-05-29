@@ -2,6 +2,7 @@ package com.api.logic.business;
 
 // #region Imports
 
+import com.api.entities.models.BaseSearchResponse;
 import com.api.entities.models.brand.GetBrandsRequest;
 import com.api.entities.models.brand.GetBrandsResponse;
 import com.api.data.business.BrandDataAccess;
@@ -21,12 +22,32 @@ public class BrandLogic {
         bda = new BrandDataAccess();
     }
 
-    public ArrayList<GetBrandsResponse> getBrands(GetBrandsRequest request) throws ApiException {
+    public GetBrandsResponse getBrand(int brandId) throws ApiException {
+        try {
+            Brand brand = bda.getBrand(brandId);
+
+            if (brand == null)
+                throw new ApiException("Brand not found", Status.NOT_FOUND);
+
+            return new GetBrandsResponse(brand.getId(), brand.getName());
+        }
+        catch(SQLException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
+    public BaseSearchResponse getBrands(GetBrandsRequest request) throws ApiException {
         try {
             ArrayList<GetBrandsResponse> response = new ArrayList<GetBrandsResponse>();
 
             // Fetch product list.
-            ArrayList<Brand> brands = bda.getBrands();
+            ArrayList<Brand> brands;
+
+            if (request.getPageSize() == null || request.getPageIndex() == null)
+                brands = bda.getBrands();
+            else
+                brands = bda.getBrands(request.getPageSize(), request.getPageIndex());
+
             if (brands == null || brands.isEmpty())
                 throw new ApiException("Couldn't find any brands.", Status.NOT_FOUND);
 
@@ -38,7 +59,7 @@ public class BrandLogic {
                 ));
             }
 
-            return response;
+            return new BaseSearchResponse(bda.countBrands(), response);
         }
         catch(SQLException ex) {
             throw new ApiException(ex);

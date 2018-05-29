@@ -32,6 +32,7 @@ public class ProposalDataAccess extends BaseDataAccess {
             "Pr.id as productId, " +
             "Pr.name as productName, " +
             "Pr.gtin as gtin, " +
+            "Pr.description as productDescription, " +
             "B.id as brandId, " +
             "B.name as brandName, " +
             "C.id as categoryId, " +
@@ -51,8 +52,20 @@ public class ProposalDataAccess extends BaseDataAccess {
     }
 
     public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
         // Works only when there's at least one row (document) of each table (collection) because of the inner join...
-        String query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
+        String query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, Pr.description as productDescription, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
+
+        if (pageSize != null && pageIndex != null) {
+            query += " (SELECT * FROM Proposal LIMIT ?, ?) as P ";
+            parameters.add(pageIndex * pageSize);
+            parameters.add(pageSize);
+        }
+        else
+            query += "Proposal P ";
+
+        query += "INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
 
         if (status != null) {
             switch (status) {
@@ -69,8 +82,6 @@ public class ProposalDataAccess extends BaseDataAccess {
                     break;
             };
         }
-
-        ArrayList<Object> parameters = new ArrayList<Object>();
 
         if (supplierId != null) {
             query += " AND P.supplierId = ?";
@@ -100,17 +111,43 @@ public class ProposalDataAccess extends BaseDataAccess {
             };
         }
 
-        System.out.println(query);
-
-        if (pageSize != null && pageIndex != null) {
-            query += " LIMIT ?, ?";
-            parameters.add(pageIndex);
-            parameters.add(pageSize);
-        }
-
         query = query.concat(";");
 
         return getManyWithoutStatement(rs -> deserializeProposals(rs), query, parameters.toArray());
+    }
+
+    public int countSearch(String status, Integer supplierId) throws SQLException {
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
+        // Works only when there's at least one row (document) of each table (collection) because of the inner join...
+        String query = "SELECT COUNT(*) AS size FROM (SELECT P.* FROM Proposal P INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
+
+        if (status != null) {
+            switch (status) {
+                case ProposalStates.ACTIVE:
+                    query = query.concat(" AND P.beginDate <= now() and P.endDate >= now()");
+                    break;
+                case ProposalStates.FINISHED:
+                    query = query.concat(" AND P.endDate < now()") ;
+                    break;
+                case ProposalStates.SCHEDULED:
+                    query = query.concat(" AND P.beginDate > now()");
+                    break;
+                default:
+                    break;
+            };
+        }
+
+        if (supplierId != null) {
+            query += " AND P.supplierId = ?";
+            parameters.add(supplierId);
+        }
+
+        query += " GROUP BY P.id) as x";
+
+        query = query.concat(";");
+
+        return getInt(query, parameters.toArray());
     }
 
     public ProposalLine getProposalLine(int proposalLineId) throws SQLException {
@@ -270,6 +307,7 @@ public class ProposalDataAccess extends BaseDataAccess {
                 resultSet.getInt("productId"),
                 resultSet.getString("productName"),
                 resultSet.getString("gtin"),
+                resultSet.getString("description"),
                 new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
                 new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
             ));
@@ -318,6 +356,7 @@ public class ProposalDataAccess extends BaseDataAccess {
                 resultSet.getInt("productId"),
                 resultSet.getString("productName"),
                 resultSet.getString("gtin"),
+                resultSet.getString("description"),
                 new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
                 new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
             ));
@@ -340,6 +379,7 @@ public class ProposalDataAccess extends BaseDataAccess {
                 resultSet.getInt("productId"),
                 resultSet.getString("productName"),
                 resultSet.getString("gtin"),
+                resultSet.getString("description"),
                 new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
                 new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
             ));

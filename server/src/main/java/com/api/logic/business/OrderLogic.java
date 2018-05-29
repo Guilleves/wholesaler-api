@@ -1,5 +1,7 @@
 package com.api.logic.business;
 
+import com.api.entities.models.BaseSearchResponse;
+import com.api.entities.models.order.GetOrdersResponse;
 import com.api.entities.models.order.GetOrdersRequest;
 import java.sql.SQLException;
 import com.api.data.business.ProposalDataAccess;
@@ -28,10 +30,10 @@ public class OrderLogic {
         oda = new OrderDataAccess();
     }
 
-    public ArrayList<GetOrderResponse> getOrders(GetOrdersRequest request) throws ApiException {
-        ArrayList<Order> orders = null;
-
+    public BaseSearchResponse getOrders(GetOrdersRequest request) throws ApiException {
         try {
+            ArrayList<Order> orders = null;
+
             orders = oda.getOrders(
                 request.getFromDate(),
                 request.getToDate(),
@@ -40,32 +42,37 @@ public class OrderLogic {
                 request.getPageSize(),
                 request.getPageIndex()
             );
+
+            if (orders == null || orders.isEmpty())
+                throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
+
+            ArrayList<GetOrdersResponse> response = new ArrayList<GetOrdersResponse>();
+
+            for (Order order : orders) {
+                response.add(new GetOrdersResponse(
+                    order.getId(),
+                    order.getDateOrdered(),
+                    new GetOrganizationResponse(
+                        order.getRetail().getId(),
+                        order.getRetail().getName(),
+                        order.getRetail().getLegalName(),
+                        order.getRetail().getCuit(),
+                        order.getRetail().getRole()
+                    )
+                ));
+            }
+
+            return new BaseSearchResponse(
+                oda.countSearch(
+                    request.getFromDate(),
+                    request.getToDate(),
+                    request.getRetailId()),
+                response
+            );
         }
         catch(SQLException e) {
             throw new ApiException(e);
         }
-
-        if (orders == null || orders.isEmpty())
-            throw new ApiException("Cound't find any order.", Status.NOT_FOUND);
-
-        ArrayList<GetOrderResponse> response = new ArrayList<GetOrderResponse>();
-
-        for (Order order : orders) {
-            response.add(new GetOrderResponse(
-                order.getId(),
-                order.getDateOrdered(),
-                getOrderLine(order.getOrderLines()),
-                new GetOrganizationResponse(
-                    order.getRetail().getId(),
-                    order.getRetail().getName(),
-                    order.getRetail().getLegalName(),
-                    order.getRetail().getCuit(),
-                    order.getRetail().getRole()
-                )
-            ));
-        }
-
-        return response;
     }
 
     public GetOrderResponse getOrder(GetOrderRequest request) throws ApiException {
@@ -183,6 +190,7 @@ public class OrderLogic {
                         orderLine.getProposalLine().getProduct().getId(),
                         orderLine.getProposalLine().getProduct().getName(),
                         orderLine.getProposalLine().getProduct().getGtin(),
+                        orderLine.getProposalLine().getProduct().getDescription(),
                         orderLine.getProposalLine().getProduct().getBrand().getId(),
                         orderLine.getProposalLine().getProduct().getBrand().getName(),
                         orderLine.getProposalLine().getProduct().getCategory().getId(),

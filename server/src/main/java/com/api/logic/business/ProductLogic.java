@@ -3,6 +3,7 @@ package com.api.logic.business;
 // #region Imports
 
 import com.api.entities.business.Ranking;
+import com.api.entities.models.BaseSearchResponse;
 import com.api.entities.models.product.GetRankingResponse;
 import java.sql.SQLException;
 import com.api.entities.models.product.GetProductsRequest;
@@ -53,6 +54,7 @@ public class ProductLogic {
                 product.getId(),
                 product.getName(),
                 product.getGtin(),
+                product.getDescription(),
                 product.getBrand().getId(),
                 product.getBrand().getName(),
                 product.getCategory().getId(),
@@ -66,7 +68,7 @@ public class ProductLogic {
         }
     }
 
-    public ArrayList<GetProductResponse> getProducts(GetProductsRequest request) throws ApiException {
+    public BaseSearchResponse getProducts(GetProductsRequest request) throws ApiException {
         try {
             ArrayList<GetProductResponse> response = new ArrayList<GetProductResponse>();
 
@@ -89,6 +91,7 @@ public class ProductLogic {
                     product.getId(),
                     product.getName(),
                     product.getGtin(),
+                    product.getDescription(),
                     product.getBrand().getId(),
                     product.getBrand().getName(),
                     product.getCategory().getId(),
@@ -96,7 +99,7 @@ public class ProductLogic {
                 ));
             }
 
-            return response;
+            return new BaseSearchResponse(pda.countSearch(request.getBrandId(), request.getCategoryId(), request.getKeyword()), response);
         }
         catch(SQLException ex) {
             throw new ApiException(ex);
@@ -122,6 +125,7 @@ public class ProductLogic {
                     product.getCount(),
                     ((Product)product.getEntity()).getName(),
                     ((Product)product.getEntity()).getGtin(),
+                    ((Product)product.getEntity()).getDescription(),
                     ((Product)product.getEntity()).getBrand().getId(),
                     ((Product)product.getEntity()).getBrand().getName(),
                     ((Product)product.getEntity()).getCategory().getId(),
@@ -157,6 +161,7 @@ public class ProductLogic {
                 request.getId(),
                 request.getName(),
                 request.getGtin(),
+                request.getDescription(),
                 brand,
                 category
             );
@@ -167,6 +172,7 @@ public class ProductLogic {
                 product.getId(),
                 product.getName(),
                 product.getGtin(),
+                product.getDescription(),
                 product.getBrand().getId(),
                 product.getBrand().getName(),
                 product.getCategory().getId(),
@@ -199,6 +205,7 @@ public class ProductLogic {
                 request.getId(),
                 request.getName(),
                 request.getGtin(),
+                request.getDescription(),
                 brand,
                 category
             );
@@ -212,6 +219,7 @@ public class ProductLogic {
                     product.getId(),
                     product.getName(),
                     product.getGtin(),
+                    product.getDescription(),
                     product.getBrand().getId(),
                     product.getBrand().getName(),
                     product.getCategory().getId(),

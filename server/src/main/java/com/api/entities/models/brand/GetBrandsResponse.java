@@ -1,8 +1,8 @@
 package com.api.entities.models.brand;
 
-import java.util.Date;
+import com.api.entities.models.BaseSearchResponse;
 
-public class GetBrandsResponse {
+public class GetBrandsResponse implements BaseSearchResponse.SearchItem {
     private int id;
     private String name;
 
