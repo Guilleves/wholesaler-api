@@ -1,10 +1,12 @@
 package com.api.entities.models.order;
 
+import com.api.entities.models.BaseSearchRequest;
 import java.util.Date;
 
-public class GetOrdersRequest {
-    private String orderBy;
-    private int pageIndex, pageSize, retailId;
+public class GetOrdersRequest extends BaseSearchRequest {
+    static final long serialVersionUID = 0L;
+
+    private Integer retailId;
     private Date fromDate, toDate;
 
 	/**
@@ -17,69 +19,28 @@ public class GetOrdersRequest {
 	/**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(String orderBy, int pageIndex, int pageSize, int retailId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(Integer retailId, Date fromDate, Date toDate) {
 		super();
-		this.orderBy = orderBy;
-		this.pageIndex = pageIndex;
-		this.pageSize = pageSize;
+		this.retailId = retailId;
+		this.fromDate = fromDate;
+		this.toDate = toDate;
+	}
+
+    /**
+	* Default GetOrdersRequest constructor
+	*/
+	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Date fromDate, Date toDate) {
+		super(orderBy, pageIndex, pageSize);
 		this.retailId = retailId;
 		this.fromDate = fromDate;
 		this.toDate = toDate;
 	}
 
 	/**
-	* Returns value of orderBy
-	* @return
-	*/
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	/**
-	* Sets new value of orderBy
-	* @param
-	*/
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
-	}
-
-	/**
-	* Returns value of pageIndex
-	* @return
-	*/
-	public int getPageIndex() {
-		return pageIndex;
-	}
-
-	/**
-	* Sets new value of pageIndex
-	* @param
-	*/
-	public void setPageIndex(int pageIndex) {
-		this.pageIndex = pageIndex;
-	}
-
-	/**
-	* Returns value of pageSize
-	* @return
-	*/
-	public int getPageSize() {
-		return pageSize;
-	}
-
-	/**
-	* Sets new value of pageSize
-	* @param
-	*/
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-
-	/**
 	* Returns value of retailId
 	* @return
 	*/
-	public int getRetailId() {
+	public Integer getRetailId() {
 		return retailId;
 	}
 
@@ -87,7 +48,7 @@ public class GetOrdersRequest {
 	* Sets new value of retailId
 	* @param
 	*/
-	public void setRetailId(int retailId) {
+	public void setRetailId(Integer retailId) {
 		this.retailId = retailId;
 	}
 

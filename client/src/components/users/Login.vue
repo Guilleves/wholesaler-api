@@ -59,8 +59,9 @@
 </template>
 
 <script>
-import API from "./../../helpers/api.js";
-import * as Session from "./../../helpers/session.js";
+import API from "@/helpers/api.js";
+import * as Session from "@/helpers/session.js";
+import * as Notifier from "@/helpers/notifier.js";
 
 export default {
     name: 'login',
@@ -80,16 +81,17 @@ export default {
     methods: {
         login: function() {
             new API().post("/users/login", { username: this.username, password: this.password })
-                .then((response) => {
-                    Session.set(response.data);
-                    this.notifications = [];
-                    this.$toast.open("Logged in");
-                    this.$router.push("/");
-                })
-                .catch((error) => {
-                    this.$toast.open("Please try again");
-                    this.notifications = error.response.data;
-                });
+            .then((response) => {
+                Session.set(response.data);
+                this.notifications = [];
+                Notifier.info("Logged in");
+                this.$router.push("home");
+            })
+            .catch((error) => {
+                console.log(error);
+                Notifier.error("Please try again");
+                this.notifications = error.response.data;
+            });
         },
         redirectSignup: function() {
             this.$router.push("signup");

@@ -1,6 +1,8 @@
 package com.api.rest;
 
 // #region Imports
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 import com.api.entities.models.brand.GetBrandsRequest;
 import com.api.logic.business.BrandLogic;
@@ -31,9 +33,26 @@ public class Brands {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
+    @Path("/{brandId}")
+    public Response getBrands(@PathParam("brandId") int brandId) {
+        try {
+            return Response.ok(bl.getBrand(brandId)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
     @Path("/")
-    public Response getBrands() {
+    public Response getBrands(@QueryParam("pageIndex") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
         GetBrandsRequest request = new GetBrandsRequest();
+
+        request.setPageSize(pageSize);
+        request.setPageIndex(pageIndex);
 
         try {
             return Response.ok(bl.getBrands(request)).build();

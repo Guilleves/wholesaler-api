@@ -39,25 +39,33 @@ public class ProductDataAccess extends BaseDataAccess {
         return getOne(rs -> new Product(rs), query, productId);
     }
 
-    public ArrayList<Product> getProducts(int brandId, int categoryId, int pageIndex, int pageSize, String keyword, String orderBy) throws SQLException{
+    public ArrayList<Product> getProducts(Integer brandId, Integer categoryId, Integer pageIndex, Integer pageSize, String keyword, String orderBy) throws SQLException{
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
         String query = "SELECT " +
             "P.*, " +
             "B.name as brandName, " +
             "C.name as categoryName " +
-            "FROM " +
-            "Product P " +
-            "INNER JOIN Brand B ON P.brandId = B.id " +
+            "FROM ";
+
+        if (pageIndex != null && pageSize != null) {
+            query += "(SELECT * FROM Product LIMIT ?, ?) as P ";
+            parameters.add(pageIndex * pageSize);
+            parameters.add(pageSize);
+        }
+        else
+            query += "Product P ";
+
+        query += "INNER JOIN Brand B ON P.brandId = B.id " +
             "INNER JOIN Category C ON P.categoryId = C.id " +
             "WHERE P.deletedAt IS NULL";
 
-        ArrayList<Object> parameters = new ArrayList<Object>();
-
-        if (brandId != 0) {
+        if (brandId != null) {
             query += " AND B.id = ?";
             parameters.add(brandId);
         }
 
-        if (categoryId != 0) {
+        if (categoryId != null) {
             query += " AND C.id = ?";
             parameters.add(categoryId);
         }
@@ -75,15 +83,42 @@ public class ProductDataAccess extends BaseDataAccess {
             parameters.add(orderBy);
         }*/
 
-        if (pageIndex != 0 && pageSize != 0) {
-            query += " LIMIT ?, ?";
-            parameters.add(pageIndex - 1);
-            parameters.add(pageSize);
-        }
-
         query += ";";
 
         return getMany(rs -> new Product(rs), query, parameters.toArray());
+    }
+
+    public int countSearch(Integer brandId, Integer categoryId, String keyword) throws SQLException{
+        ArrayList<Object> parameters = new ArrayList<Object>();
+
+        String query = "SELECT COUNT(*) as size FROM " +
+            "( SELECT P.* FROM Product P " +
+            "INNER JOIN Brand B ON P.brandId = B.id " +
+            "INNER JOIN Category C ON P.categoryId = C.id " +
+            "WHERE P.deletedAt IS NULL";
+
+        if (brandId != null) {
+            query += " AND B.id = ?";
+            parameters.add(brandId);
+        }
+
+        if (categoryId != null) {
+            query += " AND C.id = ?";
+            parameters.add(categoryId);
+        }
+
+        if (keyword != null && !keyword.isEmpty()) {
+             query += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?)";
+             parameters.add('%' + keyword + '%');
+             parameters.add('%' + keyword + '%');
+             parameters.add('%' + keyword + '%');
+        }
+
+        query += " GROUP BY P.id ) as x";
+
+        query += ";";
+
+        return getInt(query, parameters.toArray());
     }
 
     public ArrayList<Ranking> mostUsedByProposal(int supplierId) throws SQLException {

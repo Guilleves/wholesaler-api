@@ -64,11 +64,7 @@
                 </div>
             </div>
         </nav>
-        <section class="section">
-            <div class="container">
-                <router-view />
-            </div>
-        </section>
+        <router-view />
     </div>
 </template>
 
@@ -79,7 +75,8 @@ export default {
     name: 'Main',
     props: {
         msg: String
-    }, mounted: function () {
+    },
+    beforeMount() {
         if (!Session.getToken())
             this.$router.push("/login");
     }

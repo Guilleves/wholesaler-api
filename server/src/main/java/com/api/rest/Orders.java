@@ -4,7 +4,6 @@ package com.api.rest;
 
 import com.api.rest.util.DateParameter;
 import com.api.entities.models.order.GetOrdersRequest;
-import java.util.Date;
 import javax.ws.rs.QueryParam;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
@@ -47,7 +46,7 @@ public class Orders {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getOrders(@QueryParam("retailId") int retailId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") int pageSize, @QueryParam("pageIndex") int pageIndex) {
+    public Response getOrders(@QueryParam("retailId") Integer retailId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
         GetOrdersRequest request = new GetOrdersRequest(
             orderBy,
             pageIndex,

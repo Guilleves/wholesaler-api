@@ -81,8 +81,8 @@
 </template>
 
 <script>
-import API from "./../../helpers/api.js";
-import * as Session from "./../../helpers/session.js";
+import API from "@/helpers/api.js";
+import * as Session from "@/helpers/session.js";
 
 export default {
     name: 'signup',
@@ -109,10 +109,12 @@ export default {
             .then((response) => {
                 Session.set(response.data);
                 this.notifications = [];
-                this.$router.push("products");
+                this.$router.push("/home");
             })
             .catch((error) => {
+              if (error.response)
                 this.notifications = error.response.data;
+              console.log(error);
             });
         },
         redirectLogin: function() {

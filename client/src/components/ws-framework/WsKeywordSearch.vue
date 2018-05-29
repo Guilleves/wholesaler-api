@@ -1,6 +1,6 @@
 <template lang="html">
   <div>
-    <b-field label="Search by name">
+    <b-field>
       <b-input
         icon-pack="fas"
         icon="search"
@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "keyword-search",
+  name: "ws-keyword-search",
   data: function(){
     return {
       name: ""
