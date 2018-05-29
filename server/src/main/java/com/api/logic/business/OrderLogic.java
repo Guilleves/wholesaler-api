@@ -190,6 +190,7 @@ public class OrderLogic {
                         orderLine.getProposalLine().getProduct().getId(),
                         orderLine.getProposalLine().getProduct().getName(),
                         orderLine.getProposalLine().getProduct().getGtin(),
+                        orderLine.getProposalLine().getProduct().getDescription(),
                         orderLine.getProposalLine().getProduct().getBrand().getId(),
                         orderLine.getProposalLine().getProduct().getBrand().getName(),
                         orderLine.getProposalLine().getProduct().getCategory().getId(),

@@ -38,6 +38,7 @@ public class OrderDataAccess extends BaseDataAccess {
             "Pr.id as productId, " +
             "Pr.name as productName, " +
             "Pr.gtin as gtin, " +
+            "Pr.description as productDescription, " +
             "B.id as brandId, " +
             "B.name as brandName, " +
             "C.id as categoryId, " +
@@ -80,6 +81,7 @@ public class OrderDataAccess extends BaseDataAccess {
             "Pr.id as productId, " +
             "Pr.name as productName, " +
             "Pr.gtin as gtin, " +
+            "Pr.description as productDescription, " +
             "B.id as brandId, " +
             "B.name as brandName, " +
             "C.id as categoryId, " +
@@ -264,6 +266,7 @@ public class OrderDataAccess extends BaseDataAccess {
                 resultSet.getInt("productId"),
                 resultSet.getString("productName"),
                 resultSet.getString("gtin"),
+                resultSet.getString("description"),
                 new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
                 new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
             ));
@@ -326,6 +329,7 @@ public class OrderDataAccess extends BaseDataAccess {
                 resultSet.getInt("productId"),
                 resultSet.getString("productName"),
                 resultSet.getString("gtin"),
+                resultSet.getString("description"),
                 new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
                 new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
             ));
