@@ -28,7 +28,7 @@ export default new Router({
             },  {
                 path: 'products',
                 name: 'ProductsIndex',
-                component: ProductsIndex
+                component: ProductsIndex,
             }, {
               path: '/products/new_product',
               name: 'NewProduct',

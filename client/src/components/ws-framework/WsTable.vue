@@ -1,8 +1,6 @@
 <template lang="html">
     <div>
         <b-table
-            hoverable
-            selectable
             :data="formattedData"
             :columns="columns"
             :loading="loading"
@@ -10,14 +8,11 @@
             :paginated="true"
             :per-page="pageSize"
             :total="total"
-            @page-change="onPageChange"
-            @select="onSelect" />
+            @page-change="onPageChange" />
     </div>
 </template>
 
 <script>
-import * as Notifier from "@/helpers/notifier.js";
-
 export default {
     name: "ws-table",
     data: function() {
@@ -27,8 +22,7 @@ export default {
             pageIndex: 1,
             pageSize: 5,
             data: [],
-            formattedData: [],
-            selected: {}
+            formattedData: []
         }
     },
     props: {
@@ -56,7 +50,7 @@ export default {
                 self.total = response.data.size;
                 self.loading = false;
             }).catch(() => {
-                Notifier.error("Couldn't find any item.");
+                self.$toast.open("Couldn't find any item.");
                 self.data = [];
                 self.total = 0;
                 self.loading = false;
@@ -70,9 +64,6 @@ export default {
             });
 
             this.getData(this.filters);
-        },
-        onSelect(selected) {
-            this.$emit('select', selected);
         }
     },
     mounted: function() {

@@ -18,7 +18,7 @@
         <div class="columns">
           <div class="column is-half">
             <b-field horizontal label="Brand">
-                <ws-option-filter v-model="brandId" filter="brands"></ws-option-filter>
+                <ws-option-filter v-model="brandId" filter="brands" :format="formatBrands"></ws-option-filter>
             </b-field>
           </div>
           <div class="column is-half">
@@ -68,6 +68,14 @@ export default {
     }
   },
   methods: {
+    formatBrands(data) {
+      return data.items.map(brand => {
+        return {
+          id: brand.id,
+          name: brand.name
+        }
+      });
+    },
     submitForm: function(){
       if (this.productId) {
         new API()
