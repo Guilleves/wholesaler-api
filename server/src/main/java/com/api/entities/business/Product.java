@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class Product implements BaseEntity{
     private int id;
-    private String name, gtin;
+    private String name, gtin, description;
     private Brand brand;
     private Category category;
     private Date deletedAt;
@@ -21,11 +21,12 @@ public class Product implements BaseEntity{
 	/**
 	* Default Product constructor
 	*/
-	public Product(int id, String name, String gtin, Brand brand, Category category) {
+	public Product(int id, String name, String gtin, String description, Brand brand, Category category) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.gtin = gtin;
+    this.gtin = gtin;
+		this.description = description;
 		this.brand = brand;
 		this.category = category;
 	}
@@ -39,6 +40,7 @@ public class Product implements BaseEntity{
         this.id = rs.getInt("id");
         this.name = rs.getString("name");
         this.gtin = rs.getString("gtin");
+        this.description = rs.getString("description");
         this.brand = new Brand(
             rs.getInt("brandId"),
             rs.getString("brandName")
@@ -97,6 +99,14 @@ public class Product implements BaseEntity{
 		this.gtin = gtin;
 	}
 
+  public String getDescription(){
+    return description;
+  }
+
+  public void setDescription(String description){
+    this.description = description;
+  }
+
 	/**
 	* Returns value of brand
 	* @return
@@ -143,6 +153,6 @@ public class Product implements BaseEntity{
 	*/
 	@Override
 	public String toString() {
-		return "Product [id=" + id + ", name=" + name + ", gtin=" + gtin + ", brand=" + brand.toString() + ", category=" + category.toString() + "]";
+		return "Product [id=" + id + ", name=" + name + ", gtin=" + gtin + ", description=" + description + ", brand=" + brand.toString() + ", category=" + category.toString() + "]";
 	}
 }
