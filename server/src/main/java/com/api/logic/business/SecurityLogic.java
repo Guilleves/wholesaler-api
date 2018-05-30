@@ -1,6 +1,7 @@
 package com.api.logic.business;
 
 // #region Imports
+import java.util.Date;
 import java.util.Properties;
 
 import java.io.UnsupportedEncodingException;
@@ -44,7 +45,7 @@ public class SecurityLogic {
 
         Algorithm algorithm = Algorithm.HMAC256(password);
 
-        return JWT.create().withIssuer("auth0").withClaim("id", userId).sign(algorithm);
+        return JWT.create().withIssuer("auth0").withExpiresAt(new Date(System.currentTimeMillis() + (12 * 60 * 60 * 1000))).withClaim("id", userId).sign(algorithm);
     }
 
     public int validateToken(String token) throws UnsupportedEncodingException, JWTVerificationException, IOException {

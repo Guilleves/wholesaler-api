@@ -83,7 +83,7 @@ public class ProductDataAccess extends BaseDataAccess {
             parameters.add(orderBy);
         }*/
 
-        query += ";";
+        query += " ORDER BY P.id;";
 
         return getMany(rs -> new Product(rs), query, parameters.toArray());
     }
@@ -136,7 +136,8 @@ public class ProductDataAccess extends BaseDataAccess {
             "WHERE P.deletedAt IS NULL " +
             "AND Pr.supplierId = ? " +
             "GROUP BY P.id " +
-            "ORDER BY COUNT(*) DESC;";
+            "ORDER BY COUNT(*) DESC " +
+            "LIMIT 10;";
 
         return getMany(rs -> deserializeRanking(rs), query, supplierId);
     }

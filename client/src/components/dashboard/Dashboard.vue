@@ -1,69 +1,73 @@
 <template>
-    <div>
-        <section class="hero is-primary">
-            <!-- Hero head: will stick at the top -->
-            <div class="hero-head">
-                <nav class="navbar">
-                    <div class="container">
-                        <div class="navbar-brand">
-                            <a class="navbar-item">
-                            </a>
-                            <span class="navbar-burger burger" data-target="navbarMenuHeroA">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </span>
-                        </div>
+    <section class="section" style="padding-top:75px">
+        <div class="container">
+            <div class="tile is-ancestor">
+                <div class="tile is-4 is-vertical is-parent">
+                    <div class="tile is-child box">
+                        <p class="title">Proposals</p>
+                        <router-link to="/proposals">View, create or remove proposals</router-link>
                     </div>
-                </nav>
-            </div>
-
-            <!-- Hero content: will be in the middle -->
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    <h1 class="title">
-                        Dashboard
-                    </h1>
-                    <h2 class="subtitle">
-                        a description??
-                    </h2>
+                    <div class="tile is-child box">
+                        <p class="title">Orders</p>
+                        <p>View, create or remove orders</p>
+                    </div>
+                    <div class="tile is-child box">
+                        <p class="title">Products</p>
+                        <router-link to="/products">View, edit, create or remove products</router-link>
+                    </div>
+                </div>
+                <div class="tile is-parent">
+                    <div class="tile is-child box">
+                        <p class="title">Products review</p>
+                        <ws-line-chart :chart-data="chartData" :height="250" />
+                    </div>
                 </div>
             </div>
-            <!-- Hero footer: will stick at the bottom -->
-            <div class="hero-foot">
-                <nav class="tabs">
-                    <div class="container">
-                        <ul>
-                            <li is-selected><a>Home</a></li>
-                            <li><a>Products</a></li>
-                            <li><a>Users</a></li>
-                            <li><a>Proposals</a></li>
-                        </ul>
-                    </div>
-                </nav>
-            </div>
-        </section>
-        <p>Esto no se parece ni un poquito a un dashboard :)</p>
-        <p>Pero bueno, la idea está</p>
-        <footer class="footer">
-            <div class="container">
-                <div class="content has-text-centered">
-                    <p>
-                        <strong>Wholesaler</strong> by <a href="https://tuvieja.com">Guillermina Véscovo & Juan Grasso</a>. The source code is licensed
-                        <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
-                        is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
-                    </p>
-                </div>
-            </div>
-        </footer>
-    </div>
+        </div>
+    </section>
 </template>
 
 <script>
+import WsLineChart from "@/components/ws-framework/WsLineChart.vue";
+import API from './../../helpers/api.js';
+
 export default {
     name: 'HelloWorld',
-    props: {
-        msg: String
+    data: () => {
+        return {
+            chartData: null
+        };
+    },
+    components: {
+        WsLineChart
+    },
+    methods: {
+        fillChart() {
+            let labels = [];
+            let data = [];
+            let self = this;
+
+            new API().get("/products/ranking", { supplierId: 1 }).then(response => {
+                response.data.forEach(product => {
+                    labels.push(product.name);
+                    data.push(product.count);
+                });
+
+                self.chartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Amount in proposals.",
+                            backgroundColor: '#714dd2',
+                            data: data
+                        }
+                    ]
+                };
+            });
+        }
+    },
+    mounted() {
+        this.fillChart();
     }
 }
 </script>

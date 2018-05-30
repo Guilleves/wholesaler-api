@@ -2,6 +2,7 @@
     <div style="height: 100%">
         <b-field label="Search product" >
             <multiselect
+            style="z-index: 10;"
             v-model="selectedProduct"
             label="name"
             track-by="id"

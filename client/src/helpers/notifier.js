@@ -3,7 +3,8 @@ import $toast from 'buefy/src/components/toast';
 export const success = (message) => {
     $toast.open({
         message: message,
-        duration: 5000,
+        duration: 2000,
+        queue: false,
         type: "is-success"
     });
 };
@@ -11,8 +12,9 @@ export const success = (message) => {
 export const info = (message) => {
     $toast.open({
         message: message,
-        duration: 5000,
-        type: "is-info"
+        duration: 2000,
+        queue: false,
+        type: "is-light"
     });
 };
 

@@ -42,7 +42,7 @@
                 </div>
                 <b-field grouped>
                     <b-field>
-                        <b-tag class="is-success" rounded>{{ status }}</b-tag>
+                        <b-tag class="is-primary" rounded>{{ status }}</b-tag>
                         <b-tag v-if="supplier" class="is-dark" rounded>{{ supplier }}</b-tag>
                     </b-field>
                     <b-field grouped position="is-right" expanded>
@@ -55,9 +55,11 @@
                             <button class="button is-outlined is-dark" type="button" @click="goBack()">
                                 Cancel
                             </button>
-                            <button class="button is-success is-outlined" :disabled="editing">
-                                Save
-                            </button>
+                            <b-tooltip label="Can't edit proposals" :active="editing" class="is-danger" position="is-top">
+                                <button class="button is-success is-outlined" :disabled="editing">
+                                    Save
+                                </button>
+                            </b-tooltip>
                         </p>
                     </b-field>
                 </b-field>
@@ -137,7 +139,7 @@ export default {
             this.$dialog.confirm({
                 title: 'Deleting proposal',
                 message: 'Are you sure you want to <b>delete</b> this proposal?',
-                confirmText: 'Delete Account',
+                confirmText: 'Delete Proposal',
                 type: 'is-danger',
                 hasIcon: true,
                 onConfirm: () => {

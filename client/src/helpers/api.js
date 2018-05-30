@@ -1,5 +1,6 @@
 import Axios from 'axios';
 import * as session from "./session.js";
+import Router from '@/router';
 
 class API {
     constructor () {
@@ -13,6 +14,17 @@ class API {
           baseURL: "http://localhost:9090/",
           timeout: 20000,
           headers: headers
+        });
+
+        this.axios.interceptors.response.use(response => {
+            return response;
+        }, error => {
+            if (error.response.status === 401) {
+                session.clearToken();
+                Router.push("/login");
+            }
+
+            return Promise.reject(error);
         });
     }
 

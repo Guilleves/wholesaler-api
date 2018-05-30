@@ -1,10 +1,11 @@
 <template>
     <div>
-        <nav class="navbar is-transparent is-fixed-top">
+        <nav class="navbar is-transparent is-fixed-top is-dark">
             <div class="navbar-brand">
-                <a class="navbar-item">
-                    <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
-                </a>
+                <router-link to="/home" class="navbar-item">
+                    <!--img src="@/assets/brand-logo-2.svg" alt="wholesaler" style="height: 3rem; max-height: 3rem;"-->
+                    <span class="logo">Wholesaler</span>
+                </router-link>
                 <div class="navbar-burger burger" data-target="navbarExampleTransparentExample">
                     <span></span>
                     <span></span>
@@ -14,9 +15,6 @@
 
             <div id="navbarExampleTransparentExample" class="navbar-menu">
                 <div class="navbar-start">
-                    <a class="navbar-item" href="https://bulma.io/">
-                        Home
-                    </a>
                     <div class="navbar-item has-dropdown is-hoverable">
                         <a class="navbar-link" href="/documentation/overview/start/">
                             Admin
@@ -58,6 +56,11 @@
                                     </span>
                                     <span>My account</span>
                                 </a>
+                                <a class="button is-light" @click="logout()">
+                                    <span class="icon">
+                                        <i class="fas fa-power-off"></i>
+                                    </span>
+                                </a>
                             </p>
                         </div>
                     </div>
@@ -69,16 +72,44 @@
 </template>
 
 <script>
-import * as Session from './../../helpers/session.js';
+import * as Session from '@/helpers/session.js';
+import * as Notifier from '@/helpers/notifier.js';
 
 export default {
     name: 'Main',
     props: {
         msg: String
     },
+    methods: {
+        logout() {
+            Session.clearToken();
+            this.$router.push("/login");
+            Notifier.info("Logged out");
+        }
+    },
     beforeMount() {
         if (!Session.getToken())
-            this.$router.push("/login");
+        this.$router.push("/login");
     }
 }
 </script>
+
+<style>
+.logo {
+    font: bold 21px "Segoe UI";
+    color: #747273;
+    line-height: 1.5em;
+    padding-left: 1.7em;
+}
+
+.logo:before {
+    content: '\2006';
+    position: absolute;
+    height: 0.095em;
+    left: 10px;
+    box-shadow: 0.35em 0.35em 0 0.25em #efebfa,
+    1.05em 0.35em 0 0.25em #7957d5,
+    0.35em 0.97em 0 0.25em #7957d5,
+    1.05em 0.97em 0 0.25em #7957d5;
+}
+</style>
