@@ -1,4 +1,5 @@
 import $toast from 'buefy/src/components/toast';
+
 export const success = (message) => {
     $toast.open({
         message: message,
@@ -18,7 +19,8 @@ export const info = (message) => {
 export const error = (errors) => {
     $toast.open({
         message: errors,
-        duration: 5000,
+        duration: 1500,
+        queue: false,
         type: "is-danger",
         position: "is-bottom"
     });

@@ -33,32 +33,40 @@
         <section class="section">
             <div class="container">
                 <div class="columns">
-                    <div class="column is-two-fifths">
-                        <ws-keyword-search @input="buildSearchCriteria($event)" />
+                    <div class="column is-three-fifths">
+                        <div class="columns">
+                            <div class="column is-two-fifths">
+                                <ws-keyword-search @input="buildSearchCriteria($event)" />
+                            </div>
+                            <div class="column">
+                                <ws-option-filter
+                                option-type="brandId"
+                                filter="brands"
+                                placeholder="Select a brand"
+                                :format="formatBrands"
+                                @selected="buildSearchCriteria($event)" />
+                            </div>
+                            <div class="column">
+                                <ws-option-filter
+                                option-type="categoryId"
+                                filter="categories"
+                                placeholder="Select a category"
+                                @selected="buildSearchCriteria($event)" />
+                            </div>
+                        </div>
+                        <ws-table
+                        :columns="columns"
+                        :fetch="getProducts"
+                        :filters="searchCriteria"
+                        :format="format" />
                     </div>
                     <div class="column">
-                        <ws-option-filter
-                        option-type="brandId"
-                        filter="brands"
-                        placeholder="Select a brand"
-                        :format="formatBrands"
-                        @selected="buildSearchCriteria($event)" />
-                    </div>
-                    <div class="column">
-                        <ws-option-filter
-                        option-type="categoryId"
-                        filter="categories"
-                        placeholder="Select a category"
-                        @selected="buildSearchCriteria($event)" />
+                        <ws-line-chart
+                        :chart-data="chartData"
+                        />
                     </div>
                 </div>
-            </div>
-            <div class="container">
-                <ws-table
-                :columns="columns"
-                :fetch="getProducts"
-                :filters="searchCriteria"
-                :format="format" />
+
             </div>
         </section>
     </div>
@@ -69,12 +77,14 @@ import API from './../../helpers/api.js';
 import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
+import WsLineChart from "@/components/ws-framework/WsLineChart.vue";
 
 export default {
     name: 'products-index',
     data: () => {
         return {
             searchCriteria: {},
+            chartData: null,
             columns: [{
                 field: 'id',
                 label: 'ID',
@@ -90,7 +100,8 @@ export default {
     components: {
         WsOptionFilter,
         WsKeywordSearch,
-        WsTable
+        WsTable,
+        WsLineChart
     },
     methods: {
         format(product) {
@@ -115,7 +126,33 @@ export default {
                     name: brand.name
                 }
             });
+        },
+        fillChart() {
+            let labels = [];
+            let data = [];
+            let self = this;
+
+            new API().get("/products/ranking", { supplierId: 1 }).then(response => {
+                response.data.forEach(product => {
+                    labels.push(product.name);
+                    data.push(product.count);
+                });
+
+                self.chartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Amount in proposals.",
+                            backgroundColor: '#f87979',
+                            data: data
+                        }
+                    ]
+                };
+            });
         }
+    },
+    mounted() {
+        this.fillChart();
     }
 }
 </script>

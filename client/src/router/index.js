@@ -43,7 +43,6 @@ export default new Router({
                 }]
             }, {
                 path: 'brands',
-                name: 'BrandsIndex',
                 component: BrandsIndex,
                 children: [{
                     path: "",

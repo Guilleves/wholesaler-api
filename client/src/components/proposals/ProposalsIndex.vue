@@ -73,7 +73,8 @@ export default {
             { field: 'title', label: 'Title' },
             { field: 'description', label: 'Description' },
             { field: 'beginDate', label: 'Begin Date' },
-            { field: 'endDate', label: 'End Date'}]
+            { field: 'endDate', label: 'End Date'},
+            { field: 'status', label: 'Status' }]
         };
     },
     components: {
@@ -88,7 +89,8 @@ export default {
                 title: proposal.title,
                 description: proposal.description,
                 beginDate: new Date(proposal.beginDate).toLocaleDateString(),
-                endDate: new Date(proposal.endDate).toLocaleDateString()
+                endDate: new Date(proposal.endDate).toLocaleDateString(),
+                status: proposal.status
             }
         },
         getProposals(searchCriteria) {

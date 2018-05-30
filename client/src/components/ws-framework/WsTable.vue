@@ -42,7 +42,7 @@ export default {
             this.formattedData = val.map(d => this.format(d));
         },
         filters(val) {
-            this.getData(val);
+            this.getData(Object.assign(val, this.filters));
         }
     },
     methods: {
@@ -59,6 +59,7 @@ export default {
                 Notifier.error("Couldn't find any item.");
                 self.data = [];
                 self.total = 0;
+                self.pageIndex= 1;
                 self.loading = false;
             });
         },
