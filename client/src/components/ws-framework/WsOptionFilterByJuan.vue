@@ -43,7 +43,7 @@ export default {
             this.$emit("selected", {[this.optionType]: id});
         }
     },
-    mounted: function(){
+    mounted() {
         if (this.staticOptions) {
             this.options = this.staticOptions;
             return;

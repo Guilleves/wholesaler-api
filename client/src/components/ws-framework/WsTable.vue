@@ -7,11 +7,12 @@
             :columns="columns"
             :loading="loading"
             backend-pagination
-            :paginated="true"
+            :paginated="!dontPaginate"
             :per-page="pageSize"
             :total="total"
             @page-change="onPageChange"
-            @select="onSelect" />
+            @select="onSelect">
+        </b-table>
     </div>
 </template>
 
@@ -20,7 +21,7 @@ import * as Notifier from "@/helpers/notifier.js";
 
 export default {
     name: "ws-table",
-    data: function() {
+    data() {
         return {
             total: 0,
             loading: false,
@@ -36,7 +37,9 @@ export default {
         filters: Object,
         format: Function,
         columns: Array,
-        fetch: Function
+        fetch: Function,
+        rawData: Boolean,
+        dontPaginate: Boolean
     },
     watch: {
         data(val) {
@@ -53,7 +56,11 @@ export default {
             this.loading = true;
 
             this.fetch(filters).then((response) => {
-                self.data = response.data.items;
+                if (self.rawData)
+                    self.data = response.data;
+                else
+                    self.data = response.data.items;
+
                 self.total = response.data.size;
                 self.loading = false;
                 self.error = false;
@@ -69,7 +76,7 @@ export default {
         onPageChange(page) {
             if (this.error)
                 return;
-                
+
             this.pageIndex = page - 1;
             Object.assign(this.filters, {
                 "pageSize": this.pageSize,
@@ -82,7 +89,7 @@ export default {
             this.$emit('select', selected);
         }
     },
-    mounted: function() {
+    mounted() {
         this.getData(this.filters);
     }
 }

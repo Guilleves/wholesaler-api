@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 100%">
+    <div class="product-selector-parent">
         <b-field label="Search product" >
             <multiselect
             style="z-index: 10;"
@@ -26,7 +26,7 @@
                 You haven't selected any product yet.
             </p>
 
-            <div class="columns box" v-bind:key="product.id" v-for="(product, index) in value" style="padding:0" >
+            <div class="columns box" v-bind:key="product.id" v-for="(product, index) in value" style="padding:0;" >
                 <div class="column is-three-fifths">
                     {{ "[" + product.id + "] " + product.name + " - " + product.brand.name }}
                 </div>
@@ -93,10 +93,19 @@ export default {
 </script>
 
 <style lang="css">
+div .product-selector-parent {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    min-height: 0px;
+}
+
 div .scrollable {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    flex-basis: 20px;
     overflow-y: scroll;
-    min-height: 75%;
-    max-height: 0;
 }
 
 div .scrollable.disabled {

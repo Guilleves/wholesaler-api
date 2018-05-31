@@ -19,6 +19,7 @@
                 <div class="tile is-parent">
                     <div class="tile is-child box">
                         <p class="title">Products review</p>
+                        <p><router-link to="/products/ranking">More...</router-link></p>
                         <ws-line-chart :chart-data="chartData" :height="250" />
                     </div>
                 </div>
@@ -47,7 +48,7 @@ export default {
             let data = [];
             let self = this;
 
-            new API().get("/products/ranking", { supplierId: 1 }).then(response => {
+            new API().get("/products/ranking", { supplierId: 1, amount: 10 }).then(response => {
                 response.data.forEach(product => {
                     labels.push(product.name);
                     data.push(product.count);

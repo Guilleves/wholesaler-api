@@ -54,29 +54,18 @@ public class ProposalDataAccess extends BaseDataAccess {
     public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {
         ArrayList<Object> parameters = new ArrayList<Object>();
 
-        // Works only when there's at least one row (document) of each table (collection) because of the inner join...
-        String query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, Pr.description as productDescription, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM ";
-
-        if (pageSize != null && pageIndex != null) {
-            query += " (SELECT * FROM Proposal LIMIT ?, ?) as P ";
-            parameters.add(pageIndex * pageSize);
-            parameters.add(pageSize);
-        }
-        else
-            query += " Proposal P ";
-
-        query += "INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE P.deletedAt IS NULL AND PL.deletedAt IS NULL";
+        String proposalSubQuery = "(SELECT * FROM Proposal P WHERE P.deletedAt IS NULL ";
 
         if (status != null) {
             switch (status) {
                 case ProposalStates.ACTIVE:
-                    query = query.concat(" AND P.beginDate <= now() and P.endDate >= now()");
+                    proposalSubQuery += " AND P.beginDate <= now() and P.endDate >= now() ";
                     break;
                 case ProposalStates.FINISHED:
-                    query = query.concat(" AND P.endDate < now()") ;
+                    proposalSubQuery += " AND P.endDate < now() ";
                     break;
                 case ProposalStates.SCHEDULED:
-                    query = query.concat(" AND P.beginDate > now()");
+                    proposalSubQuery += " AND P.beginDate > now() ";
                     break;
                 default:
                     break;
@@ -84,32 +73,24 @@ public class ProposalDataAccess extends BaseDataAccess {
         }
 
         if (supplierId != null) {
-            query += " AND P.supplierId = ?";
+            proposalSubQuery += " AND P.supplierId = ? ";
             parameters.add(supplierId);
         }
 
-        // We do this to avoid query injection.
-        if (orderBy != null) {
-            switch (orderBy) {
-                case "beginDate":
-                    query += " ORDER BY P.beginDate";
-                    break;
-                case "endDate":
-                    query += " ORDER BY P.endDate";
-                    break;
-                case "title":
-                    query += " ORDER BY P.title";
-                    break;
-                case "description":
-                    query += " ORDER BY P.description";
-                    break;
-                case "supplier":
-                    query += " ORDER BY P.supplierId";
-                    break;
-                default:
-                    break;
-            };
+        if (pageIndex != null && pageSize != null) {
+            proposalSubQuery += " LIMIT ?, ? ";
+            parameters.add(pageIndex * pageSize);
+            parameters.add(pageSize);
         }
+
+        proposalSubQuery += ") as P ";
+
+        // Works only when there's at least one row (document) of each table (collection) because of the inner join...
+        String query = "SELECT P.*, O.id as organizationId, O.name as organizationName, O.cuit, O.legalName, O.role, PL.id as proposalLineId, PL.price as price, Pr.id as productId, Pr.name as productName, Pr.gtin as gtin, Pr.description as productDescription, B.id as brandId, B.name as brandName, C.id as categoryId, C.name as categoryName FROM ";
+
+        query += proposalSubQuery;
+
+        query += "INNER JOIN Organization O ON P.supplierId = O.id INNER JOIN ProposalLine PL ON P.id = PL.proposalId INNER JOIN Product Pr ON PL.productId = Pr.id INNER JOIN Brand B ON Pr.brandId = B.id INNER JOIN Category C ON Pr.categoryId = C.id WHERE PL.deletedAt IS NULL";
 
         query = query.concat(";");
 

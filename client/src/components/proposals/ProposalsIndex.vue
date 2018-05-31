@@ -53,13 +53,13 @@
 
 <script>
 import API from '@/helpers/api.js';
-import OptionFilter from "@/components/ws-framework/WsSelect.vue";
+import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 
 export default {
     name: 'proposals-index',
-    data: () => {
+    data() {
         return {
             showDeleted: false,
             searchCriteria: {},

@@ -55,7 +55,7 @@
                             <button class="button is-outlined is-dark" type="button" @click="goBack()">
                                 Cancel
                             </button>
-                            <b-tooltip label="Can't edit proposals" :active="editing" class="is-danger" position="is-top">
+                            <b-tooltip label="Can't edit proposals" :active="editing" class="is-success" position="is-top">
                                 <button class="button is-success is-outlined" :disabled="editing">
                                     Save
                                 </button>
@@ -76,7 +76,7 @@ import API from "@/helpers/api.js";
 import * as Notifier from "@/helpers/notifier.js";
 
 export default {
-    data: () => {
+    data() {
         return {
             id: null,
             title: null,
