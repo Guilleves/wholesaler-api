@@ -28,7 +28,8 @@ export default {
             pageSize: 5,
             data: [],
             formattedData: [],
-            selected: {}
+            selected: {},
+            error: false
         }
     },
     props: {
@@ -55,15 +56,20 @@ export default {
                 self.data = response.data.items;
                 self.total = response.data.size;
                 self.loading = false;
+                self.error = false;
             }).catch(() => {
                 Notifier.error("Couldn't find any item.");
                 self.data = [];
                 self.total = 0;
-                self.pageIndex= 1;
+                self.pageIndex = 1;
                 self.loading = false;
+                self.error = true;
             });
         },
         onPageChange(page) {
+            if (this.error)
+                return;
+                
             this.pageIndex = page - 1;
             Object.assign(this.filters, {
                 "pageSize": this.pageSize,

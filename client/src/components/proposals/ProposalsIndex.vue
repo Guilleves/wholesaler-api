@@ -11,14 +11,13 @@
                             :static-options="[{'id': 'scheduled', 'name': 'Schduled'},
                             {'id': 'active', 'name': 'Active'},
                             {'id': 'finished', 'name': 'Finished'}]"
-                            filter="status"
                             placeholder="Select a status"
                             @selected="buildSearchCriteria($event)" />
                         </div>
                         <div class="column">
                             <option-filter
                             option-type="supplierId"
-                            filter="organizations/suppliers"
+                            :getOptions="getSuppliers"
                             placeholder="Select a supplier"
                             @selected="buildSearchCriteria($event)" />
                         </div>
@@ -54,7 +53,7 @@
 
 <script>
 import API from '@/helpers/api.js';
-import OptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
+import OptionFilter from "@/components/ws-framework/WsSelect.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 
@@ -101,6 +100,9 @@ export default {
         },
         onSelect(proposal) {
             this.$router.push("/proposals/" + proposal.id);
+        },
+        getSuppliers() {
+            return new API().get("/organizations/suppliers");
         },
         formatBrands(data) {
             return data.items.map(brand => {
