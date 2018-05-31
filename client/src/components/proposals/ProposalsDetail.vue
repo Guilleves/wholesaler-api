@@ -3,11 +3,7 @@
         <div class="container">
             <b-loading :is-full-page="false" :active.sync="loading" :canCancel="false" />
             <form @submit.prevent="save()">
-                <b-notification type="is-danger" has-icon :active.sync="showNotification">
-                    <ul v-bind:key="index" v-for="(notification, index) in notifications">
-                        <li>{{ notification }}</li>
-                    </ul>
-                </b-notification>
+                <ws-error v-model="errors" />
                 <div class="columns">
                     <div class="column">
                         <b-field label="Title">
@@ -44,20 +40,28 @@
                         <products-selector :search="getProducts" v-model="selectedProducts"/>
                     </div>
                 </div>
-                <b-field grouped position="is-right">
-                    <p class="control">
-                        <a class="button is-danger is-outlined" @click="remove" :disabled="!editing">
-                            <span class="icon">
-                                <i class="fas fa-trash"></i>
-                            </span>
-                        </a>
-                        <button class="button is-outlined is-dark" type="button" @click="goBack()">
-                            Cancel
-                        </button>
-                        <button class="button is-success is-outlined" :disabled="editing">
-                            Save
-                        </button>
-                    </p>
+                <b-field grouped>
+                    <b-field>
+                        <b-tag class="is-primary" rounded>{{ status }}</b-tag>
+                        <b-tag v-if="supplier" class="is-dark" rounded>{{ supplier }}</b-tag>
+                    </b-field>
+                    <b-field grouped position="is-right" expanded>
+                        <p class="control">
+                            <a class="button is-danger is-outlined" @click="remove" :disabled="!editing">
+                                <span class="icon">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                            </a>
+                            <button class="button is-outlined is-dark" type="button" @click="goBack()">
+                                Cancel
+                            </button>
+                            <b-tooltip label="Can't edit proposals" :active="editing" class="is-success" position="is-top">
+                                <button class="button is-success is-outlined" :disabled="editing">
+                                    Save
+                                </button>
+                            </b-tooltip>
+                        </p>
+                    </b-field>
                 </b-field>
             </form>
         </div>
@@ -67,11 +71,12 @@
 <script>
 import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import ProductsSelector from "@/components/ws-framework/WsProductsSelector.vue";
+import WsError from "@/components/ws-framework/WsError.vue";
 import API from "@/helpers/api.js";
 import * as Notifier from "@/helpers/notifier.js";
 
 export default {
-    data: () => {
+    data() {
         return {
             id: null,
             title: null,
@@ -80,19 +85,16 @@ export default {
             description: null,
             selectedProducts: [],
             editing: false,
-            showNotification: false,
-            notifications: [],
-            loading: false
+            errors: [],
+            loading: false,
+            status: "new",
+            supplier: null
         }
     },
     components: {
         WsKeywordSearch,
-        ProductsSelector
-    },
-    watch:{
-        notifications() {
-            this.showNotification = this.notifications.length != 0;
-        }
+        ProductsSelector,
+        WsError
     },
     methods: {
         getProposal(id) {
@@ -103,7 +105,7 @@ export default {
         },
         save() {
             if (this.editing)
-                return;
+            return;
 
             this.loading = true;
 
@@ -121,13 +123,13 @@ export default {
             };
             new API().post("/proposals", data).then(() => {
                 Notifier.success("Proposal was created.");
-                this.notifications = [];
+                this.errors = [];
                 this.loading = false;
                 this.goBack();
             })
             .catch(error => {
                 this.loading = false;
-                this.notifications = error.response.data;
+                this.errors = error.response.data;
             });
         },
         goBack() {
@@ -137,7 +139,7 @@ export default {
             this.$dialog.confirm({
                 title: 'Deleting proposal',
                 message: 'Are you sure you want to <b>delete</b> this proposal?',
-                confirmText: 'Delete Account',
+                confirmText: 'Delete Proposal',
                 type: 'is-danger',
                 hasIcon: true,
                 onConfirm: () => {
@@ -145,13 +147,13 @@ export default {
 
                     new API().delete("/proposals/" + this.id).then(() => {
                         Notifier.success("Proposal was deleted.");
-                        this.notifications = [];
+                        this.errors = [];
                         this.loading = false;
                         this.goBack();
                     })
                     .catch(error => {
                         this.loading = false;
-                        this.notifications = error.response.data;
+                        this.errors = error.response.data;
                     });
                 }
             });
@@ -168,7 +170,7 @@ export default {
 
         this.getProposal(id).then(response => {
             this.loading = false;
-            this.notifications = [];
+            this.errors = [];
             let proposal = response.data;
 
             this.id = proposal.id;
@@ -176,13 +178,15 @@ export default {
             this.beginDate = new Date(proposal.beginDate);
             this.endDate = new Date(proposal.endDate);
             this.description = proposal.description;
+            this.status = proposal.status;
+            this.supplier = proposal.supplier.name;
             this.selectedProducts = proposal.proposalLines.map(line => {
                 return Object.assign(line.product, { "price": line.price });
             });
         })
         .catch(error => {
             this.loading = false;
-            this.notifications = error.response.data;
+            this.errors = error.response.data;
         });
     }
 }
