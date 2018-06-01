@@ -2,11 +2,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Main from '@/components/layouts/Main.vue';
 import ProductsIndex from '@/components/products/ProductsIndex.vue';
-<<<<<<< HEAD
 import NewProduct from '@/components/products/NewProduct.vue';
-=======
 import ProductsRanking from '@/components/products/ProductsRanking.vue';
->>>>>>> origin/v1.2
 import ProposalsLayout from '@/components/proposals/ProposalsLayout.vue';
 import ProposalsIndex from '@/components/proposals/ProposalsIndex.vue';
 import ProposalsDetail from '@/components/proposals/ProposalsDetail.vue';

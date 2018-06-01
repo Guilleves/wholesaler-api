@@ -49,6 +49,7 @@
 
 <script>
 import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
+import API from "@/helpers/api.js";
 
 export default {
   name: 'new-product',
