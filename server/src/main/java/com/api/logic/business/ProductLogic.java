@@ -106,12 +106,12 @@ public class ProductLogic {
         }
     }
 
-    public ArrayList<GetRankingResponse> mostUsedByProposal(int supplierId) throws ApiException {
+    public ArrayList<GetRankingResponse> mostUsedByProposal(int supplierId, int amount) throws ApiException {
         try {
             if (supplierId == 0)
                 throw new ApiException("Please provide a supplier id", Status.BAD_REQUEST);
 
-            ArrayList<Ranking> products = pda.mostUsedByProposal(supplierId);
+            ArrayList<Ranking> products = pda.mostUsedByProposal(supplierId, amount);
 
             if (products == null || products.isEmpty())
                 throw new ApiException("Product was not found.", Status.NOT_FOUND);

@@ -1,11 +1,19 @@
 <template id="">
     <div>
-        <ws-hero title="Brands" description="View, create or delete brands" />
         <section class="section">
             <div class="container">
                 <div class="columns">
-                    <div class="column is-three-fifths">
-                        <ws-table
+                    <div class="column">
+                        <b-field grouped position="is-right">
+                            <p class="control">
+                                <router-link class="button is-rounded is-primary" to="/brands/new">
+                                    <span class="icon">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span>New brand</span>
+                                </router-link>
+                            </p>
+                        </b-field>                        <ws-table
                         :columns="columns"
                         :fetch="getBrands"
                         :filters="searchCriteria"
@@ -13,7 +21,7 @@
                         @select="onSelect"/>
                     </div>
                     <div class="column">
-                        <router-view />
+                        <p>Acá deberíamos rellenar con algo... </p>
                     </div>
                 </div>
             </div>

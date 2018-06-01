@@ -24,66 +24,63 @@ public class ProductDataAccess extends BaseDataAccess {
 
     // #region ProductSetup
 
-    public Product getProduct(int productId) throws SQLException{
+    public Product getProduct(int productId) throws SQLException {
         String query = "SELECT " +
-            "P.*, " +
-            "B.name as brandName, " +
-            "C.name as categoryName " +
-            "FROM " +
-            "Product P " +
-            "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.brandId = B.id " +
-            "WHERE P.id = ? " +
-            "AND P.deletedAt IS NULL;";
+        "P.*, " +
+        "B.name as brandName, " +
+        "C.name as categoryName " +
+        "FROM " +
+        "Product P " +
+        "INNER JOIN Brand B ON P.brandId = B.id " +
+        "INNER JOIN Category C ON P.brandId = B.id " +
+        "WHERE P.id = ? " +
+        "AND P.deletedAt IS NULL;";
 
         return getOne(rs -> new Product(rs), query, productId);
     }
 
-    public ArrayList<Product> getProducts(Integer brandId, Integer categoryId, Integer pageIndex, Integer pageSize, String keyword, String orderBy) throws SQLException{
+    public ArrayList<Product> getProducts(Integer brandId, Integer categoryId, Integer pageIndex, Integer pageSize, String keyword, String orderBy) throws SQLException {
         ArrayList<Object> parameters = new ArrayList<Object>();
 
-        String query = "SELECT " +
-            "P.*, " +
-            "B.name as brandName, " +
-            "C.name as categoryName " +
-            "FROM ";
-
-        if (pageIndex != null && pageSize != null) {
-            query += "(SELECT * FROM Product LIMIT ?, ?) as P ";
-            parameters.add(pageIndex * pageSize);
-            parameters.add(pageSize);
-        }
-        else
-            query += "Product P ";
-
-        query += "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.categoryId = C.id " +
-            "WHERE P.deletedAt IS NULL";
+        String productSubQuery = "(SELECT P.* FROM product P INNER JOIN brand B ON B.id = P.brandId INNER JOIN Category C ON C.id = P.categoryId WHERE P.deletedAt IS NULL ";
 
         if (brandId != null) {
-            query += " AND B.id = ?";
+            productSubQuery += " AND B.id = ?";
             parameters.add(brandId);
         }
 
         if (categoryId != null) {
-            query += " AND C.id = ?";
+            productSubQuery += " AND C.id = ? ";
             parameters.add(categoryId);
         }
 
         if (keyword != null && !keyword.isEmpty()) {
-             query += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?)";
-             parameters.add('%' + keyword + '%');
-             parameters.add('%' + keyword + '%');
-             parameters.add('%' + keyword + '%');
+            productSubQuery += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?) ";
+            parameters.add('%' + keyword + '%');
+            parameters.add('%' + keyword + '%');
+            parameters.add('%' + keyword + '%');
         }
 
-        // this is not working...
-        /*if (orderBy != null && !orderBy.isEmpty()) {
-            query += " ORDER BY ?";
-            parameters.add(orderBy);
-        }*/
+        if (pageIndex != null && pageSize != null) {
+            productSubQuery += " LIMIT ?, ? ";
+            parameters.add(pageIndex * pageSize);
+            parameters.add(pageSize);
+        }
 
-        query += ";";
+        productSubQuery += ") as P ";
+
+        String query = "SELECT " +
+        "P.*, " +
+        "B.name as brandName, " +
+        "C.name as categoryName " +
+        "FROM " +
+        productSubQuery +
+        "INNER JOIN Brand B ON P.brandId = B.id " +
+        "INNER JOIN Category C ON P.categoryId = C.id " +
+        "WHERE P.deletedAt IS NULL";
+
+
+        query += " ORDER BY P.id;";
 
         return getMany(rs -> new Product(rs), query, parameters.toArray());
     }
@@ -92,10 +89,10 @@ public class ProductDataAccess extends BaseDataAccess {
         ArrayList<Object> parameters = new ArrayList<Object>();
 
         String query = "SELECT COUNT(*) as size FROM " +
-            "( SELECT P.* FROM Product P " +
-            "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.categoryId = C.id " +
-            "WHERE P.deletedAt IS NULL";
+        "( SELECT P.* FROM Product P " +
+        "INNER JOIN Brand B ON P.brandId = B.id " +
+        "INNER JOIN Category C ON P.categoryId = C.id " +
+        "WHERE P.deletedAt IS NULL";
 
         if (brandId != null) {
             query += " AND B.id = ?";
@@ -108,10 +105,10 @@ public class ProductDataAccess extends BaseDataAccess {
         }
 
         if (keyword != null && !keyword.isEmpty()) {
-             query += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?)";
-             parameters.add('%' + keyword + '%');
-             parameters.add('%' + keyword + '%');
-             parameters.add('%' + keyword + '%');
+            query += " AND (P.name LIKE ? or B.name LIKE ? or C.name LIKE ?)";
+            parameters.add('%' + keyword + '%');
+            parameters.add('%' + keyword + '%');
+            parameters.add('%' + keyword + '%');
         }
 
         query += " GROUP BY P.id ) as x";
@@ -121,24 +118,35 @@ public class ProductDataAccess extends BaseDataAccess {
         return getInt(query, parameters.toArray());
     }
 
-    public ArrayList<Ranking> mostUsedByProposal(int supplierId) throws SQLException {
-        String query = "SELECT " +
-            "P.*, " +
-            "B.name as brandName, " +
-            "C.name as categoryName, " +
-            "COUNT(*) as `count` " +
-            "FROM " +
-            "Product P " +
-            "INNER JOIN Brand B ON P.brandId = B.id " +
-            "INNER JOIN Category C ON P.categoryId = C.id " +
-            "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
-            "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
-            "WHERE P.deletedAt IS NULL " +
-            "AND Pr.supplierId = ? " +
-            "GROUP BY P.id " +
-            "ORDER BY COUNT(*) DESC;";
+    public ArrayList<Ranking> mostUsedByProposal(int supplierId, int amount) throws SQLException {
+        ArrayList<Integer> parameters = new ArrayList<Integer>();
 
-        return getMany(rs -> deserializeRanking(rs), query, supplierId);
+        String query = "SELECT " +
+        "P.*, " +
+        "B.name as brandName, " +
+        "C.name as categoryName, " +
+        "COUNT(*) as `count` " +
+        "FROM " +
+        "Product P " +
+        "INNER JOIN Brand B ON P.brandId = B.id " +
+        "INNER JOIN Category C ON P.categoryId = C.id " +
+        "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
+        "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+        "WHERE P.deletedAt IS NULL " +
+        "AND Pr.supplierId = ? " +
+        "GROUP BY P.id " +
+        "ORDER BY COUNT(*) DESC ";
+
+        parameters.add(supplierId);
+
+        if (amount != 0) {
+            query += "LIMIT ?";
+            parameters.add(amount);
+        }
+
+        query += ";";
+
+        return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
     }
 
     private Ranking deserializeRanking(ResultSet rs) throws SQLException {
@@ -149,11 +157,11 @@ public class ProductDataAccess extends BaseDataAccess {
         String query = "INSERT INTO Product (name, gtin, description, brandId, categoryId) VALUES (?, ?, ?, ?, ?);";
 
         product.setId(create(query,
-            product.getName(),
-            product.getGtin(),
-            product.getDescription(),
-            product.getBrand().getId(),
-            product.getCategory().getId())
+        product.getName(),
+        product.getGtin(),
+        product.getDescription(),
+        product.getBrand().getId(),
+        product.getCategory().getId())
         );
 
         return product;
@@ -163,12 +171,12 @@ public class ProductDataAccess extends BaseDataAccess {
         String query = "UPDATE Product SET name = ?, gtin = ?, description = ?, brandId = ?, categoryId = ? WHERE id = ?;";
 
         return update(query,
-            product.getName(),
-            product.getGtin(),
-            product.getDescription(),
-            product.getBrand().getId(),
-            product.getCategory().getId(),
-            product.getId()
+        product.getName(),
+        product.getGtin(),
+        product.getDescription(),
+        product.getBrand().getId(),
+        product.getCategory().getId(),
+        product.getId()
         );
     }
 
@@ -202,8 +210,8 @@ public class ProductDataAccess extends BaseDataAccess {
         Date now = new Date();
 
         int rowsEdited = update(query,
-            new java.sql.Timestamp(now.getTime()),
-            product.getId()
+        new java.sql.Timestamp(now.getTime()),
+        product.getId()
         );
 
         return rowsEdited != 0;

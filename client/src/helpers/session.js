@@ -31,5 +31,5 @@ export const clearToken = () => {
 
     storage.token = null;
 
-    session.setItem(SESSION_KEY, JSON.stringify(storage));
+    store.setItem(SESSION_KEY, JSON.stringify(storage));
 }
