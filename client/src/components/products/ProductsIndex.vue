@@ -1,6 +1,5 @@
 <template id="">
     <div>
-        <ws-hero title="Products" description="View, create, edit or delete products"/>
         <section class="section">
             <div class="container">
                 <div class="columns">
@@ -28,6 +27,18 @@
                 :fetch="getProducts"
                 :filters="searchCriteria"
                 :format="format" />
+                <div class="column">
+                    <b-field grouped position="is-right">
+                        <p class="control">
+                            <router-link class="button is-rounded is-primary" to="/products/new">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span>New product</span>
+                            </router-link>
+                        </p>
+                    </b-field>
+                </div>
             </div>
         </section>
     </div>
