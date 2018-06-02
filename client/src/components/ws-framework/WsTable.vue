@@ -1,6 +1,8 @@
 <template lang="html">
     <div>
         <b-table
+            hoverable
+            selectable
             :data="formattedData"
             :columns="columns"
             :loading="loading"
@@ -80,6 +82,9 @@ export default {
             });
 
             this.getData(this.filters);
+        },
+        onSelect(selected) {
+            this.$emit('select', selected);
         }
     },
     mounted() {

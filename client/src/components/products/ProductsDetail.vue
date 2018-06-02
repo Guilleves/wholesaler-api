@@ -54,9 +54,6 @@ import * as Notifier from "@/helpers/notifier.js";
 
 export default {
   name: 'new-product',
-  props: {
-    productId: Number
-  },
   components: {
     WsOptionFilter
   },
@@ -69,6 +66,7 @@ export default {
         categoryId: null,
         description: null
       },
+      productId: null,
       loading: false,
       errors: [],
       edit: false
@@ -76,14 +74,19 @@ export default {
   },
   mounted: function() {
     if (this.$route.params.id){
+      this.productId = this.$route.params.id;
       this.edit = true;
-      return;
+      let self = this;
+      new API().get('/products/' + self.productId).then((response) => {
+        self.productData.name = response.data.name;
+        self.productData.description = response.data.description;
+        self.productData.gtin = response.data.gtin;
+        self.productData.brandId = response.data.brand.id;
+        self.productData.categoryId = response.data.category.id;
+      }).catch((error) => {
+        self.errors = ["Product not found"];
+      })
     }
-    new API().get('/products' + this.productId).then(response => {
-      this.productData = response.data;
-    }).catch(error => {
-      this.errors = ["Product not found"];
-    })
   },
   methods: {
     formatBrands(data) {

@@ -26,7 +26,8 @@
                 :columns="columns"
                 :fetch="getProducts"
                 :filters="searchCriteria"
-                :format="format" />
+                :format="format"
+                @select="onSelect" />
                 <div class="column">
                     <b-field grouped position="is-right">
                         <p class="control">
@@ -95,6 +96,9 @@ export default {
     },
     buildSearchCriteria(param) {
       this.searchCriteria = Object.assign({}, this.searchCriteria, param);
+    },
+    onSelect(product) {
+      this.$router.push("/products/" + product.id);
     },
     formatBrands(data) {
       return data.items.map(brand => {
