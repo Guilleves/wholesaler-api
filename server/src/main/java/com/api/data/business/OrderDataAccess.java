@@ -58,8 +58,41 @@ public class OrderDataAccess extends BaseDataAccess {
         return this.getOneWithoutStatement(rs -> deserializeOrder(rs), query, orderId);
     }
 
-    public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException{
+    public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, Integer proposalId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException{
         ArrayList<Object> parameters = new ArrayList<Object>();
+
+        String orderSubQuery = "(SELECT O.* FROM `order` O " +
+        "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
+        "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+        "WHERE O.deletedAt IS NULL ";
+
+        if (fromDate != null) {
+            orderSubQuery += " AND O.dateOrdered > ?";
+            parameters.add(fromDate);
+        }
+
+        if (toDate != null) {
+            orderSubQuery += " AND O.dateOrdered < ?";
+            parameters.add(toDate);
+        }
+
+        if (retailId != null) {
+            orderSubQuery += " AND O.retailId = ?";
+            parameters.add(retailId);
+        }
+
+        if (proposalId != null) {
+            orderSubQuery += " AND PL.proposalId = ?";
+            parameters.add(proposalId);
+        }
+
+        if (pageIndex != null && pageSize != null) {
+            orderSubQuery += " LIMIT ?, ? ";
+            parameters.add(pageIndex * pageSize);
+            parameters.add(pageSize);
+        }
+
+        orderSubQuery += ") as O ";
 
         // Eeeeeeeeeeeeeeeeeek...
         String query = "SELECT " +
@@ -86,15 +119,8 @@ public class OrderDataAccess extends BaseDataAccess {
             "B.name as brandName, " +
             "C.id as categoryId, " +
             "C.name as categoryName " +
-            "FROM ";
-
-        if (pageIndex != null && pageSize != null) {
-            query += "(SELECT * FROM `Order` LIMIT ?, ?) as O ";
-            parameters.add(pageIndex * pageSize);
-            parameters.add(pageSize);
-        }
-        else
-            query += "`Order` O ";
+            "FROM " +
+            orderSubQuery;
 
         query += "INNER JOIN Organization R ON R.id = O.retailId " +
             "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
@@ -104,21 +130,6 @@ public class OrderDataAccess extends BaseDataAccess {
             "INNER JOIN Brand B ON Pr.brandId = B.id " +
             "INNER JOIN Category C ON Pr.categoryId = C.id " +
             "WHERE PL.deletedAt IS NULL";
-
-            if (fromDate != null) {
-                query += " AND O.dateOrdered > ?";
-                parameters.add(fromDate);
-            }
-
-            if (toDate != null) {
-                query += " AND O.dateOrdered < ?";
-                parameters.add(toDate);
-            }
-
-            if (retailId != null) {
-                query += " AND O.retailId = ?";
-                parameters.add(retailId);
-            }
 
             query += ";";
 

@@ -6,7 +6,7 @@ import java.util.Date;
 public class GetOrdersRequest extends BaseSearchRequest {
     static final long serialVersionUID = 0L;
 
-    private Integer retailId;
+    private Integer retailId, proposalId;
     private Date fromDate, toDate;
 
 	/**
@@ -19,9 +19,10 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	/**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(Integer retailId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(Integer retailId, Integer proposalId, Date fromDate, Date toDate) {
 		super();
 		this.retailId = retailId;
+        this.proposalId = proposalId;
 		this.fromDate = fromDate;
 		this.toDate = toDate;
 	}
@@ -29,9 +30,10 @@ public class GetOrdersRequest extends BaseSearchRequest {
     /**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Integer proposalId, Date fromDate, Date toDate) {
 		super(orderBy, pageIndex, pageSize);
 		this.retailId = retailId;
+        this.proposalId = proposalId;
 		this.fromDate = fromDate;
 		this.toDate = toDate;
 	}
@@ -42,6 +44,22 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	*/
 	public Integer getRetailId() {
 		return retailId;
+	}
+
+	/**
+	* Sets new value of retailId
+	* @param
+	*/
+	public void setProposalId(Integer proposalId) {
+		this.proposalId = proposalId;
+	}
+
+    /**
+	* Returns value of retailId
+	* @return
+	*/
+	public Integer getProposalId() {
+		return proposalId;
 	}
 
 	/**

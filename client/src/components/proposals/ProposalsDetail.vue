@@ -47,6 +47,12 @@
                     </b-field>
                     <b-field grouped position="is-right" expanded>
                         <p class="control">
+                            <router-link class="button is-default" :to="`/proposals/${id}/orders/`">
+                                <span class="icon">
+                                    <i class="fas fa-book"></i>
+                                </span>
+                                <span>Show orders</span>
+                            </router-link>
                             <a class="button is-danger is-outlined" @click="remove" :disabled="!editing">
                                 <span class="icon">
                                     <i class="fas fa-trash"></i>
@@ -133,7 +139,7 @@ export default {
             });
         },
         goBack() {
-            this.$router.go(-1);
+            this.$router.push(`/proposals`);
         },
         remove() {
             this.$dialog.confirm({

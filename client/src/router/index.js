@@ -6,6 +6,9 @@ import ProductsRanking from '@/components/products/ProductsRanking.vue';
 import ProposalsLayout from '@/components/proposals/ProposalsLayout.vue';
 import ProposalsIndex from '@/components/proposals/ProposalsIndex.vue';
 import ProposalsDetail from '@/components/proposals/ProposalsDetail.vue';
+import OrdersLayout from '@/components/orders/OrdersLayout.vue';
+import OrdersIndex from '@/components/orders/OrdersIndex.vue';
+import OrdersDetail from '@/components/orders/OrdersDetail.vue';
 import BrandsLayout from '@/components/brands/BrandsLayout.vue';
 import BrandsIndex from '@/components/brands/BrandsIndex.vue';
 import BrandsDetail from '@/components/brands/BrandsDetail.vue';
@@ -18,56 +21,25 @@ Vue.use(Router);
 export default new Router({
     mode: 'history',
     routes: [
-        {
-            path: '/',
-            name: 'Main',
-            component: Main,
-            children: [{
-                path: "home",
-                name: "Home",
-                component: Dashboard
-            },  {
-                path: 'products',
-                name: 'ProductsIndex',
-                component: ProductsIndex
-            }, {
-                path: 'products/ranking',
-                name: 'ProductsRanking',
-                component: ProductsRanking
-            }, {
-                path: 'proposals',
-                component: ProposalsLayout,
-                children: [{
-                    path: "",
-                    name: "ProposalsIndex",
-                    component: ProposalsIndex
-                },
-                {
-                    path: ":id",
-                    name: "ProposalsDetail",
-                    component: ProposalsDetail
-                }]
-            }, {
-                path: 'brands',
-                component: BrandsLayout,
-                children: [{
-                    path: "",
-                    name: 'BrandsIndex',
-                    component: BrandsIndex
-                }, {
-                    path: ":id",
-                    name: 'EditBrand',
-                    component: BrandsDetail
-                }]
-            }]
-        }, {
-            path: "/login",
-            name: "Login",
-            component: Login
-        }, {
-            path: "/signup",
-            name: "Signup",
-            component: Signup
-        }
+        { path: '/', component: Main, children: [
+            {path: "home", component: Dashboard },
+            { path: 'products', component: ProductsIndex },
+            { path: 'products/ranking', component: ProductsRanking },
+            { path: 'proposals', component: ProposalsLayout, children: [
+                { path: "", component: ProposalsIndex },
+                { path: ":id", component: ProposalsDetail },
+                { path:":proposalId/orders/", component: OrdersIndex },
+                { path:":proposalId/orders/:orderId", component: OrdersDetail }
+            ]},
+            { path: 'orders', component: OrdersLayout, children: [
+                { path: "", component: OrdersIndex }
+            ]},
+            { path: 'brands', component: BrandsLayout, children: [
+                { path: "", component: BrandsIndex },
+                { path: ":id", component: BrandsDetail }
+            ]}
+        ]},
+        { path: "/login", component: Login },
+        { path: "/signup", component: Signup }
     ]
 });

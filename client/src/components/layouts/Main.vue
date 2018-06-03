@@ -2,7 +2,7 @@
     <div>
         <nav class="navbar is-transparent is-fixed-top is-dark">
             <div class="navbar-brand">
-                <router-link to="/home" class="navbar-item">
+                <router-link to="/home/" class="navbar-item">
                     <!--img src="@/assets/brand-logo-2.svg" alt="wholesaler" style="height: 3rem; max-height: 3rem;"-->
                     <span class="logo">Wholesaler</span>
                 </router-link>
@@ -83,13 +83,13 @@ export default {
     methods: {
         logout() {
             Session.clearToken();
-            this.$router.push("/login");
+            this.$router.push("/login/");
             Notifier.info("Logged out");
         }
     },
     beforeMount() {
         if (!Session.getToken())
-        this.$router.push("/login");
+        this.$router.push("/login/");
     }
 }
 </script>

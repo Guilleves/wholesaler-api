@@ -90,6 +90,31 @@ public class OrganizationLogic {
       }
   }
 
+  public ArrayList<GetSuppliersResponse> getRetails() throws ApiException {
+      try {
+          ArrayList<GetSuppliersResponse> response = new ArrayList<GetSuppliersResponse>();
+
+          // Fetch product list.
+          ArrayList<Organization> suppliers = oda.getOrganizations(OrganizationRoles.RETAIL);
+
+          if (suppliers == null || suppliers.isEmpty())
+              throw new ApiException("Couldn't find any retail.", Status.NOT_FOUND);
+
+          // Generate the response object.
+          for (Organization supplier : suppliers) {
+              response.add(new GetSuppliersResponse(
+                  supplier.getId(),
+                  supplier.getName()
+              ));
+          }
+
+          return response;
+      }
+      catch(SQLException e) {
+          throw new ApiException(e);
+      }
+  }
+
   public GetOrganizationResponse getOrganization(GetOrganizationRequest request) throws ApiException {
       try {
           Organization organization = oda.getOrganization(request.getOrganizationId());
