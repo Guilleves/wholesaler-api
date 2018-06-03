@@ -1,5 +1,6 @@
 package com.api.logic.business;
 
+import com.api.entities.business.Proposal;
 import com.api.entities.models.BaseSearchResponse;
 import com.api.entities.models.order.GetOrdersResponse;
 import com.api.entities.models.order.GetOrdersRequest;
@@ -38,6 +39,7 @@ public class OrderLogic {
                 request.getFromDate(),
                 request.getToDate(),
                 request.getRetailId(),
+                request.getProposalId(),
                 request.getOrderBy(),
                 request.getPageSize(),
                 request.getPageIndex()
@@ -128,10 +130,18 @@ public class OrderLogic {
                 if (orderLine.getProposalLine() == null)
                     throw new ApiException("At least one proposal line could not be found", Status.NOT_FOUND);
 
+                if (line.getQuantity() == 0)
+                    throw new ApiException("Amount cannot be empty or 0", Status.BAD_REQUEST);
+
                 orderLine.setQuantity(line.getQuantity());
 
                 lines.add(orderLine);
             }
+
+            Proposal selectedProposal = lines.get(0).getProposalLine().getProposal();
+
+            if (!selectedProposal.isActive())
+                throw new ApiException("Proposal must be active");
 
             // Set primitive data.
             order.setDateOrdered(request.getDateOrdered());

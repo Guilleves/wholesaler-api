@@ -19,6 +19,7 @@
             :max-height="600"
             :show-no-results="false"
             :hide-selected="true"
+            @select="onSelect"
             @search-change="getProducts"/>
         </b-field>
         <div v-bind:class="{ 'disabled': !value || value.length === 0 }" class="box scrollable">
@@ -81,6 +82,9 @@ export default {
         },
         clearAll() {
             this.value = [];
+        },
+        onSelect(selectedOption) {
+            this.$emit("selected", selectedOption);
         },
         removeProduct(index) {
             this.value.splice(index, 1);
