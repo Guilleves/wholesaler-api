@@ -32,7 +32,8 @@ export default new Router({
                 { path:":proposalId/orders/:orderId", component: OrdersDetail }
             ]},
             { path: 'orders', component: OrdersLayout, children: [
-                { path: "", component: OrdersIndex }
+                { path: "", component: OrdersIndex },
+                { path: ":orderId", component: OrdersDetail }
             ]},
             { path: 'brands', component: BrandsLayout, children: [
                 { path: "", component: BrandsIndex },

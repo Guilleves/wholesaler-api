@@ -38,7 +38,6 @@ import API from './../../helpers/api.js';
 import WsOptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
 import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearchByJuan.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
-import WsLineChart from "@/components/ws-framework/WsLineChart.vue";
 import WsHero from "@/components/ws-framework/WsHero.vue";
 
 export default {
@@ -62,7 +61,6 @@ export default {
         WsOptionFilter,
         WsKeywordSearch,
         WsTable,
-        WsLineChart,
         WsHero
     },
     methods: {

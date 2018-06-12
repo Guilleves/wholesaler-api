@@ -22,8 +22,8 @@
                             @selected="buildSearchCriteria($event)" />
                         </div>
                         <div class="column">
-                            <b-switch v-model="showDeleted">
-                                Show deleted proposals
+                            <b-switch @input="toggleShowMine($event)">
+                                Show only from my supplier
                             </b-switch>
                         </div>
                     </div>
@@ -53,6 +53,7 @@
 
 <script>
 import API from '@/helpers/api.js';
+import * as Session from '@/helpers/session.js';
 import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
@@ -61,7 +62,7 @@ export default {
     name: 'proposals-index',
     data() {
         return {
-            showDeleted: false,
+            currentSupplier: Session.get().organization.id,
             searchCriteria: {},
             columns: [{
                 field: 'id',
@@ -103,6 +104,12 @@ export default {
         },
         getSuppliers() {
             return new API().get("/organizations/suppliers");
+        },
+        toggleShowMine(show) {
+            if (show)
+                this.buildSearchCriteria({ supplierId: this.currentSupplier });
+            else
+                this.buildSearchCriteria({ supplierId: null });
         },
         formatBrands(data) {
             return data.items.map(brand => {
