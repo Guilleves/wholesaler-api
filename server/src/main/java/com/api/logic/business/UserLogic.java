@@ -12,6 +12,7 @@ import com.api.entities.models.user.GetUserRequest;
 import com.api.entities.models.user.GetUserResponse;
 import com.api.entities.models.user.SaveUserRequest;
 import com.api.entities.models.user.LoginRequest;
+import com.api.entities.models.organization.GetOrganizationResponse;
 import com.api.entities.models.user.LoginResponse;
 
 import com.api.logic.validations.ApiException;
@@ -38,21 +39,21 @@ public class UserLogic {
             ApiException ex = validateGetUser(request.getUserId());
 
             if (!ex.isOk())
-                throw ex;
+            throw ex;
 
             // Fetch the user.
             User user = uda.getUser(request.getUserId());
 
             if (user == null)
-                throw ex.addError("User not found.");
+            throw ex.addError("User not found.");
 
             // Generate de response object (future JSON).
             GetUserResponse response = new GetUserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getUsername(),
-                user.getEmail()
+            user.getId(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getUsername(),
+            user.getEmail()
             );
 
             return response;
@@ -77,11 +78,11 @@ public class UserLogic {
             // Generate the response (future JSON).
             for (User user : users) {
                 response.add(new GetUserResponse(
-                    user.getId(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getUsername(),
-                    user.getEmail()
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getUsername(),
+                user.getEmail()
                 ));
             }
 
@@ -96,18 +97,18 @@ public class UserLogic {
     public void saveUser(SaveUserRequest request) throws ApiException {
         try {
             User user = new User(
-                request.getUserId(),
-                request.getFirstName(),
-                request.getLastName(),
-                request.getUsername(),
-                request.getPassword(),
-                request.getEmail()
+            request.getUserId(),
+            request.getFirstName(),
+            request.getLastName(),
+            request.getUsername(),
+            request.getPassword(),
+            request.getEmail()
             );
 
             ApiException ex = validateSaveUser(user);
 
             if (!ex.isOk())
-                throw ex;
+            throw ex;
 
             // If password is being created/updated, ecrypt it
             if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
@@ -120,9 +121,9 @@ public class UserLogic {
             }
 
             if (user.getId() == 0)
-                uda.createUser(user);
+            uda.createUser(user);
             else
-                uda.updateUser(user);
+            uda.updateUser(user);
         }
         catch(SQLException ex) {
             throw new ApiException(ex);
@@ -136,28 +137,28 @@ public class UserLogic {
     public LoginResponse signup(SaveUserRequest request) throws ApiException {
         try {
             if (!request.getPassword().equals(request.getRepeatPassword()))
-                throw new ApiException("Passwords don't match.");
+            throw new ApiException("Passwords don't match.");
 
             User user = new User(
-                0,
-                request.getFirstName(),
-                request.getLastName(),
-                request.getUsername(),
-                request.getPassword(),
-                request.getEmail()
+            0,
+            request.getFirstName(),
+            request.getLastName(),
+            request.getUsername(),
+            request.getPassword(),
+            request.getEmail()
             );
 
             // Fetch user.
             User dbUser = uda.getUser(request.getUsername());
 
             if (dbUser != null)
-                throw new ApiException("This username is taken");
+            throw new ApiException("This username is taken");
 
             // Validate.
             ApiException ex = validateSaveUser(user);
 
             if (!ex.isOk())
-                throw ex;
+            throw ex;
 
             try {
                 user.setPassword(sl.encryptPassword(user.getPassword()));
@@ -177,7 +178,21 @@ public class UserLogic {
                 throw new ApiException(e);
             }
 
-            return new LoginResponse(token);
+            return new LoginResponse(
+            token,
+            new GetUserResponse(
+            createdUser.getId(),
+            createdUser.getFirstName(),
+            createdUser.getLastName(),
+            createdUser.getUsername(),
+            createdUser.getEmail()),
+            new GetOrganizationResponse(
+            createdUser.getOrganization().getId(),
+            createdUser.getOrganization().getName(),
+            createdUser.getOrganization().getLegalName(),
+            createdUser.getOrganization().getCuit(),
+            createdUser.getOrganization().getRole())
+            );
         }
         catch(SQLException ex) {
             throw new ApiException(ex);
@@ -196,13 +211,13 @@ public class UserLogic {
             ApiException ex = validateAuthentication(username, password);
 
             if (!ex.isOk())
-                throw ex;
+            throw ex;
 
             // Fetch user.
             User dbUser = uda.getUser(username);
 
             if (dbUser == null)
-                throw ex.addError("Invalid username or password.");
+            throw ex.addError("Invalid username or password.");
 
             // First, try to authenticate against the db.
             try {
@@ -223,7 +238,23 @@ public class UserLogic {
                 }
             }
             else
-                throw new ApiException("Invalid username or password.");
+            throw new ApiException("Invalid username or password.");
+
+            response.setUser(new GetUserResponse(
+            dbUser.getId(),
+            dbUser.getFirstName(),
+            dbUser.getLastName(),
+            dbUser.getUsername(),
+            dbUser.getEmail())
+            );
+
+            response.setOrganization(new GetOrganizationResponse(
+            dbUser.getOrganization().getId(),
+            dbUser.getOrganization().getName(),
+            dbUser.getOrganization().getLegalName(),
+            dbUser.getOrganization().getCuit(),
+            dbUser.getOrganization().getRole())
+            );
 
             return response;
         }
@@ -240,10 +271,10 @@ public class UserLogic {
         ApiException sr = new ApiException();
 
         if (username == null || username.isEmpty())
-            sr.addError("El nombre de usuario no puede estar vacío.");
+        sr.addError("El nombre de usuario no puede estar vacío.");
 
         if (password == null || password.isEmpty())
-            sr.addError("La contraseña no puede estar vacía.");
+        sr.addError("La contraseña no puede estar vacía.");
 
         // if (passwordRequirements(password))
 
@@ -254,7 +285,7 @@ public class UserLogic {
         ApiException sr = new ApiException();
 
         if (userId <= 0)
-            sr.addError("Please provide a valid user id");
+        sr.addError("Please provide a valid user id");
 
         return sr;
     }
