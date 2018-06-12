@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="column">
-                    <b-field grouped position="is-right">
+                    <b-field grouped position="is-right" v-if="proposalId">
                         <p class="control">
                             <router-link class="button is-rounded is-primary" :to="`/proposals/${proposalId}/orders/new/`">
                                 <span class="icon">
@@ -54,7 +54,7 @@
             :format="format"
             @select="onSelect"/>
 
-            <router-link class="button is-default" :to="`/proposals/${proposalId}`">
+            <router-link class="button is-default" :to="`/proposals/${proposalId}`" v-if="proposalId">
                 <span class="icon">
                     <i class="fas fa-arrow-left"></i>
                 </span>

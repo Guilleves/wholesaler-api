@@ -218,14 +218,13 @@ export default {
         let orderId = this.$route.params.orderId;
         let proposalId = this.$route.params.proposalId;
 
-        if (!proposalId || Number.isNaN(Number(proposalId)))
-            return;
-
         let vm = this;
 
-        new API().get("/proposals/" + proposalId).then(response => {
-            vm.selectedProposal = response.data;
-        });
+        if (proposalId && !Number.isNaN(Number(proposalId))) {
+            new API().get("/proposals/" + proposalId).then(response => {
+                vm.selectedProposal = response.data;
+            });
+        }
 
         if (!orderId || Number.isNaN(Number(orderId)))
             return;
@@ -241,6 +240,14 @@ export default {
             vm.selectedProducts = order.orderLines.map(line => {
                 return Object.assign(line.proposalLine.product, { price: line.proposalLine.price, lineId: line.proposalLine.id });
             });
+
+            if (!proposalId) {
+                let proposals = order.orderLines.map(line => {
+                    return line.proposalLine.proposal;
+                });
+
+                vm.selectedProposal = proposals[0];
+            }
 
             vm.productPrices = order.orderLines.map((line, index) => {
                 return {

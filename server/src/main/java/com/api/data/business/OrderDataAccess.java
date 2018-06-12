@@ -22,7 +22,7 @@ public class OrderDataAccess extends BaseDataAccess {
         String query = "SELECT " +
             "O.*, " +
             "P.id as proposalId, " +
-            "P.id as proposalTitle, " +
+            "P.title as proposalTitle, " +
             "P.beginDate, " +
             "P.endDate, " +
             "P.description, " +
@@ -98,7 +98,7 @@ public class OrderDataAccess extends BaseDataAccess {
         String query = "SELECT " +
             "O.*, " +
             "P.id as proposalId, " +
-            "P.id as proposalTitle, " +
+            "P.title as proposalTitle, " +
             "P.beginDate, " +
             "P.endDate, " +
             "P.description, " +
