@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Main from '@/components/layouts/Main.vue';
 import ProductsLayout from '@/components/products/ProductsLayout.vue';
-
 import ProductsIndex from '@/components/products/ProductsIndex.vue';
 import ProductsDetail from '@/components/products/ProductsDetail.vue';
 import ProductsRanking from '@/components/products/ProductsRanking.vue';

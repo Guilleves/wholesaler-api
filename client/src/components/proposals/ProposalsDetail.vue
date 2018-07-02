@@ -42,8 +42,8 @@
                 </div>
                 <b-field grouped>
                     <b-field>
-                        <b-tag class="is-primary" rounded>{{ status }}</b-tag>
-                        <b-tag v-if="supplier" class="is-dark" rounded>{{ supplier }}</b-tag>
+                        <b-tag class="is-primary"  >{{ status }}</b-tag>
+                        <b-tag v-if="supplier" class="is-dark"  >{{ supplier }}</b-tag>
                     </b-field>
                     <b-field grouped position="is-right" expanded>
                         <p class="control">

@@ -7,7 +7,7 @@
         v-model="keyword"
         :placeholder="placeholder"
         :loading="loading"
-        rounded />
+          />
     </b-field>
   </div>
 </template>

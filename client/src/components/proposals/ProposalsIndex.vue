@@ -31,7 +31,7 @@
                 <div class="column">
                     <b-field grouped position="is-right">
                         <p class="control">
-                            <router-link class="button is-rounded is-primary" to="/proposals/new">
+                            <router-link class="button   is-primary" to="/proposals/new">
                                 <span class="icon">
                                     <i class="fas fa-plus"></i>
                                 </span>
@@ -53,7 +53,7 @@
 
 <script>
 import API from '@/helpers/api.js';
-import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
+import OptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 

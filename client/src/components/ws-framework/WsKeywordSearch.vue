@@ -6,7 +6,7 @@
         icon="search"
         placeholder="Product's name"
         @input="addKeyword($event)"
-        rounded></b-input>
+         ></b-input>
     </b-field>
   </div>
 </template>
