@@ -25,9 +25,11 @@ export default new Router({
     routes: [
         { path: '/', component: Main, children: [
             {path: "home", component: Dashboard },
-            { path: 'products', component: ProductsIndex },
-            { path: 'products/ranking', component: ProductsRanking },
-            { path: 'products/new_product', component: ProductsDetail },
+            { path: 'products', component: ProductsLayout, children: [
+              { path: '', component: ProductsIndex },
+              { path: 'ranking', component: ProductsRanking },
+              { path: 'new', component: ProductsDetail }
+            ]},
             { path: 'proposals', component: ProposalsLayout, children: [
                 { path: "", component: ProposalsIndex },
                 { path: ":id", component: ProposalsDetail },
