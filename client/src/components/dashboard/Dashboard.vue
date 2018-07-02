@@ -9,7 +9,6 @@
                         </p>
                         <ul class="menu-list">
                             <li><router-link to="/home">Dashboard</router-link></li>
-                            <li><b style="color:red;" to="/home">**Data muy real ---></b></li>
                         </ul>
                         <p class="menu-label">
                             Administration
@@ -128,7 +127,7 @@ export default {
             let data = [["Product name", "Amount in proposal"]];
             let self = this;
 
-            new API().get("/products/ranking", { supplierId: 1, amount: 10 }).then(response => {
+            new API().get("/rankings/products", { amount: 10, orderBy: "proposal" }).then(response => {
                 response.data.forEach(product => {
                     data.push([product.name, product.count]);
                 });
