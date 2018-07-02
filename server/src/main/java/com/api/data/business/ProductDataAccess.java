@@ -132,12 +132,13 @@ public class ProductDataAccess extends BaseDataAccess {
         "INNER JOIN Category C ON P.categoryId = C.id " +
         "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
         "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
-        "WHERE P.deletedAt IS NULL " +
-        "AND Pr.supplierId = ? " +
-        "GROUP BY P.id " +
+        "WHERE P.deletedAt IS NULL ";
+        if (supplierId != 0) {
+            query += "AND Pr.supplierId = ? ";
+            parameters.add(supplierId);
+        }
+        query += "GROUP BY P.id " +
         "ORDER BY COUNT(*) DESC ";
-
-        parameters.add(supplierId);
 
         if (amount != 0) {
             query += "LIMIT ?";

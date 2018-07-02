@@ -28,12 +28,12 @@ import com.api.rest.security.Secured;
 // #endregion
 
 @Path("/proposals")
-public class Proposal {
+public class Proposals {
     private ProposalLogic pl;
 
     // #region Constructors
 
-    public Proposal() {
+    public Proposals() {
         pl = new ProposalLogic();
     }
 
