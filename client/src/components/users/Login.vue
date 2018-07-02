@@ -85,7 +85,7 @@ export default {
                 Session.set(response.data);
                 this.notifications = [];
                 Notifier.info("Logged in");
-                this.$router.push("home");
+                this.$router.push("/home/");
             })
             .catch((error) => {
                 console.log(error);
@@ -94,7 +94,7 @@ export default {
             });
         },
         redirectSignup: function() {
-            this.$router.push("signup");
+            this.$router.push("/signup/");
         }
     }
 }

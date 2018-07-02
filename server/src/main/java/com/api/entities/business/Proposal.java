@@ -158,7 +158,8 @@ public class Proposal implements BaseEntity {
 
     public boolean isActive() {
         Date today = new Date();
-        return this.getEndDate().after(today) && (this.getBeginDate().equals(today) || today.before(this.getBeginDate()));
+
+        return endDate.after(today) && (beginDate.equals(today) || beginDate.before(today));
     }
 
     public String getStatus() {

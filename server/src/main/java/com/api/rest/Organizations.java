@@ -74,6 +74,20 @@ public class Organizations {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
+    @Path("/retails")
+    public Response getRetails() {
+        try {
+            return Response.ok(ol.getRetails()).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
     @Path("/{organizationId}")
     public Response getOrganization(@PathParam("organizationId") int organizationId) {
         GetOrganizationRequest request = new GetOrganizationRequest();

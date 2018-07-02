@@ -58,14 +58,14 @@ export default {
 
             new API().post("/brands", data).then(() => {
                 this.editing = false;
-                this.$router.push("/brands");
+                this.goBack();
             })
             .catch(error => {
                 console.log(error);
             });
         },
         goBack() {
-            this.$router.go(-1);
+            this.$router.push("/brands");
         },
         remove() {
             this.$dialog.confirm({

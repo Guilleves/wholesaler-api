@@ -1,69 +1,139 @@
 <template>
     <section class="section" style="padding-top:75px">
         <div class="container">
-            <div class="tile is-ancestor">
-                <div class="tile is-4 is-vertical is-parent">
-                    <div class="tile is-child box">
-                        <p class="title">Proposals</p>
-                        <router-link to="/proposals">View, create or remove proposals</router-link>
-                    </div>
-                    <div class="tile is-child box">
-                        <p class="title">Orders</p>
-                        <p>View, create or remove orders</p>
-                    </div>
-                    <div class="tile is-child box">
-                        <p class="title">Products</p>
-                        <router-link to="/products">View, edit, create or remove products</router-link>
-                    </div>
+            <div class="columns">
+                <div class="column is-one-fifth">
+                    <aside class="menu">
+                        <p class="menu-label">
+                            General
+                        </p>
+                        <ul class="menu-list">
+                            <li><router-link to="/home">Dashboard</router-link></li>
+                            <li><b style="color:red;" to="/home">**Data muy real ---></b></li>
+                        </ul>
+                        <p class="menu-label">
+                            Administration
+                        </p>
+                        <ul class="menu-list">
+                            <li><router-link to="/proposals">Proposals</router-link></li>
+                            <li><router-link to="/orders">Orders</router-link></li>
+                            <li><router-link to="/products">Products</router-link></li>
+                            <li><router-link to="/users">Users</router-link></li>
+                        </ul>
+                        <p class="menu-label">
+                            Transactions
+                        </p>
+                        <ul class="menu-list">
+                            <li><router-link to="/proposals/new">New proposal</router-link></li>
+                            <li><router-link to="/products/new">New product</router-link></li>
+                        </ul>
+                    </aside>
                 </div>
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <p class="title">Products review</p>
-                        <p><router-link to="/products/ranking">More...</router-link></p>
-                        <ws-line-chart :chart-data="chartData" :height="250" />
+                <div class="column">
+                    <div class="tile is-ancestor is-vertical">
+                        <div class="tile is-parent">
+                            <div class="tile is-child box">
+                                <div class="columns">
+                                    <div class="column is-three-fifths">
+                                        <p class="title">1254</p>
+                                    </div>
+                                    <div class="column">
+                                        <b-icon type="is-light" icon="fa fa-receipt fa-3x" />
+                                    </div>
+                                </div>
+                                <router-link to="/proposals">Proposals created</router-link>
+                            </div>
+                            <div class="tile is-child box">
+                                <div class="columns">
+                                    <div class="column is-three-fifths">
+                                        <p class="title">3241</p>
+                                    </div>
+                                    <div class="column">
+                                        <b-icon type="is-light" icon="fa fa-shopping-cart fa-3x" />
+                                    </div>
+                                </div>
+                                <p>Orders done</p>
+                            </div>
+                            <div class="tile is-child box">
+                                <div class="columns">
+                                    <div class="column is-three-fifths">
+                                        <p class="title">3142</p>
+                                    </div>
+                                    <div class="column">
+                                        <b-icon type="is-light" icon="fa fa-box fa-3x" />
+                                    </div>
+                                </div>
+                                <router-link to="/products">Products created</router-link>
+                            </div>
+                            <div class="tile is-child box">
+                                <div class="columns">
+                                    <div class="column is-three-fifths">
+                                        <p class="title">324</p>
+                                    </div>
+                                    <div class="column">
+                                        <b-icon type="is-light" icon="fa fa-users fa-3x" />
+                                    </div>
+                                </div>
+                                <router-link to="/users">Users registered</router-link>
+                            </div>
+                        </div>
+                        <div class="tile is-parent">
+                            <div class="tile is-child">
+                                <ws-chart :data="chartData" type="ColumnChart" :options="options" />
+                                <p><router-link to="/products/ranking">More...</router-link></p>
+                            </div>
+                            <div class="tile is-child">
+                                <ws-chart :data="chartData" type="PieChart" :options="options" />
+                                <p><router-link to="/products/ranking">More...</router-link></p>
+                            </div>
+                        </div>
+                        <div class="tile is-parent">
+                            <div class="tile is-child">
+                                <ws-chart :data="chartData" type="BarChart" :options="options" />
+                                <p><router-link to="/products/ranking">More...</router-link></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </section>
 </template>
 
 <script>
-import WsLineChart from "@/components/ws-framework/WsLineChart.vue";
+import WsChart from "@/components/ws-framework/WsChart.vue";
 import API from './../../helpers/api.js';
 
 export default {
     name: 'HelloWorld',
     data: () => {
         return {
+            options: {
+                title: "Amount of products in proposals",
+                pieSliceTextStyle: {
+                    color: 'white',
+                },
+                pieHole: 0.25,
+                legend: {position: 'left', textStyle: {color: 'blue', fontSize: 10}}
+            },
             chartData: null
         };
     },
     components: {
-        WsLineChart
+        WsChart
     },
     methods: {
         fillChart() {
-            let labels = [];
-            let data = [];
+            let data = [["Product name", "Amount in proposal"]];
             let self = this;
 
             new API().get("/products/ranking", { supplierId: 1, amount: 10 }).then(response => {
                 response.data.forEach(product => {
-                    labels.push(product.name);
-                    data.push(product.count);
+                    data.push([product.name, product.count]);
                 });
 
-                self.chartData = {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: "Amount in proposals.",
-                            backgroundColor: '#714dd2',
-                            data: data
-                        }
-                    ]
-                };
+                self.chartData = data;
             });
         }
     },

@@ -46,12 +46,13 @@ public class Orders {
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
     @Path("/")
-    public Response getOrders(@QueryParam("retailId") Integer retailId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+    public Response getOrders(@QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
         GetOrdersRequest request = new GetOrdersRequest(
             orderBy,
             pageIndex,
             pageSize,
             retailId,
+            proposalId,
             fromDate == null ? null : fromDate.getDate(),
             toDate == null ? null : toDate.getDate()
         );

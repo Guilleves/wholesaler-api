@@ -6,7 +6,7 @@
                     <div class="column">
                         <b-field grouped position="is-right">
                             <p class="control">
-                                <router-link class="button   is-primary" to="/brands/new">
+                                <router-link class="button is-rounded is-primary" to="/brands/new/">
                                     <span class="icon">
                                         <i class="fas fa-plus"></i>
                                     </span>

@@ -21,7 +21,7 @@ class API {
         }, error => {
             if (error.response.status === 401) {
                 session.clearToken();
-                Router.push("/login");
+                Router.push("/login/");
             }
 
             return Promise.reject(error);
