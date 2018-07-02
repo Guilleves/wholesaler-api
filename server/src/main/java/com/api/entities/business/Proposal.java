@@ -1,5 +1,7 @@
 package com.api.entities.business;
 
+import java.sql.SQLException;
+import java.sql.ResultSet;
 import com.api.entities.enums.ProposalStates;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,27 @@ public class Proposal implements BaseEntity {
 		this.proposalLines = proposalLines;
 		this.supplier = supplier;
 	}
+
+    /**
+    * Default Proposal constructor
+    */
+    public Proposal(ResultSet rs) throws SQLException {
+        super();
+
+        this.id = rs.getInt("id");
+        this.beginDate = rs.getTimestamp("beginDate");
+        this.endDate = rs.getTimestamp("endDate");
+        this.title = rs.getString("title");
+        this.description = rs.getString("description");
+
+        this.supplier = new Supplier(
+            rs.getInt("organizationId"),
+            rs.getString("organizationName"),
+            rs.getString("cuit"),
+            rs.getString("legalName"),
+            rs.getString("role")
+        );
+    }
 
 	/**
 	* Returns value of id

@@ -47,7 +47,7 @@
                     </b-field>
                     <b-field grouped position="is-right" expanded>
                         <p class="control">
-                            <router-link class="button is-default" :to="`/proposals/${id}/orders/`">
+                            <router-link class="button is-default" :to="`/proposals/${id}/orders/`" v-if="editing">
                                 <span class="icon">
                                     <i class="fas fa-book"></i>
                                 </span>
