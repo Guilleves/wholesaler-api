@@ -1,52 +1,54 @@
 <template lang="html">
     <div class="">
         <b-field>
-            <b-select expanded :placeholder="this.placeholder" rounded @input="selectOption($event)">
-                <option
-                v-for="option in options"
-                :value="option.id"
-                :key="option.id">
-                {{ option.name }}
-            </option>
-        </b-select>
+            <multiselect
+            style="z-index: 10;"
+            v-model="selected"
+            label="name"
+            track-by="id"
+            :placeholder="placeholder"
+            open-direction="bottom"
+            :options="options"
+            :searchable="true"
+            :internal-search="true"
+            :clear-on-select="true"
+            :close-on-select="true"
+            :options-limit="300"
+            :limit="3"
+            :max-height="600"
+            :show-no-results="true" />
     </b-field>
 </div>
 </template>
 
 <script>
-import API from './../../helpers/api.js';
-
 export default {
-    name: "option-filter",
+    name: "ws-option-filter",
     props: {
-        filter: String,
-        optionType: String,
         placeholder: String,
         staticOptions: Array,
-        format: Function
+        format: Function,
+        getOptions: Function
     },
     data: function() {
         return {
             options: [],
-            selectedOption: ""
+            selected: null
         }
     },
-    methods: {
-        selectOption: function(event){
-            this.selected = event;
-            this.$emit('selected', {[this.optionType]: event});
+    watch: {
+        selected(val) {
+            this.$emit("input", val);
         }
     },
-    mounted: function(){
+    mounted() {
         if (this.staticOptions) {
             this.options = this.staticOptions;
             return;
         }
 
         var self = this;
-        new API()
-        .get('/' + self.filter, )
-        .then((response) => {
+        this.getOptions().then((response) => {
             if (self.format)
                 self.options = self.format(response.data);
             else
@@ -58,3 +60,9 @@ export default {
     }
 }
 </script>
+
+<style>
+    .multiselect__tags {
+        border-radius: 20px !important;
+    }
+</style>
