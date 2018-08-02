@@ -6,20 +6,18 @@
                 <div class="column is-three-fifths">
                     <div class="columns">
                         <div class="column">
-                            <option-filter
-                            option-type="status"
+                            <ws-option-filter
                             :static-options="[{'id': 'scheduled', 'name': 'Schduled'},
                             {'id': 'active', 'name': 'Active'},
                             {'id': 'finished', 'name': 'Finished'}]"
                             placeholder="Select a status"
-                            @selected="buildSearchCriteria($event)" />
+                            v-model="selectedStatus" />
                         </div>
                         <div class="column">
-                            <option-filter
-                            option-type="supplierId"
+                            <ws-option-filter
                             :getOptions="getSuppliers"
                             placeholder="Select a supplier"
-                            @selected="buildSearchCriteria($event)" />
+                            v-model="selectedSupplier" />
                         </div>
                         <div class="column">
                             <b-switch @input="toggleShowMine($event)">
@@ -54,7 +52,7 @@
 <script>
 import API from '@/helpers/api.js';
 import * as Session from '@/helpers/session.js';
-import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
+import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 
@@ -62,6 +60,8 @@ export default {
     name: 'proposals-index',
     data() {
         return {
+          selectedStatus: null,
+          selectedSupplier: null,
             currentSupplier: Session.get().organization.id,
             searchCriteria: {},
             columns: [{
@@ -77,8 +77,16 @@ export default {
             { field: 'status', label: 'Status' }]
         };
     },
+    watch: {
+      selectedStatus(val) {
+        this.buildSearchCriteria({ status: val.id });
+      },
+      selectedSupplier(val) {
+        this.buildSearchCriteria({ supplierId: val.id });
+      }
+    },
     components: {
-        OptionFilter,
+        WsOptionFilter,
         KeywordSearch,
         WsTable
     },

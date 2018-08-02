@@ -21,11 +21,10 @@
                             </b-field>
                         </div>
                         <div class="column">
-                            <option-filter
-                            option-type="retailId"
+                            <ws-option-filter
                             :getOptions="getRetails"
                             placeholder="Select a retailer"
-                            @selected="buildSearchCriteria($event)" />
+                            v-model="selectedRetail" />
                         </div>
                         <div class="column">
                             <b-switch v-model="showDeleted">
@@ -66,7 +65,7 @@
 
 <script>
 import API from '@/helpers/api.js';
-import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
+import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 
@@ -74,6 +73,7 @@ export default {
     name: 'proposals-index',
     data() {
         return {
+          selectedRetail: null,
             proposalId: this.$route.params.proposalId,
             showDeleted: false,
             searchCriteria: {},
@@ -87,8 +87,13 @@ export default {
             { field: 'dateOrdered', label: 'Date ordered' }]
         };
     },
+    watch: {
+      selectedRetail(val) {
+        this.buildSearchCriteria({ retailId: val.id })
+      }
+    },
     components: {
-        OptionFilter,
+        WsOptionFilter,
         KeywordSearch,
         WsTable
     },

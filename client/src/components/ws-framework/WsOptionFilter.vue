@@ -25,7 +25,6 @@
 export default {
     name: "ws-option-filter",
     props: {
-        optionType: String,
         placeholder: String,
         staticOptions: Array,
         format: Function,
@@ -61,3 +60,9 @@ export default {
     }
 }
 </script>
+
+<style>
+    .multiselect__tags {
+        border-radius: 20px !important;
+    }
+</style>
