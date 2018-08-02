@@ -27,6 +27,7 @@ export default new Router({
             {path: "home", component: Dashboard },
             { path: 'products', component: ProductsLayout, children: [
               { path: '', component: ProductsIndex },
+              { path: ':id', component: ProductsDetail },
               { path: 'ranking', component: ProductsRanking },
               { path: 'new', component: ProductsDetail }
             ]},

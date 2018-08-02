@@ -55,11 +55,6 @@ export default {
   components: {
     WsOptionFilter
   },
-  watch:{
-    productData(val){
-      debugger
-    }
-  },
   data(){
     return {
       productData: {
@@ -75,7 +70,7 @@ export default {
       edit: false
     }
   },
-  mounted: function() {
+  mounted() {
     if (this.$route.params.id){
       this.productId = this.$route.params.id;
       this.edit = true;
@@ -115,7 +110,7 @@ export default {
         description: this.productData.description
       };
       if (this.edit) {
-        req = new API().put('/products/' + this.productId, preparedData );
+        req = new API().put('/products/' + this.productId, preparedData);
         message = "Product successfully updated.";
       } else {
         req = new API().post('/products', preparedData);
