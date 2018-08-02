@@ -40,7 +40,7 @@ export default {
     watch: {
         selected(val) {
             let id = val ? val.id : null;
-            this.$emit("selected", {[this.optionType]: id});
+            this.value = val;
         }
     },
     mounted() {
