@@ -193,7 +193,7 @@ public class ProductLogic {
             Category category = pda.getCategory(request.getCategoryId());
 
             // Validate fields.
-            ApiException ex = validateSaveProduct(request, brand, category);
+            ApiException ex = validateUpdateProduct(request, brand, category);
 
             if (!ex.isOk())
                 throw(ex);
@@ -237,7 +237,28 @@ public class ProductLogic {
     private ApiException validateSaveProduct(SaveProductRequest product, Brand brand, Category category) throws SQLException {
         ApiException ex = new ApiException();
 
-        if (pda.validateGtin(product.getGtin()))
+        if (pda.validateGtin(product.getGtin(), null))
+            ex.addError("A product with this gtin has already been created.");
+
+        if (product.getName() == null || product.getName().isEmpty())
+            ex.addError("Product name cannot be empty.");
+
+        if (product.getGtin() == null || product.getGtin().isEmpty())
+            ex.addError("Gtin code cannot be empty.");
+
+        if (brand == null)
+            ex.addError("Brand could not be found.");
+
+        if (category == null)
+            ex.addError("Category could not be found.");
+
+        return ex;
+    }
+
+    private ApiException validateUpdateProduct(SaveProductRequest product, Brand brand, Category category) throws SQLException {
+        ApiException ex = new ApiException();
+
+        if (pda.validateGtin(product.getGtin(), product.getId()))
             ex.addError("A product with this gtin has already been created.");
 
         if (product.getName() == null || product.getName().isEmpty())

@@ -181,14 +181,15 @@ public class ProductDataAccess extends BaseDataAccess {
         );
     }
 
-    public boolean validateGtin(String gtin) throws SQLException {
+    public boolean validateGtin(String gtin, Integer id) throws SQLException {
         PreparedStatement statement;
         ResultSet resultSet;
-        String query = "SELECT * FROM product WHERE gtin = ?";
+        String query = "SELECT * FROM product WHERE gtin = ? and id != ?";
 
         try {
             statement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, gtin);
+            statement.setInt(2, id);
 
             resultSet = statement.executeQuery();
 

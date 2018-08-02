@@ -58,6 +58,7 @@ public class Brands {
             return Response.ok(bl.getBrands(request)).build();
         }
         catch(ApiException e) {
+            System.out.print("Llegué al catch");
             return Response.status(e.getStatus()).entity(e.getErrors()).build();
         }
     }

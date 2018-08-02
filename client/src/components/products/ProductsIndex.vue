@@ -8,18 +8,17 @@
                     </div>
                     <div class="column">
                         <ws-option-filter
-                        option-type="brandId"
                         placeholder="Select a brand"
                         :getOptions="getBrands"
                         :format="formatBrands"
-                        @selected="buildSearchCriteria($event)" />
+                        v-model="brand"
+                         />
                     </div>
                     <div class="column">
                         <ws-option-filter
-                        option-type="categoryId"
                         :getOptions="getCategories"
                         placeholder="Select a category"
-                        @selected="buildSearchCriteria($event)" />
+                        v-model="category" />
                     </div>
                 </div>
                 <ws-table
@@ -56,6 +55,8 @@ export default {
   name: 'products-index',
   data: () => {
     return {
+      brand: null,
+      category: null,
       searchCriteria: {},
       columns: [{
         field: 'id',
@@ -74,6 +75,14 @@ export default {
     WsKeywordSearch,
     WsTable,
     WsHero
+  },
+  watch: {
+    brand(val){
+      this.buildSearchCriteria({brandId: val.id})
+    },
+    category(val){
+      this.buildSearchCriteria({categoryId: val.id})
+    }
   },
   methods: {
     format(product) {
