@@ -19,6 +19,17 @@ export const info = (message) => {
 };
 
 export const error = (errors) => {
+  if (Array.isArray(errors)) {
+    errors.forEach(error => {
+      $toast.open({
+          message: error,
+          duration: 1500,
+          queue: false,
+          type: "is-danger",
+          position: "is-bottom"
+      });
+    })
+  } else
     $toast.open({
         message: errors,
         duration: 1500,

@@ -18,7 +18,7 @@
         <div class="columns">
           <div class="column ">
             <b-field label="Brand">
-                <ws-option-filter placeholder="Select a brand" option-type="brandId" @selected="brandSelected" :getOptions="getBrands" :format="formatBrands"></ws-option-filter>
+                <ws-option-filter placeholder="Select a brand" option-type="brandId" v-model="productData.brand" :getOptions="getBrands" :format="formatBrands"></ws-option-filter>
             </b-field>
           </div>
           <div class="column ">
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import WsOptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
+import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import API from "@/helpers/api.js";
 import * as Notifier from "@/helpers/notifier.js";
 
@@ -106,8 +106,7 @@ export default {
       console.log(event);
     },
     submitForm() {
-      debugger
-      let req;
+      let req, message;
       let preparedData = {
         name: this.productData.name,
         gtin: this.productData.gtin,
@@ -117,10 +116,10 @@ export default {
       };
       if (this.edit) {
         req = new API().put('/products/' + this.productId, preparedData );
-        let message = "Product successfully updated.";
+        message = "Product successfully updated.";
       } else {
         req = new API().post('/products', preparedData);
-        let message = "Product created successfully.";
+        message = "Product created successfully.";
       }
       req.then((response) => {
          Notifier.success(message);
@@ -128,6 +127,7 @@ export default {
          this.loading = false;
          this.$router.push("/products/");
        }).catch((error) => {
+         Notifier.error(error.response.data[0])
          this.errors = error.response.data;
          this.loading = false;
        });
