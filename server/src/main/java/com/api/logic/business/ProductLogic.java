@@ -40,6 +40,15 @@ public class ProductLogic {
 
     // #region ProductSetup
 
+    public int countProducts() throws ApiException {
+      try {
+        return pda.countProducts();
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
+    }
+
     public GetProductResponse getProduct(GetProductRequest request) throws ApiException {
         try {
             // Fetch product.

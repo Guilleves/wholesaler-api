@@ -52,6 +52,12 @@ public class ProposalDataAccess extends BaseDataAccess {
         return getOneWithoutStatement(rs -> deserializeProposal(rs), query, proposalId);
     }
 
+    public int countProposals() throws SQLException {
+      String query = "SELECT COUNT(*) FROM Proposal WHERE deletedAt IS NULL";
+
+      return getInt(query);
+    }
+
     public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {
         ArrayList<Object> parameters = new ArrayList<Object>();
 
@@ -102,17 +108,18 @@ public class ProposalDataAccess extends BaseDataAccess {
         ArrayList<Integer> parameters = new ArrayList<Integer>();
 
         String query = "SELECT " +
-        "P.*, " +
+        "Pr.*, " +
         "O.id as organizationId, " +
         "O.name as organizationName, "+
         "O.cuit, " +
         "O.legalName, " +
         "O.role, " +
-        "SUM(*) as `sum` " +
+        "SUM(PL.price * OL.quantity) as `sum` " +
         "FROM " +
-        "Proposal Pr" +
+        "Proposal Pr " +
         "INNER JOIN Organization O ON O.id = Pr.supplierId " +
         "INNER JOIN ProposalLine PL ON Pr.id = PL.proposalId " +
+        "INNER JOIN OrderLine OL ON PL.id = OL.proposalLineId " +
         "INNER JOIN Product P ON P.id = PL.productId " +
         "INNER JOIN Brand B ON P.brandId = B.id " +
         "INNER JOIN Category C ON P.categoryId = C.id " +
@@ -122,8 +129,8 @@ public class ProposalDataAccess extends BaseDataAccess {
             query += "AND Pr.supplierId = ? ";
             parameters.add(supplierId);
         }
-        query += "GROUP BY PL.id " +
-        "ORDER BY SUM(*) DESC ";
+        query += "GROUP BY PR.id " +
+        "ORDER BY SUM(PL.price * OL.quantity) DESC ";
 
         if (amount != 0) {
             query += "LIMIT ?";

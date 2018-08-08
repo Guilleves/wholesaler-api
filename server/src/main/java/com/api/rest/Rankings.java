@@ -4,24 +4,14 @@ package com.api.rest;
 
 import javax.ws.rs.core.Response.Status;
 import com.api.logic.business.ProductLogic;
-import com.api.entities.models.proposal.GetProposalsRequest;
+import com.api.logic.business.ProposalLogic;
 import javax.ws.rs.QueryParam;
-import com.api.entities.business.User;
-import com.api.rest.security.UserPrincipal;
-import com.api.entities.models.proposal.SaveProposalRequest;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.api.logic.business.ProposalLogic;
 
 import com.api.logic.validations.ApiException;
 
@@ -38,6 +28,7 @@ public class Rankings {
 
     public Rankings() {
         pl = new ProductLogic();
+        prl = new ProposalLogic();
     }
 
     // #endregion

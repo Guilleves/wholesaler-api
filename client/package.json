@@ -16,7 +16,8 @@
     "@vue/cli-service": "^3.0.0-beta.10",
     "axios": "^0.18.0",
     "buefy": "^0.6.5",
-    "vue-google-charts": "^0.1.0",
+    "echarts": "^4.1.0",
+    "vue-echarts-v3": "^1.0.19",
     "vue-multiselect": "^2.1.0",
     "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.5.13"

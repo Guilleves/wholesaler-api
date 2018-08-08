@@ -17,6 +17,13 @@ import com.api.data.db.Connection;
 import com.api.entities.business.Order;
 
 public class OrderDataAccess extends BaseDataAccess {
+
+    public int countOrders() throws SQLException {
+      String query = "SELECT COUNT(*) FROM `Order` WHERE deletedAt IS NULL";
+
+      return getInt(query);
+    }
+
     public Order getOrder(int orderId) throws SQLException {
         // Eeeeeeeeeeeeeeeeeek...
         String query = "SELECT " +

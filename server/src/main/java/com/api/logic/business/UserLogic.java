@@ -34,6 +34,15 @@ public class UserLogic {
 
     // #region UserSetup
 
+    public int countUsers() throws ApiException {
+      try {
+        return uda.countUsers();
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
+    }
+
     public GetUserResponse getUser(GetUserRequest request) throws ApiException {
         try {
             ApiException ex = validateGetUser(request.getUserId());

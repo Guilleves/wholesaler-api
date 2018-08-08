@@ -33,6 +33,15 @@ public class ProposalLogic {
         productDa = new ProductDataAccess();
     }
 
+    public int countProposals() throws ApiException {
+      try {
+        return pda.countProposals();
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
+    }
+
     public BaseSearchResponse getProposals(GetProposalsRequest request) throws ApiException {
         try {
             ArrayList<Proposal> proposals = pda.getProposals(request.getStatus(), request.getSupplierId(), request.getOrderBy(), request.getPageSize(), request.getPageIndex());
@@ -134,6 +143,7 @@ public class ProposalLogic {
             return response;
         }
         catch(SQLException e) {
+          e.printStackTrace();
             throw new ApiException(e);
         }
     }

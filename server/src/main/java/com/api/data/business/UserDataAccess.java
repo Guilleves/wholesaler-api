@@ -11,6 +11,12 @@ import com.api.entities.business.User;
 public class UserDataAccess extends BaseDataAccess {
     // #region UserSetup
 
+    public int countUsers() throws SQLException {
+      String query = "SELECT COUNT(*) FROM User WHERE deletedAt IS NULL";
+
+      return getInt(query);
+    }
+
     public ArrayList<User> getUsers() throws SQLException {
         String query = "SELECT " +
             "U.*, " +

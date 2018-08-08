@@ -85,7 +85,7 @@ export default {
                 Session.set(response.data);
                 this.notifications = [];
                 Notifier.info("Logged in");
-                this.$router.push("/home/");
+                this.$router.push("/");
             })
             .catch((error) => {
                 console.log(error);

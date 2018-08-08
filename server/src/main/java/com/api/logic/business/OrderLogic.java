@@ -31,6 +31,15 @@ public class OrderLogic {
         oda = new OrderDataAccess();
     }
 
+    public int countOrders() throws ApiException {
+      try {
+        return oda.countOrders();
+      }
+      catch(SQLException ex) {
+          throw new ApiException(ex);
+      }
+    }
+
     public BaseSearchResponse getOrders(GetOrdersRequest request) throws ApiException {
         try {
             ArrayList<Order> orders = null;

@@ -15,6 +15,7 @@ import BrandsDetail from '@/components/brands/BrandsDetail.vue';
 import Login from '@/components/users/Login.vue';
 import Signup from '@/components/users/Signup.vue';
 import Dashboard from '@/components/dashboard/Dashboard.vue';
+import NotFound from '@/components/notfound/NotFound.vue';
 
 Vue.use(Router);
 
@@ -22,7 +23,7 @@ export default new Router({
     mode: 'history',
     routes: [
         { path: '/', component: Main, children: [
-            {path: "home", component: Dashboard },
+            {path: "", component: Dashboard },
             { path: 'products', component: ProductsIndex },
             { path: 'products/ranking', component: ProductsRanking },
             { path: 'proposals', component: ProposalsLayout, children: [
@@ -41,6 +42,7 @@ export default new Router({
             ]}
         ]},
         { path: "/login", component: Login },
-        { path: "/signup", component: Signup }
+        { path: "/signup", component: Signup },
+        { path: "*", component: NotFound }
     ]
 });

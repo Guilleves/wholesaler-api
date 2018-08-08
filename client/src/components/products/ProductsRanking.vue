@@ -47,7 +47,7 @@ export default {
             }
         },
         getProducts() {
-            return new API().get("/products/ranking", { supplierId: 1, amount: 10 });
+            return new API().get("/rankings/products", { orderBy: "proposal" });
         }
     }
 }

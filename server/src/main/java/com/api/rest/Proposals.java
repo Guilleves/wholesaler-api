@@ -77,6 +77,20 @@ public class Proposals {
         }
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/count")
+    public Response countProposals() {
+        try {
+            return Response.ok(pl.countProposals()).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

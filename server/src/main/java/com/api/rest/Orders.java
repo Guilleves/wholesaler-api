@@ -45,6 +45,20 @@ public class Orders {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Secured()
+    @Path("/count")
+    public Response count() {
+        try {
+            return Response.ok(ol.countOrders()).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
     @Path("/")
     public Response getOrders(@QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
         GetOrdersRequest request = new GetOrdersRequest(

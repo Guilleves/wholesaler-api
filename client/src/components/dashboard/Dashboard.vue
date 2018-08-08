@@ -1,143 +1,208 @@
 <template>
-    <section class="section" style="padding-top:75px">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-one-fifth">
-                    <aside class="menu">
-                        <p class="menu-label">
-                            General
-                        </p>
-                        <ul class="menu-list">
-                            <li><router-link to="/home">Dashboard</router-link></li>
-                        </ul>
-                        <p class="menu-label">
-                            Administration
-                        </p>
-                        <ul class="menu-list">
-                            <li><router-link to="/proposals">Proposals</router-link></li>
-                            <li><router-link to="/orders">Orders</router-link></li>
-                            <li><router-link to="/products">Products</router-link></li>
-                            <li><router-link to="/users">Users</router-link></li>
-                        </ul>
-                        <p class="menu-label">
-                            Transactions
-                        </p>
-                        <ul class="menu-list">
-                            <li><router-link to="/proposals/new">New proposal</router-link></li>
-                            <li><router-link to="/products/new">New product</router-link></li>
-                        </ul>
-                    </aside>
-                </div>
-                <div class="column">
-                    <div class="tile is-ancestor is-vertical">
-                        <div class="tile is-parent">
-                            <div class="tile is-child box">
-                                <div class="columns">
-                                    <div class="column is-three-fifths">
-                                        <p class="title">1254</p>
-                                    </div>
-                                    <div class="column">
-                                        <b-icon type="is-light" icon="fa fa-receipt fa-3x" />
-                                    </div>
-                                </div>
-                                <router-link to="/proposals">Proposals created</router-link>
-                            </div>
-                            <div class="tile is-child box">
-                                <div class="columns">
-                                    <div class="column is-three-fifths">
-                                        <p class="title">3241</p>
-                                    </div>
-                                    <div class="column">
-                                        <b-icon type="is-light" icon="fa fa-shopping-cart fa-3x" />
-                                    </div>
-                                </div>
-                                <p>Orders done</p>
-                            </div>
-                            <div class="tile is-child box">
-                                <div class="columns">
-                                    <div class="column is-three-fifths">
-                                        <p class="title">3142</p>
-                                    </div>
-                                    <div class="column">
-                                        <b-icon type="is-light" icon="fa fa-box fa-3x" />
-                                    </div>
-                                </div>
-                                <router-link to="/products">Products created</router-link>
-                            </div>
-                            <div class="tile is-child box">
-                                <div class="columns">
-                                    <div class="column is-three-fifths">
-                                        <p class="title">324</p>
-                                    </div>
-                                    <div class="column">
-                                        <b-icon type="is-light" icon="fa fa-users fa-3x" />
-                                    </div>
-                                </div>
-                                <router-link to="/users">Users registered</router-link>
-                            </div>
-                        </div>
-                        <div class="tile is-parent">
-                            <div class="tile is-child">
-                                <ws-chart :data="chartData" type="ColumnChart" :options="options" />
-                                <p><router-link to="/products/ranking">More...</router-link></p>
-                            </div>
-                            <div class="tile is-child">
-                                <ws-chart :data="chartData" type="PieChart" :options="options" />
-                                <p><router-link to="/products/ranking">More...</router-link></p>
-                            </div>
-                        </div>
-                        <div class="tile is-parent">
-                            <div class="tile is-child">
-                                <ws-chart :data="chartData" type="BarChart" :options="options" />
-                                <p><router-link to="/products/ranking">More...</router-link></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <section class="section" style="padding-top:75px">
+    <div class="container">
+      <div class="columns">
+        <div class="column is-one-fifth">
+          <aside class="menu">
+            <p class="menu-label">
+              General
+            </p>
+            <ul class="menu-list">
+              <li><router-link to="/">Dashboard</router-link></li>
+            </ul>
+            <p class="menu-label">
+              Administration
+            </p>
+            <ul class="menu-list">
+              <li><router-link to="/proposals">Proposals</router-link></li>
+              <li><router-link to="/orders">Orders</router-link></li>
+              <li><router-link to="/products">Products</router-link></li>
+              <li><router-link to="/users">Users</router-link></li>
+            </ul>
+            <p class="menu-label">
+              Transactions
+            </p>
+            <ul class="menu-list">
+              <li><router-link to="/proposals/new">New proposal</router-link></li>
+              <li><router-link to="/products/new">New product</router-link></li>
+            </ul>
+          </aside>
         </div>
-
-    </section>
+        <div class="column">
+          <div class="tile is-ancestor is-vertical">
+            <div class="tile is-parent">
+              <div class="tile is-child box">
+                <div class="columns">
+                  <div class="column is-three-fifths">
+                    <p class="title" v-if="counts.proposal.loading"><i class="fa fa-spinner fa-spin" /></p>
+                    <p class="title" v-else>{{ counts.proposal.value }}</p>
+                  </div>
+                  <div class="column">
+                    <b-icon type="is-light" icon="fa fa-receipt fa-3x" />
+                  </div>
+                </div>
+                <router-link to="/proposals">Proposals created</router-link>
+              </div>
+              <div class="tile is-child box">
+                <div class="columns">
+                  <div class="column is-three-fifths">
+                    <p class="title" v-if="counts.order.loading"><i class="fa fa-spinner fa-spin" /></p>
+                    <p class="title" v-else>{{ counts.order.value }}</p>
+                  </div>
+                  <div class="column">
+                    <b-icon type="is-light" icon="fa fa-shopping-cart fa-3x" />
+                  </div>
+                </div>
+                <p>Orders done</p>
+              </div>
+              <div class="tile is-child box">
+                <div class="columns">
+                  <div class="column is-three-fifths">
+                    <p class="title" v-if="counts.product.loading"><i class="fa fa-spinner fa-spin" /></p>
+                    <p class="title" v-else>{{ counts.product.value }}</p>
+                  </div>
+                  <div class="column">
+                    <b-icon type="is-light" icon="fa fa-box fa-3x" />
+                  </div>
+                </div>
+                <router-link to="/products">Products created</router-link>
+              </div>
+              <div class="tile is-child box">
+                <div class="columns">
+                  <div class="column is-three-fifths">
+                    <p class="title" v-if="counts.user.loading"><i class="fa fa-spinner fa-spin" /></p>
+                    <p class="title" v-else>{{ counts.user.value }}</p>
+                  </div>
+                  <div class="column">
+                    <b-icon type="is-light" icon="fa fa-users fa-3x" />
+                  </div>
+                </div>
+                <router-link to="/users">Users registered</router-link>
+              </div>
+            </div>
+            <div class="tile is-parent">
+              <div class="tile is-child">
+                <ws-bar-chart title="Top sellers" barname="Amount of uses" :names="mostUsedProducts.names" :amount="mostUsedProducts.count" color="#c23531" />
+                <p><router-link to="/products/ranking">More...</router-link></p>
+              </div>
+              <div class="tile is-child">
+                <ws-bar-chart title="Profits by proposal" barname="Profit" :names="profitByProposal.names" :amount="profitByProposal.sum" color="#2f4554"/>
+                <p>More...</p>
+              </div>
+            </div>
+            <div class="tile is-parent">
+              <div class="tile is-child">
+                <ws-bar-chart title="Anything else"/>
+                <p>More...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>
 
 <script>
-import WsChart from "@/components/ws-framework/WsChart.vue";
+import WsBarChart from "@/components/ws-framework/WsBarChart.vue";
 import API from './../../helpers/api.js';
 
 export default {
-    name: 'HelloWorld',
-    data: () => {
-        return {
-            options: {
-                title: "Amount of products in proposals",
-                pieSliceTextStyle: {
-                    color: 'white',
-                },
-                pieHole: 0.25,
-                legend: {position: 'left', textStyle: {color: 'blue', fontSize: 10}}
-            },
-            chartData: null
-        };
-    },
-    components: {
-        WsChart
-    },
-    methods: {
-        fillChart() {
-            let data = [["Product name", "Amount in proposal"]];
-            let self = this;
-
-            new API().get("/rankings/products", { amount: 10, orderBy: "proposal" }).then(response => {
-                response.data.forEach(product => {
-                    data.push([product.name, product.count]);
-                });
-
-                self.chartData = data;
-            });
+  name: 'HelloWorld',
+  data: () => {
+    return {
+      mostUsedProducts: {
+        names: [],
+        count: []
+      },
+      profitByProposal: {
+        names: [],
+        sum: []
+      },
+      counts: {
+        product: {
+          value: 0,
+          loading: true
+        },
+        proposal: {
+          value: 0,
+          loading: true
+        },
+        order: {
+          value: 0,
+          loading: true
+        },
+        user: {
+          value: 0,
+          loading: true
         }
+      }
+    };
+  },
+  components: {
+    WsBarChart
+  },
+  methods: {
+    fillProductsChart() {
+      let self = this;
+
+      new API().get("/rankings/products", { amount: 10, orderBy: "proposal" }).then(response => {
+        self.mostUsedProducts.names = response.data.map(ranking => ranking.name);
+        self.mostUsedProducts.count = response.data.map(ranking => ranking.count);
+      });
     },
-    mounted() {
-        this.fillChart();
+    fillProfitChart() {
+      let self = this;
+
+      new API().get("/rankings/proposals", { amount: 10, type: "profit" }).then(response => {
+        self.profitByProposal.names = response.data.map(ranking => ranking.proposal.title);
+        self.profitByProposal.sum = response.data.map(ranking => ranking.sum);
+      });
+    },
+    countProducts() {
+      let self = this;
+      self.counts.product.loading = true;
+
+      new API().get("/products/count").then(response => {
+        self.counts.product.value = response.data;
+        self.counts.product.loading = false;
+      });
+    },
+    countUsers() {
+      let self = this;
+      self.counts.user.loading = true;
+
+      new API().get("/users/count").then(response => {
+        self.counts.user.value = response.data;
+        self.counts.user.loading = false;
+      });
+    },
+    countOrders() {
+      let self = this;
+      self.counts.order.loading = true;
+
+      new API().get("/orders/count").then(response => {
+        self.counts.order.value = response.data;
+        self.counts.order.loading = false;
+      });
+    },
+    countProposals() {
+      let self = this;
+      self.counts.proposal.loading = true;
+
+      new API().get("/proposals/count").then(response => {
+        self.counts.proposal.value = response.data;
+        self.counts.proposal.loading = false;
+      });
     }
+  },
+  mounted() {
+    this.fillProductsChart();
+    this.fillProfitChart();
+    this.countProducts();
+    this.countOrders();
+    this.countUsers();
+    this.countProposals();
+  }
 }
 </script>

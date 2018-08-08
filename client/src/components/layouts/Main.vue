@@ -2,7 +2,7 @@
     <div>
         <nav class="navbar is-transparent is-fixed-top is-dark">
             <div class="navbar-brand">
-                <router-link to="/home/" class="navbar-item">
+                <router-link to="/" class="navbar-item">
                     <!--img src="@/assets/brand-logo-2.svg" alt="wholesaler" style="height: 3rem; max-height: 3rem;"-->
                     <span class="logo">Wholesaler</span>
                 </router-link>
@@ -16,7 +16,7 @@
             <div id="navbarExampleTransparentExample" class="navbar-menu">
                 <div class="navbar-start">
                     <div class="navbar-item has-dropdown is-hoverable">
-                        <router-link class="navbar-link" to="/home">
+                        <router-link class="navbar-link" to="/">
                             Admin
                         </router-link>
                         <div class="navbar-dropdown is-boxed">

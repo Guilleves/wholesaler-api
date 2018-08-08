@@ -24,6 +24,12 @@ public class ProductDataAccess extends BaseDataAccess {
 
     // #region ProductSetup
 
+    public int countProducts() throws SQLException {
+      String query = "SELECT COUNT(*) FROM Product WHERE deletedAt IS NULL";
+
+      return getInt(query);
+    }
+
     public Product getProduct(int productId) throws SQLException {
         String query = "SELECT " +
         "P.*, " +
