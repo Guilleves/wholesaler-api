@@ -280,10 +280,10 @@ public class UserLogic {
         ApiException sr = new ApiException();
 
         if (username == null || username.isEmpty())
-        sr.addError("El nombre de usuario no puede estar vacío.");
+        sr.addError("Please provide a username.");
 
         if (password == null || password.isEmpty())
-        sr.addError("La contraseña no puede estar vacía.");
+        sr.addError("Please provide a password.");
 
         // if (passwordRequirements(password))
 
@@ -303,19 +303,19 @@ public class UserLogic {
         ApiException sr = new ApiException();
 
         if (user.getUsername() == null || user.getUsername().isEmpty())
-        sr.addError("El nombre de usuario es un campo obligatorio");
+        sr.addError("Username missing");
 
         if (user.getFirstName() == null || user.getFirstName().isEmpty())
-        sr.addError("El primer nombre es un campo obligatorio");
+        sr.addError("Firstname missing");
 
         if (user.getLastName() == null || user.getLastName().isEmpty())
-        sr.addError("El apellido es un campo obligatorio");
+        sr.addError("Surname missing");
 
         if (user.getPassword() == null || user.getPassword().isEmpty())
-        sr.addError("La contraseña es un campo obligatorio");
+        sr.addError("Password missing");
 
         if (user.getEmail() == null || user.getEmail().isEmpty())
-        sr.addError("El email es un campo obligatorio");
+        sr.addError("eMail missing");
 
         return sr;
     }
