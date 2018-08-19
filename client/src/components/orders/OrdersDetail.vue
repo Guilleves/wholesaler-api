@@ -79,7 +79,6 @@
 
 <script>
 import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
-import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
 import ProductsSelector from "@/components/ws-framework/WsProductsSelector.vue";
 import WsError from "@/components/ws-framework/WsError.vue";
 import API from "@/helpers/api.js";
@@ -103,7 +102,6 @@ export default {
     },
     components: {
         WsKeywordSearch,
-        OptionFilter,
         ProductsSelector,
         WsError
     },

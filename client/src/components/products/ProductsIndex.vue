@@ -35,7 +35,7 @@
 
 <script>
 import API from './../../helpers/api.js';
-import WsOptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
+import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearchByJuan.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 import WsHero from "@/components/ws-framework/WsHero.vue";
