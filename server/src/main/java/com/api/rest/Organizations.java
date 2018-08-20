@@ -2,7 +2,6 @@ package com.api.rest;
 
 // #region Imports
 
-import com.api.entities.models.organization.GetSuppliersResponse;
 import javax.ws.rs.QueryParam;
 import com.api.entities.models.organization.GetOrganizationsRequest;
 import com.api.entities.models.organization.SaveOrganizationRequest;

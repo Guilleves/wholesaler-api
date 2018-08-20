@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class SaveUserRequest implements Serializable {
     static final long serialVersionUID = 0L;
 
-    private int userId;
+    private int id, organizationId;
     private String username, firstName, lastName, email, password, repeatPassword;
 
 	/**
@@ -22,9 +22,10 @@ public class SaveUserRequest implements Serializable {
 	/**
 	* Default SaveUserRequest constructor
 	*/
-	public SaveUserRequest(int userId, String username, String firstName, String lastName, String email, String password, String repeatPassword) {
+	public SaveUserRequest(int id, int organizationId, String username, String firstName, String lastName, String email, String password, String repeatPassword) {
 		super();
-		this.userId = userId;
+		this.id = id;
+    this.organizationId = organizationId;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -34,19 +35,35 @@ public class SaveUserRequest implements Serializable {
 	}
 
 	/**
-	* Returns value of userId
+	* Returns value of id
 	* @return
 	*/
-	public int getUserId() {
-		return userId;
+	public int getId() {
+		return id;
 	}
 
 	/**
-	* Sets new value of userId
+	* Sets new value of id
 	* @param
 	*/
-	public void setUserId(int userId) {
-		this.userId = userId;
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	* Returns value of organizationId
+	* @return
+	*/
+	public int getOrganizationId() {
+		return organizationId;
+	}
+
+	/**
+	* Sets new value of organizationId
+	* @param
+	*/
+	public void setOrganizationId(int organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	/**

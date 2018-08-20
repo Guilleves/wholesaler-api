@@ -50,9 +50,9 @@
 
               <b-field expanded label="Organization">
                 <option-filter
-                option-type="organizationId"
+                v-model="organization"
                 :getOptions="getOrganizations"
-                placeholder="Select a organization" />
+                placeholder="Select an organization" />
               </b-field>
             </b-field>
 
@@ -92,8 +92,8 @@
 
 <script>
 import API from "@/helpers/api.js";
-import * as Session from "@/helpers/session.js";
-import OptionFilter from "@/components/ws-framework/WsOptionFilterByJuan.vue";
+import OptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
+import * as Notifier from "@/helpers/notifier.js";
 
 export default {
   name: 'signup',
@@ -106,7 +106,10 @@ export default {
       lastName: null,
       email: null,
       showNotification: false,
-      notifications: []
+      notifications: [],
+      organization: {
+        id: null
+      }
     }
   },
   components: {
@@ -119,23 +122,22 @@ export default {
   },
   methods: {
     signup: function() {
-      new API().post("/users/signup", { firstName: this.firstName, lastName: this.lastName, email: this.email, username: this.username, password: this.password, repeatPassword: this.repeatPassword })
-      .then((response) => {
-        Session.set(response.data);
+      new API().post("/users/signup", { firstName: this.firstName, lastName: this.lastName, email: this.email, username: this.username, password: this.password, repeatPassword: this.repeatPassword, organizationId: this.organization.id })
+      .then(() => {
         this.notifications = [];
-        this.$router.push("/");
+        this.$router.push("/login");
+        Notifier.success("User created! Please login");
       })
       .catch((error) => {
-        if (error.response)
+        if (error.response && error.response.data)
         this.notifications = error.response.data;
-        console.log(error);
       });
     },
     getOrganizations() {
       return new API().get("/organizations");
     },
     redirectLogin: function() {
-      this.$router.push("/login/");
+      this.$router.push("/login");
     }
   }
 }

@@ -17,6 +17,7 @@
     "axios": "^0.18.0",
     "buefy": "^0.6.5",
     "echarts": "^4.1.0",
+    "element-resize-detector": "^1.1.14",
     "vue-echarts-v3": "^1.0.19",
     "vue-multiselect": "^2.1.0",
     "vue-router": "^3.0.1",
