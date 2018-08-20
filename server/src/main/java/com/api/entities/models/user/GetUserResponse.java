@@ -1,8 +1,12 @@
 package com.api.entities.models.user;
 
-public class GetUserResponse {
+import com.api.entities.models.organization.GetOrganizationResponse;
+import com.api.entities.models.BaseSearchResponse;
+
+public class GetUserResponse implements BaseSearchResponse.SearchItem {
     private int id;
     private String firstName, lastName, username, email;
+    private GetOrganizationResponse organization;
 
 	/**
 	* Default empty GetUserResponse constructor
@@ -14,13 +18,14 @@ public class GetUserResponse {
 	/**
 	* Default GetUserResponse constructor
 	*/
-	public GetUserResponse(int id, String firstName, String lastName, String username, String email) {
+	public GetUserResponse(int id, String firstName, String lastName, String username, String email, GetOrganizationResponse organization) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
 		this.email = email;
+		this.organization = organization;
 	}
 
 	/**
@@ -101,5 +106,21 @@ public class GetUserResponse {
 	*/
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	/**
+	* Returns value of organization
+	* @return
+	*/
+	public GetOrganizationResponse getOrganization() {
+		return organization;
+	}
+
+	/**
+	* Sets new value of organization
+	* @param
+	*/
+	public void setOrganization(GetOrganizationResponse organization) {
+		this.organization = organization;
 	}
 }

@@ -2,7 +2,6 @@ package com.api.rest;
 
 // #region Imports
 
-import com.api.entities.models.organization.GetSuppliersResponse;
 import javax.ws.rs.QueryParam;
 import com.api.entities.models.organization.GetOrganizationsRequest;
 import com.api.entities.models.organization.SaveOrganizationRequest;
@@ -41,7 +40,6 @@ public class Organizations {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
     @Path("/")
     public Response getOrganizations(@QueryParam("role") String role) {
         GetOrganizationsRequest request = new GetOrganizationsRequest();

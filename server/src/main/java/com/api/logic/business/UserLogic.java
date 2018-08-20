@@ -1,7 +1,9 @@
 package com.api.logic.business;
 
 // #region Imports
-
+import com.api.entities.models.BaseSearchResponse;
+import com.api.entities.models.user.GetUsersRequest;
+import com.api.entities.business.Organization;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -20,305 +22,367 @@ import com.api.logic.validations.ApiException;
 // #endregion
 
 public class UserLogic {
-    private UserDataAccess uda;
-    private SecurityLogic sl;
+  private UserDataAccess uda;
+  private SecurityLogic sl;
 
-    // #region Constructors
+  // #region Constructors
 
-    public UserLogic() {
-        uda = new UserDataAccess();
-        sl = new SecurityLogic();
+  public UserLogic() {
+    uda = new UserDataAccess();
+    sl = new SecurityLogic();
+  }
+
+  // #endregion
+
+  // #region UserSetup
+
+  public int countUsers() throws ApiException {
+    try {
+      return uda.countUsers();
     }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
+    }
+  }
 
-    // #endregion
+  public boolean deleteUser(int userId) throws ApiException {
+    try {
+      return uda.deleteUser(userId);
+    }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
+    }
+  }
 
-    // #region UserSetup
+  public GetUserResponse getUser(GetUserRequest request) throws ApiException {
+    try {
+      ApiException ex = validateGetUser(request.getUserId());
 
-    public int countUsers() throws ApiException {
+      if (!ex.isOk())
+      throw ex;
+
+      // Fetch the user.
+      User user = uda.getUser(request.getUserId());
+
+      if (user == null)
+      throw ex.addError("User not found.");
+
+      // Generate de response object (future JSON).
+      GetUserResponse response = new GetUserResponse(
+      user.getId(),
+      user.getFirstName(),
+      user.getLastName(),
+      user.getUsername(),
+      user.getEmail(),
+      new GetOrganizationResponse(
+      user.getOrganization().getId(),
+      user.getOrganization().getName(),
+      user.getOrganization().getLegalName(),
+      user.getOrganization().getCuit(),
+      user.getOrganization().getRole()
+      )
+      );
+
+      return response;
+    }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
+    }
+  }
+
+  public BaseSearchResponse getUsers(GetUsersRequest request) throws ApiException {
+    try {
+      ArrayList<GetUserResponse> response = new ArrayList<GetUserResponse>();
+
+      // Fetch the user list.
+      ArrayList<User> users = uda.getUsers(
+      request.getKeyword(),
+      request.getOrderBy(),
+      request.getPageIndex(),
+      request.getPageSize()
+      );
+
+      if (users == null || users.isEmpty()) {
+        throw new ApiException("No users found.");
+      }
+
+      // Generate the response (future JSON).
+      for (User user : users) {
+        response.add(new GetUserResponse(
+        user.getId(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getUsername(),
+        user.getEmail(),
+        new GetOrganizationResponse(
+        user.getOrganization().getId(),
+        user.getOrganization().getName(),
+        user.getOrganization().getLegalName(),
+        user.getOrganization().getCuit(),
+        user.getOrganization().getRole()
+        )
+        ));
+      }
+
+      return new BaseSearchResponse(uda.countSearch(request.getKeyword()), response);
+    }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
+    }
+  }
+
+  // Is this void? If something goes wrong, it would let me know throw the ApiException error
+  public void saveUser(SaveUserRequest request) throws ApiException {
+    try {
+      User user = new User(
+      request.getId(),
+      request.getFirstName(),
+      request.getLastName(),
+      request.getUsername(),
+      request.getPassword(),
+      request.getEmail()
+      );
+
+      ApiException ex = validateSaveUser(user, request.getRepeatPassword());
+
+      if (!ex.isOk())
+      throw ex;
+
+      // If password is being created/updated, ecrypt it
+      if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
+        try {
+          user.setPassword(sl.encryptPassword(user.getPassword()));
+        } // Dunno if should specify the exception, since I'll handle all of them equally
+        catch(Exception e) {
+          throw ex.addError(e);
+        }
+      }
+
+      uda.updateUser(user);
+    }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
+    }
+  }
+
+  // #endregion
+
+  // #region Security
+
+  public LoginResponse signup(SaveUserRequest request) throws ApiException {
+    try {
+      User user = new User(
+      0,
+      request.getFirstName(),
+      request.getLastName(),
+      request.getUsername(),
+      request.getPassword(),
+      request.getEmail()
+      );
+
+      Organization org = new Organization();
+      org.setId(request.getOrganizationId());
+      user.setOrganization(org);
+
+      // Fetch user.
+      User dbUser = uda.getUser(request.getUsername());
+
+      if (dbUser != null)
+      throw new ApiException("This username is taken");
+
+      // Validate.
+      ApiException ex = validateSignup(user, request.getRepeatPassword());
+
+      if (!ex.isOk())
+      throw ex;
+
       try {
-        return uda.countUsers();
+        user.setPassword(sl.encryptPassword(user.getPassword()));
+      } // Dunno if should specify the exception, since I'll handle all of them equally
+      catch(Exception e) {
+        throw new ApiException(e);
       }
-      catch(SQLException ex) {
-          throw new ApiException(ex);
+
+      User createdUser = uda.createUser(user);
+
+      String token = "";
+
+      try {
+        token = sl.issueAuthToken(createdUser.getId());
       }
-    }
+      catch(Exception e) {
+        throw new ApiException(e);
+      }
 
-    public GetUserResponse getUser(GetUserRequest request) throws ApiException {
+      return new LoginResponse(
+      token,
+      new GetUserResponse(
+      createdUser.getId(),
+      createdUser.getFirstName(),
+      createdUser.getLastName(),
+      createdUser.getUsername(),
+      createdUser.getEmail(), new GetOrganizationResponse(
+      user.getOrganization().getId(),
+      user.getOrganization().getName(),
+      user.getOrganization().getLegalName(),
+      user.getOrganization().getCuit(),
+      user.getOrganization().getRole()
+      )),
+      new GetOrganizationResponse(
+      createdUser.getOrganization().getId(),
+      createdUser.getOrganization().getName(),
+      createdUser.getOrganization().getLegalName(),
+      createdUser.getOrganization().getCuit(),
+      createdUser.getOrganization().getRole())
+      );
+    }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
+    }
+  }
+
+  public LoginResponse login(LoginRequest request) throws ApiException {
+    try {
+      LoginResponse response = new LoginResponse();
+
+      boolean couldAuthenticate = false;
+      String username = request.getUsername();
+      String password = request.getPassword();
+
+      // Validate input fields, and throw exception if invalid.
+      ApiException ex = validateAuthentication(username, password);
+
+      if (!ex.isOk())
+      throw ex;
+
+      // Fetch user.
+      User dbUser = uda.getUser(username);
+
+      if (dbUser == null)
+      throw ex.addError("Invalid username or password.");
+
+      // First, try to authenticate against the db.
+      try {
+        couldAuthenticate = sl.validatePassword(password, dbUser.getPassword());
+      }
+      catch(Exception e) {
+        throw new ApiException("Invalid username or password.");
+      }
+
+      // If the password comparison succeed.
+      if (couldAuthenticate) {
         try {
-            ApiException ex = validateGetUser(request.getUserId());
-
-            if (!ex.isOk())
-            throw ex;
-
-            // Fetch the user.
-            User user = uda.getUser(request.getUserId());
-
-            if (user == null)
-            throw ex.addError("User not found.");
-
-            // Generate de response object (future JSON).
-            GetUserResponse response = new GetUserResponse(
-            user.getId(),
-            user.getFirstName(),
-            user.getLastName(),
-            user.getUsername(),
-            user.getEmail()
-            );
-
-            return response;
+          // Set the token in the response body.
+          response.setToken(sl.issueAuthToken(dbUser.getId()));
         }
-        catch(SQLException ex) {
-            throw new ApiException(ex);
+        catch(Exception e) {
+          throw ex.addError(e);
         }
+      }
+      else
+      throw new ApiException("Invalid username or password.");
+
+      response.setUser(new GetUserResponse(
+      dbUser.getId(),
+      dbUser.getFirstName(),
+      dbUser.getLastName(),
+      dbUser.getUsername(),
+      dbUser.getEmail(),
+      new GetOrganizationResponse(
+      dbUser.getOrganization().getId(),
+      dbUser.getOrganization().getName(),
+      dbUser.getOrganization().getLegalName(),
+      dbUser.getOrganization().getCuit(),
+      dbUser.getOrganization().getRole()
+      ))
+      );
+
+      response.setOrganization(new GetOrganizationResponse(
+      dbUser.getOrganization().getId(),
+      dbUser.getOrganization().getName(),
+      dbUser.getOrganization().getLegalName(),
+      dbUser.getOrganization().getCuit(),
+      dbUser.getOrganization().getRole())
+      );
+
+      return response;
     }
-
-    // In case we actually use this method, it would probably need some filters.
-    public ArrayList<GetUserResponse> getUsers() throws ApiException {
-        try {
-            ArrayList<GetUserResponse> response = new ArrayList<GetUserResponse>();
-
-            // Fetch the user list.
-            ArrayList<User> users = uda.getUsers();
-
-            if (users == null || users.isEmpty()) {
-                throw new ApiException("No users found.");
-            }
-
-            // Generate the response (future JSON).
-            for (User user : users) {
-                response.add(new GetUserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getUsername(),
-                user.getEmail()
-                ));
-            }
-
-            return response;
-        }
-        catch(SQLException ex) {
-            throw new ApiException(ex);
-        }
+    catch(SQLException ex) {
+      throw new ApiException(ex);
     }
+  }
 
-    // Is this void? If something goes wrong, it would let me know throw the ApiException error
-    public void saveUser(SaveUserRequest request) throws ApiException {
-        try {
-            User user = new User(
-            request.getUserId(),
-            request.getFirstName(),
-            request.getLastName(),
-            request.getUsername(),
-            request.getPassword(),
-            request.getEmail()
-            );
+  // #endregion
 
-            ApiException ex = validateSaveUser(user);
+  // #region Validations
 
-            if (!ex.isOk())
-            throw ex;
+  private ApiException validateAuthentication(String username, String password) {
+    ApiException sr = new ApiException();
 
-            // If password is being created/updated, ecrypt it
-            if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
-                try {
-                    user.setPassword(sl.encryptPassword(user.getPassword()));
-                } // Dunno if should specify the exception, since I'll handle all of them equally
-                catch(Exception e) {
-                    throw ex.addError(e);
-                }
-            }
+    if (username == null || username.isEmpty())
+    sr.addError("Please provide a username.");
 
-            if (user.getId() == 0)
-            uda.createUser(user);
-            else
-            uda.updateUser(user);
-        }
-        catch(SQLException ex) {
-            throw new ApiException(ex);
-        }
-    }
+    if (password == null || password.isEmpty())
+    sr.addError("Please provide a password.");
 
-    // #endregion
+    // if (passwordRequirements(password))
 
-    // #region Security
+    return sr;
+  }
 
-    public LoginResponse signup(SaveUserRequest request) throws ApiException {
-        try {
-            if (!request.getPassword().equals(request.getRepeatPassword()))
-            throw new ApiException("Passwords don't match.");
+  private ApiException validateGetUser(int userId) {
+    ApiException sr = new ApiException();
 
-            User user = new User(
-            0,
-            request.getFirstName(),
-            request.getLastName(),
-            request.getUsername(),
-            request.getPassword(),
-            request.getEmail()
-            );
+    if (userId <= 0)
+    sr.addError("Please provide a valid user id");
 
-            // Fetch user.
-            User dbUser = uda.getUser(request.getUsername());
+    return sr;
+  }
 
-            if (dbUser != null)
-            throw new ApiException("This username is taken");
+  private ApiException validateSaveUser(User user, String repeatPassword) {
+    ApiException sr = new ApiException();
 
-            // Validate.
-            ApiException ex = validateSaveUser(user);
+    if (user.getUsername() == null || user.getUsername().isEmpty())
+    sr.addError("Username missing");
 
-            if (!ex.isOk())
-            throw ex;
+    if (user.getFirstName() == null || user.getFirstName().isEmpty())
+    sr.addError("Firstname missing");
 
-            try {
-                user.setPassword(sl.encryptPassword(user.getPassword()));
-            } // Dunno if should specify the exception, since I'll handle all of them equally
-            catch(Exception e) {
-                throw new ApiException(e);
-            }
+    if (user.getLastName() == null || user.getLastName().isEmpty())
+    sr.addError("Surname missing");
 
-            User createdUser = uda.createUser(user);
+    if (user.getEmail() == null || user.getEmail().isEmpty())
+    sr.addError("eMail missing");
 
-            String token = "";
+    return sr;
+  }
 
-            try {
-                token = sl.issueAuthToken(createdUser.getId());
-            }
-            catch(Exception e) {
-                throw new ApiException(e);
-            }
+  private ApiException validateSignup(User user, String repeatPassword) {
+    ApiException sr = new ApiException();
 
-            return new LoginResponse(
-            token,
-            new GetUserResponse(
-            createdUser.getId(),
-            createdUser.getFirstName(),
-            createdUser.getLastName(),
-            createdUser.getUsername(),
-            createdUser.getEmail()),
-            new GetOrganizationResponse(
-            createdUser.getOrganization().getId(),
-            createdUser.getOrganization().getName(),
-            createdUser.getOrganization().getLegalName(),
-            createdUser.getOrganization().getCuit(),
-            createdUser.getOrganization().getRole())
-            );
-        }
-        catch(SQLException ex) {
-            throw new ApiException(ex);
-        }
-    }
+    if (user.getUsername() == null || user.getUsername().isEmpty())
+    sr.addError("Username missing");
 
-    public LoginResponse login(LoginRequest request) throws ApiException {
-        try {
-            LoginResponse response = new LoginResponse();
+    if (user.getFirstName() == null || user.getFirstName().isEmpty())
+    sr.addError("Firstname missing");
 
-            boolean couldAuthenticate = false;
-            String username = request.getUsername();
-            String password = request.getPassword();
+    if (user.getLastName() == null || user.getLastName().isEmpty())
+    sr.addError("Surname missing");
 
-            // Validate input fields, and throw exception if invalid.
-            ApiException ex = validateAuthentication(username, password);
+    if (user.getPassword() == null || user.getPassword().isEmpty())
+    sr.addError("Password missing");
 
-            if (!ex.isOk())
-            throw ex;
+    if (repeatPassword == null || repeatPassword.isEmpty())
+    sr.addError("Repeat password missing");
 
-            // Fetch user.
-            User dbUser = uda.getUser(username);
+    if (user.getEmail() == null || user.getEmail().isEmpty())
+    sr.addError("eMail missing");
 
-            if (dbUser == null)
-            throw ex.addError("Invalid username or password.");
+    if (user.getPassword() != null && repeatPassword != null && !user.getPassword().equals(repeatPassword))
+    sr.addError("Passwords don't match.");
 
-            // First, try to authenticate against the db.
-            try {
-                couldAuthenticate = sl.validatePassword(password, dbUser.getPassword());
-            }
-            catch(Exception e) {
-                throw new ApiException("Invalid username or password.");
-            }
+    return sr;
+  }
 
-            // If the password comparison succeed.
-            if (couldAuthenticate) {
-                try {
-                    // Set the token in the response body.
-                    response.setToken(sl.issueAuthToken(dbUser.getId()));
-                }
-                catch(Exception e) {
-                    throw ex.addError(e);
-                }
-            }
-            else
-            throw new ApiException("Invalid username or password.");
-
-            response.setUser(new GetUserResponse(
-            dbUser.getId(),
-            dbUser.getFirstName(),
-            dbUser.getLastName(),
-            dbUser.getUsername(),
-            dbUser.getEmail())
-            );
-
-            response.setOrganization(new GetOrganizationResponse(
-            dbUser.getOrganization().getId(),
-            dbUser.getOrganization().getName(),
-            dbUser.getOrganization().getLegalName(),
-            dbUser.getOrganization().getCuit(),
-            dbUser.getOrganization().getRole())
-            );
-
-            return response;
-        }
-        catch(SQLException ex) {
-            throw new ApiException(ex);
-        }
-    }
-
-    // #endregion
-
-    // #region Validations
-
-    private ApiException validateAuthentication(String username, String password) {
-        ApiException sr = new ApiException();
-
-        if (username == null || username.isEmpty())
-        sr.addError("El nombre de usuario no puede estar vacío.");
-
-        if (password == null || password.isEmpty())
-        sr.addError("La contraseña no puede estar vacía.");
-
-        // if (passwordRequirements(password))
-
-        return sr;
-    }
-
-    private ApiException validateGetUser(int userId) {
-        ApiException sr = new ApiException();
-
-        if (userId <= 0)
-        sr.addError("Please provide a valid user id");
-
-        return sr;
-    }
-
-    private ApiException validateSaveUser(User user) {
-        ApiException sr = new ApiException();
-
-        if (user.getUsername() == null || user.getUsername().isEmpty())
-        sr.addError("El nombre de usuario es un campo obligatorio");
-
-        if (user.getFirstName() == null || user.getFirstName().isEmpty())
-        sr.addError("El primer nombre es un campo obligatorio");
-
-        if (user.getLastName() == null || user.getLastName().isEmpty())
-        sr.addError("El apellido es un campo obligatorio");
-
-        if (user.getPassword() == null || user.getPassword().isEmpty())
-        sr.addError("La contraseña es un campo obligatorio");
-
-        if (user.getEmail() == null || user.getEmail().isEmpty())
-        sr.addError("El email es un campo obligatorio");
-
-        return sr;
-    }
-
-    // #endregion
+  // #endregion
 }

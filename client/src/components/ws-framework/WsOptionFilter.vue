@@ -1,68 +1,72 @@
 <template lang="html">
-    <div class="">
-        <b-field>
-            <multiselect
-            style="z-index: 10;"
-            v-model="selected"
-            label="name"
-            track-by="id"
-            :placeholder="placeholder"
-            open-direction="bottom"
-            :options="options"
-            :searchable="true"
-            :internal-search="true"
-            :clear-on-select="true"
-            :close-on-select="true"
-            :options-limit="300"
-            :limit="3"
-            :max-height="600"
-            :show-no-results="true" />
+  <div class="">
+    <b-field>
+      <multiselect
+      style="z-index: 10;"
+      v-model="selected"
+      label="name"
+      track-by="id"
+      :placeholder="placeholder"
+      open-direction="bottom"
+      :options="options"
+      :searchable="true"
+      :internal-search="true"
+      :clear-on-select="true"
+      :close-on-select="true"
+      :options-limit="300"
+      :limit="3"
+      :max-height="600"
+      :show-no-results="true" />
     </b-field>
-</div>
+  </div>
 </template>
 
 <script>
 export default {
-    name: "ws-option-filter",
-    props: {
-        placeholder: String,
-        staticOptions: Array,
-        format: Function,
-        getOptions: Function
-    },
-    data: function() {
-        return {
-            options: [],
-            selected: null
-        }
-    },
-    watch: {
-        selected(val) {
-            this.$emit("input", val);
-        }
-    },
-    mounted() {
-        if (this.staticOptions) {
-            this.options = this.staticOptions;
-            return;
-        }
-
-        var self = this;
-        this.getOptions().then((response) => {
-            if (self.format)
-                self.options = self.format(response.data);
-            else
-                self.options = response.data;
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+  name: "ws-option-filter",
+  props: {
+    placeholder: String,
+    staticOptions: Array,
+    format: Function,
+    getOptions: Function,
+    value: Object
+  },
+  data: function() {
+    return {
+      options: [],
+      selected: null
     }
+  },
+  watch: {
+    selected(val) {
+      this.$emit("input", val);
+    },
+    value(val) {
+      this.selected = val;
+    }
+  },
+  mounted() {
+    if (this.staticOptions) {
+      this.options = this.staticOptions;
+      return;
+    }
+
+    var self = this;
+    this.getOptions().then((response) => {
+      if (self.format)
+      self.options = self.format(response.data);
+      else
+      self.options = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
 }
 </script>
 
 <style>
-    .multiselect__tags {
-        border-radius: 20px !important;
-    }
+.multiselect__tags {
+  border-radius: 20px !important;
+}
 </style>

@@ -9,9 +9,9 @@ import ProposalsDetail from '@/components/proposals/ProposalsDetail.vue';
 import OrdersLayout from '@/components/orders/OrdersLayout.vue';
 import OrdersIndex from '@/components/orders/OrdersIndex.vue';
 import OrdersDetail from '@/components/orders/OrdersDetail.vue';
-import BrandsLayout from '@/components/brands/BrandsLayout.vue';
-import BrandsIndex from '@/components/brands/BrandsIndex.vue';
-import BrandsDetail from '@/components/brands/BrandsDetail.vue';
+import UsersLayout from '@/components/users/UsersLayout.vue';
+import UsersIndex from '@/components/users/UsersIndex.vue';
+import UsersDetail from '@/components/users/UsersDetail.vue';
 import Login from '@/components/users/Login.vue';
 import Signup from '@/components/users/Signup.vue';
 import Dashboard from '@/components/dashboard/Dashboard.vue';
@@ -36,9 +36,9 @@ export default new Router({
                 { path: "", component: OrdersIndex },
                 { path: ":orderId", component: OrdersDetail }
             ]},
-            { path: 'brands', component: BrandsLayout, children: [
-                { path: "", component: BrandsIndex },
-                { path: ":id", component: BrandsDetail }
+            { path: 'users', component: UsersLayout, children: [
+                { path: "", component: UsersIndex },
+                { path: ":id(\\d+)", component: UsersDetail }
             ]}
         ]},
         { path: "/login", component: Login },
