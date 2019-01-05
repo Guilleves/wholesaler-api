@@ -16,6 +16,8 @@ import Login from '@/components/users/Login.vue';
 import Signup from '@/components/users/Signup.vue';
 import Dashboard from '@/components/dashboard/Dashboard.vue';
 import NotFound from '@/components/notfound/NotFound.vue';
+import MyAccountIndex from '@/components/my-account/MyAccountIndex';
+import MyAccountLayout from '@/components/my-account/MyAccountLayout';
 
 Vue.use(Router);
 
@@ -39,7 +41,10 @@ export default new Router({
             { path: 'users', component: UsersLayout, children: [
                 { path: "", component: UsersIndex },
                 { path: ":id(\\d+)", component: UsersDetail }
-            ]}
+            ]},
+            { path: 'my-account', component: MyAccountLayout, children: [
+              { path: "", component: MyAccountIndex }
+            ]},
         ]},
         { path: "/login", component: Login },
         { path: "/signup", component: Signup },

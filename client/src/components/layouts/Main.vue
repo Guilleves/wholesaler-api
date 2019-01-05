@@ -40,12 +40,12 @@
                     <div class="navbar-item">
                         <div class="field is-grouped">
                             <p class="control">
-                                <a class="button is-primary">
+                                <router-link class="button is-primary" to="/my-account">
                                     <span class="icon">
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <span>My account</span>
-                                </a>
+                                </router-link>
                                 <a class="button is-light" @click="logout()">
                                     <span class="icon">
                                         <i class="fas fa-power-off"></i>

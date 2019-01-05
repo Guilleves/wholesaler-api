@@ -1,6 +1,10 @@
 package com.api.rest;
 
 // #region Imports
+import com.api.entities.business.User;
+import com.api.rest.security.UserPrincipal;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Context;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
@@ -85,6 +89,22 @@ public class Users {
 
     try {
       return Response.ok(ul.getUser(request)).build();
+    }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/logged") // TODO: This is an awuful URL
+  public Response getLoggedUser(@Context SecurityContext context) {
+    User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+
+    try {
+      return Response.ok(ul.getUser(new GetUserRequest(user.getId(), null))).build();
     }
     catch(ApiException e) {
       return Response.status(e.getStatus()).entity(e.getErrors()).build();

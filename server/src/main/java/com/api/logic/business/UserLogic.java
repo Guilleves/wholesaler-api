@@ -131,7 +131,6 @@ public class UserLogic {
     }
   }
 
-  // Is this void? If something goes wrong, it would let me know throw the ApiException error
   public void saveUser(SaveUserRequest request) throws ApiException {
     try {
       User user = new User(
@@ -152,7 +151,7 @@ public class UserLogic {
       if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
         try {
           user.setPassword(sl.encryptPassword(user.getPassword()));
-        } // Dunno if should specify the exception, since I'll handle all of them equally
+        } // TODO: Dunno if should specify the exception, since I'll handle all of them equally
         catch(Exception e) {
           throw ex.addError(e);
         }
