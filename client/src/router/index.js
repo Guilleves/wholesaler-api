@@ -2,6 +2,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Main from '@/components/layouts/Main.vue';
 import ProductsIndex from '@/components/products/ProductsIndex.vue';
+import ProductsLayout from '@/components/products/ProductsLayout.vue';
+import ProductsDetail from '@/components/products/ProductsDetail.vue';
 import ProductsRanking from '@/components/products/ProductsRanking.vue';
 import ProposalsLayout from '@/components/proposals/ProposalsLayout.vue';
 import ProposalsIndex from '@/components/proposals/ProposalsIndex.vue';
@@ -26,7 +28,10 @@ export default new Router({
     routes: [
         { path: '/', component: Main, children: [
             {path: "", component: Dashboard },
-            { path: 'products', component: ProductsIndex },
+            { path: 'products', component: ProductsLayout, children: [
+                { path: "", component: ProductsIndex },
+                { path: ":id", component: ProductsDetail }
+            ]},
             { path: 'products/ranking', component: ProductsRanking },
             { path: 'proposals', component: ProposalsLayout, children: [
                 { path: "", component: ProposalsIndex },

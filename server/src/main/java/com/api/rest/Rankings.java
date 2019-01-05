@@ -2,7 +2,13 @@ package com.api.rest;
 
 // #region Imports
 
+import com.api.entities.business.User;
+import com.api.rest.security.UserPrincipal;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.DELETE;
 import com.api.logic.business.ProductLogic;
 import com.api.logic.business.ProposalLogic;
 import javax.ws.rs.QueryParam;

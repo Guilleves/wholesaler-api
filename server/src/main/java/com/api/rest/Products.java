@@ -2,6 +2,7 @@ package com.api.rest;
 
 // #region Imports
 
+import javax.ws.rs.DELETE;
 import com.api.entities.models.product.GetProductsRequest;
 import javax.ws.rs.PUT;
 import javax.ws.rs.QueryParam;
@@ -130,6 +131,19 @@ public class Products {
         }
     }
 
-
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Secured()
+    @Path("/{productId}")
+    public Response deleteProduct(@PathParam("productId") int productId, @Context SecurityContext context) {
+        try {
+            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+            return Response.ok(pl.deleteProduct(productId, user)).build();
+        }
+        catch(ApiException e) {
+            return Response.status(e.getStatus()).entity(e.getErrors()).build();
+        }
+    }
     // #endregion
 }
