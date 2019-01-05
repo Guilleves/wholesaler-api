@@ -187,14 +187,22 @@ public class ProductDataAccess extends BaseDataAccess {
         );
     }
 
-    public boolean validateGtin(String gtin) throws SQLException {
+    public boolean validateGtin(String gtin, int id) throws SQLException {
         PreparedStatement statement;
         ResultSet resultSet;
-        String query = "SELECT * FROM product WHERE gtin = ?";
+        String query = "SELECT * FROM product WHERE gtin = ? ";
+
+        if (id != 0) {
+          query += "AND id != ?";
+        }
 
         try {
             statement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, gtin);
+
+            if (id != 0) {
+              statement.setInt(2, id);
+            }
 
             resultSet = statement.executeQuery();
 
@@ -212,13 +220,13 @@ public class ProductDataAccess extends BaseDataAccess {
         return false;
     }
 
-    public boolean deleteProduct(Product product) throws SQLException {
+    public boolean deleteProduct(int productId) throws SQLException {
         String query = "UPDATE Product SET deletedAt = ? WHERE id = ?;";
         Date now = new Date();
 
         int rowsEdited = update(query,
         new java.sql.Timestamp(now.getTime()),
-        product.getId()
+        productId
         );
 
         return rowsEdited != 0;

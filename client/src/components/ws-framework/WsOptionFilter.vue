@@ -2,7 +2,6 @@
   <div class="">
     <b-field>
       <multiselect
-      style="z-index: 10;"
       v-model="selected"
       label="name"
       track-by="id"
@@ -29,7 +28,8 @@ export default {
     staticOptions: Array,
     format: Function,
     getOptions: Function,
-    value: Object
+    value: Object,
+    zindex: String
   },
   data: function() {
     return {

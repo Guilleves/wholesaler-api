@@ -1,6 +1,7 @@
 package com.api.logic.business;
 
 // #region Imports
+import com.api.entities.models.product.DeleteProductResponse;
 
 import com.api.entities.business.Ranking;
 import com.api.entities.models.BaseSearchResponse;
@@ -146,6 +147,19 @@ public class ProductLogic {
         }
     }
 
+    public DeleteProductResponse deleteProduct(int productId, User loggedUser) throws ApiException {
+        try {
+            // Only suppliers can delete Proposals
+            if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
+                throw new ApiException("You don't have permissions to access here.", Status.UNAUTHORIZED);
+
+            return new DeleteProductResponse(pda.deleteProduct(productId));
+        }
+        catch (SQLException ex) {
+                throw new ApiException(ex);
+        }
+    }
+
     public GetProductResponse createProduct(SaveProductRequest request, User loggedUser) throws ApiException {
         try {
             if(!(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)))
@@ -246,7 +260,7 @@ public class ProductLogic {
     private ApiException validateSaveProduct(SaveProductRequest product, Brand brand, Category category) throws SQLException {
         ApiException ex = new ApiException();
 
-        if (pda.validateGtin(product.getGtin()))
+        if (pda.validateGtin(product.getGtin(), product.getId()))
             ex.addError("A product with this gtin has already been created.");
 
         if (product.getName() == null || product.getName().isEmpty())

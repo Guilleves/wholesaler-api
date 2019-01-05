@@ -1,6 +1,5 @@
 <template id="">
     <div>
-        <ws-hero title="Products" description="View, create, edit or delete products"/>
         <section class="section">
             <div class="container">
                 <div class="columns">
@@ -22,11 +21,24 @@
                         placeholder="Select a category"
                         @selected="buildSearchCriteria($event)" />
                     </div>
+                    <div class="column">
+                      <b-field grouped position="is-right">
+                        <p class="control">
+                          <router-link class="button is-rounded is-primary" to="/products/new/">
+                            <span class="icon">
+                              <i class="fas fa-plus"></i>
+                            </span>
+                            <span>New product</span>
+                          </router-link>
+                        </p>
+                      </b-field>
+                    </div>
                 </div>
                 <ws-table
                 :columns="columns"
                 :fetch="getProducts"
                 :filters="searchCriteria"
+                @select="onSelect"
                 :format="format" />
             </div>
         </section>
@@ -81,6 +93,9 @@ export default {
         },
         getCategories() {
             return new API().get("/categories");
+        },
+        onSelect(product) {
+          this.$router.push("/products/" + product.id);
         },
         buildSearchCriteria(param) {
             this.searchCriteria = Object.assign({}, this.searchCriteria, param);
