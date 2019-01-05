@@ -187,6 +187,8 @@ export default {
 
             if (proposalId)
             this.$router.push(`/proposals/${proposalId}/orders`);
+            else
+            this.$router.push('/orders');
         },
         remove() {
             this.$dialog.confirm({
