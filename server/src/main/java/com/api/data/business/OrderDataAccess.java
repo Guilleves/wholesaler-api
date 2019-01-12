@@ -65,12 +65,13 @@ public class OrderDataAccess extends BaseDataAccess {
         return this.getOneWithoutStatement(rs -> deserializeOrder(rs), query, orderId);
     }
 
-    public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, Integer proposalId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException{
+    public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, Integer proposalId, String orderBy, Integer pageSize, Integer pageIndex, Integer supplierId) throws SQLException{
         ArrayList<Object> parameters = new ArrayList<Object>();
 
         String orderSubQuery = "(SELECT O.* FROM `order` O " +
         "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
         "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+        "INNER JOIN Proposal P ON P.id = PL.proposalId " +
         "WHERE O.deletedAt IS NULL ";
 
         if (fromDate != null) {
@@ -91,6 +92,11 @@ public class OrderDataAccess extends BaseDataAccess {
         if (proposalId != null) {
             orderSubQuery += " AND PL.proposalId = ?";
             parameters.add(proposalId);
+        }
+
+        if (supplierId != null) {
+            orderSubQuery += " AND P.supplierId = ?";
+            parameters.add(supplierId);
         }
 
         if (pageIndex != null && pageSize != null) {

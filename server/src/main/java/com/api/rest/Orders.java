@@ -29,86 +29,89 @@ import com.api.rest.security.Secured;
 
 @Path("/orders")
 public class Orders {
-    private OrderLogic ol;
+  private OrderLogic ol;
 
-    // #region Constructors
+  // #region Constructors
 
-    public Orders() {
-        ol = new OrderLogic();
+  public Orders() {
+    ol = new OrderLogic();
+  }
+
+  // #endregion
+
+  // #region ProposalSetup
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/count")
+  public Response count() {
+    try {
+      return Response.ok(ol.countOrders()).build();
     }
-
-    // #endregion
-
-    // #region ProposalSetup
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/count")
-    public Response count() {
-        try {
-            return Response.ok(ol.countOrders()).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
     }
+  }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/")
-    public Response getOrders(@QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
-        GetOrdersRequest request = new GetOrdersRequest(
-            orderBy,
-            pageIndex,
-            pageSize,
-            retailId,
-            proposalId,
-            fromDate == null ? null : fromDate.getDate(),
-            toDate == null ? null : toDate.getDate()
-        );
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/")
+  public Response getOrders(@Context SecurityContext context, @QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("supplierId") Integer supplierId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+    GetOrdersRequest request = new GetOrdersRequest(
+    orderBy,
+    pageIndex,
+    pageSize,
+    retailId,
+    proposalId,
+    supplierId,
+    fromDate == null ? null : fromDate.getDate(),
+    toDate == null ? null : toDate.getDate()
+    );
 
-        try {
-            return Response.ok(ol.getOrders(request)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+
+      return Response.ok(ol.getOrders(request, user)).build();
     }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/{orderId}")
-    public Response getOrder(@PathParam("orderId") int orderId) {
-        GetOrderRequest request = new GetOrderRequest(orderId);
-
-        try {
-            return Response.ok(ol.getOrder(request)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
     }
+  }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/")
-    public Response createOrder(@Context SecurityContext context, SaveOrderRequest request) {
-        try {
-            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
-            return Response.ok(ol.createOrder(request, user)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/{orderId}")
+  public Response getOrder(@PathParam("orderId") int orderId) {
+    GetOrderRequest request = new GetOrderRequest(orderId);
+
+    try {
+      return Response.ok(ol.getOrder(request)).build();
     }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
+    }
+  }
 
-    // #endregion
+  @POST
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/")
+  public Response createOrder(@Context SecurityContext context, SaveOrderRequest request) {
+    try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(ol.createOrder(request, user)).build();
+    }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
+    }
+  }
+
+  // #endregion
 }

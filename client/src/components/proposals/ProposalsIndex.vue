@@ -27,7 +27,7 @@
           </div>
         </div>
         <div class="column">
-          <b-field grouped position="is-right">
+          <b-field grouped position="is-right" v-if="currentRole === 'supplier'">
             <p class="control">
               <router-link class="button is-rounded is-primary" to="/proposals/new/">
                 <span class="icon">
@@ -63,6 +63,7 @@ export default {
       selectedStatus: null,
       selectedSupplier: null,
       currentSupplier: Session.get().organization.id,
+      currentRole: Session.get().organization.role,
       searchCriteria: {},
       columns: [{
         field: 'id',

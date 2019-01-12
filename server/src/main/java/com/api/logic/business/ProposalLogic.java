@@ -42,8 +42,13 @@ public class ProposalLogic {
       }
     }
 
-    public BaseSearchResponse getProposals(GetProposalsRequest request) throws ApiException {
+    public BaseSearchResponse getProposals(GetProposalsRequest request, User loggedUser) throws ApiException {
         try {
+            if(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)) {
+              // When the user is a supplier, only show own proposals.
+              request.setSupplierId(loggedUser.getOrganization().getId());
+            }
+
             ArrayList<Proposal> proposals = pda.getProposals(request.getStatus(), request.getSupplierId(), request.getOrderBy(), request.getPageSize(), request.getPageIndex());
 
             ArrayList<GetProposalsResponse> response = new ArrayList<GetProposalsResponse>();

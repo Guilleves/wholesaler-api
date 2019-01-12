@@ -40,9 +40,16 @@ public class OrderLogic {
       }
     }
 
-    public BaseSearchResponse getOrders(GetOrdersRequest request) throws ApiException {
+    public BaseSearchResponse getOrders(GetOrdersRequest request, User loggedUser) throws ApiException {
         try {
             ArrayList<Order> orders = null;
+
+            if (loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL)) {
+              // When the user is a retailer, only show own orders.
+              request.setRetailId(loggedUser.getOrganization().getId());
+            } else {
+              request.setSupplierId(loggedUser.getOrganization().getId());
+            }
 
             orders = oda.getOrders(
                 request.getFromDate(),
@@ -51,7 +58,8 @@ public class OrderLogic {
                 request.getProposalId(),
                 request.getOrderBy(),
                 request.getPageSize(),
-                request.getPageIndex()
+                request.getPageIndex(),
+                request.getSupplierId()
             );
 
             if (orders == null || orders.isEmpty())

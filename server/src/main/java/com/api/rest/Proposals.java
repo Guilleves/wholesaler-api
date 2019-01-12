@@ -29,97 +29,98 @@ import com.api.rest.security.Secured;
 
 @Path("/proposals")
 public class Proposals {
-    private ProposalLogic pl;
+  private ProposalLogic pl;
 
-    // #region Constructors
+  // #region Constructors
 
-    public Proposals() {
-        pl = new ProposalLogic();
+  public Proposals() {
+    pl = new ProposalLogic();
+  }
+
+  // #endregion
+
+  // #region ProposalSetup
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/")
+  public Response getProposals(@Context SecurityContext context, @QueryParam("status") String status, @QueryParam("supplierId") Integer supplierId, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+    GetProposalsRequest request = new GetProposalsRequest(
+    orderBy,
+    status,
+    pageIndex,
+    pageSize,
+    supplierId
+    );
+    
+    try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(pl.getProposals(request, user)).build();
     }
-
-    // #endregion
-
-    // #region ProposalSetup
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/")
-    public Response getProposals(@QueryParam("status") String status, @QueryParam("supplierId") Integer supplierId, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
-        GetProposalsRequest request = new GetProposalsRequest(
-            orderBy,
-            status,
-            pageIndex,
-            pageSize,
-            supplierId
-        );
-
-        try {
-            return Response.ok(pl.getProposals(request)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
     }
+  }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/{proposalId}")
-    public Response getProposal(@PathParam("proposalId") int proposalId) {
-        try {
-            return Response.ok(pl.getProposal(proposalId)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/{proposalId}")
+  public Response getProposal(@PathParam("proposalId") int proposalId) {
+    try {
+      return Response.ok(pl.getProposal(proposalId)).build();
     }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/count")
-    public Response countProposals() {
-        try {
-            return Response.ok(pl.countProposals()).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
     }
+  }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/")
-    public Response saveProposal(@Context SecurityContext context, SaveProposalRequest request) {
-        try {
-            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
-            return Response.ok(pl.saveProposal(request, user)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/count")
+  public Response countProposals() {
+    try {
+      return Response.ok(pl.countProposals()).build();
     }
-
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Secured()
-    @Path("/{proposalId}")
-    public Response deleteProposal(@PathParam("proposalId") int proposalId, @Context SecurityContext context) {
-        try {
-            User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
-            return Response.ok(pl.deleteProposal(proposalId, user)).build();
-        }
-        catch(ApiException e) {
-            return Response.status(e.getStatus()).entity(e.getErrors()).build();
-        }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
     }
+  }
 
-    // #endregion
+  @POST
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/")
+  public Response saveProposal(@Context SecurityContext context, SaveProposalRequest request) {
+    try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(pl.saveProposal(request, user)).build();
+    }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
+    }
+  }
+
+  @DELETE
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/{proposalId}")
+  public Response deleteProposal(@PathParam("proposalId") int proposalId, @Context SecurityContext context) {
+    try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(pl.deleteProposal(proposalId, user)).build();
+    }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
+    }
+  }
+
+  // #endregion
 }

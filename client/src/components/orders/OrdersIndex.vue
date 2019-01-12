@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="column">
-          <b-field grouped position="is-right" v-if="proposalId">
+          <b-field grouped position="is-right" v-if="proposalId && currentRole === 'retail'">
             <p class="control">
               <router-link class="button is-rounded is-primary" :to="`/proposals/${proposalId}/orders/new/`">
                 <span class="icon">
@@ -73,6 +73,7 @@ import API from '@/helpers/api.js';
 import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import KeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
+import * as Session from '@/helpers/session.js';
 
 export default {
   name: 'proposals-index',
@@ -81,6 +82,7 @@ export default {
       selectedRetail: null,
       selectedProposal: null,
       proposalId: this.$route.params.proposalId,
+      currentRole: Session.get().organization.role,
       showDeleted: false,
       searchCriteria: {},
       columns: [{

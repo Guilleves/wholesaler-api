@@ -6,7 +6,7 @@ import java.util.Date;
 public class GetOrdersRequest extends BaseSearchRequest {
     static final long serialVersionUID = 0L;
 
-    private Integer retailId, proposalId;
+    private Integer retailId, proposalId, supplierId;
     private Date fromDate, toDate;
 
 	/**
@@ -19,22 +19,24 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	/**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(Integer retailId, Integer proposalId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(Integer retailId, Integer proposalId, Integer supplierId, Date fromDate, Date toDate) {
 		super();
 		this.retailId = retailId;
-        this.proposalId = proposalId;
+    this.proposalId = proposalId;
 		this.fromDate = fromDate;
 		this.toDate = toDate;
+    this.supplierId = supplierId;
 	}
 
     /**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Integer proposalId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Integer proposalId, Integer supplierId, Date fromDate, Date toDate) {
 		super(orderBy, pageIndex, pageSize);
 		this.retailId = retailId;
-        this.proposalId = proposalId;
+    this.proposalId = proposalId;
 		this.fromDate = fromDate;
+    this.supplierId = supplierId;
 		this.toDate = toDate;
 	}
 
@@ -52,6 +54,22 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	*/
 	public void setProposalId(Integer proposalId) {
 		this.proposalId = proposalId;
+	}
+
+  /**
+	* Returns value of supplierIdd
+	* @return
+	*/
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	/**
+	* Sets new value of supplierId
+	* @param
+	*/
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
 	}
 
     /**
