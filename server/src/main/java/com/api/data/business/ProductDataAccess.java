@@ -131,20 +131,56 @@ public class ProductDataAccess extends BaseDataAccess {
         "P.*, " +
         "B.name as brandName, " +
         "C.name as categoryName, " +
-        "COUNT(*) as `count` " +
+        "SUM(OL.quantity) as `count` " +
         "FROM " +
         "Product P " +
         "INNER JOIN Brand B ON P.brandId = B.id " +
         "INNER JOIN Category C ON P.categoryId = C.id " +
         "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
         "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+        "INNER JOIN OrderLine OL ON OL.proposalLineId = PL.id " +
         "WHERE P.deletedAt IS NULL ";
         if (supplierId != 0) {
             query += "AND Pr.supplierId = ? ";
             parameters.add(supplierId);
         }
         query += "GROUP BY P.id " +
-        "ORDER BY COUNT(*) DESC ";
+        "ORDER BY SUM(OL.quantity) DESC ";
+
+        if (amount != 0) {
+            query += "LIMIT ?";
+            parameters.add(amount);
+        }
+
+        query += ";";
+
+        return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+    }
+
+    public ArrayList<Ranking> topSellersByOrder(int retailId, int amount) throws SQLException {
+        ArrayList<Integer> parameters = new ArrayList<Integer>();
+
+        String query = "SELECT " +
+        "P.*, " +
+        "B.name as brandName, " +
+        "C.name as categoryName, " +
+        "SUM(OL.quantity) as `count` " +
+        "FROM " +
+        "Product P " +
+        "INNER JOIN Brand B ON P.brandId = B.id " +
+        "INNER JOIN Category C ON P.categoryId = C.id " +
+        "INNER JOIN ProposalLine PL ON P.id = PL.productId " +
+        "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+        "INNER JOIN OrderLine OL ON OL.proposalLineId = PL.id " +
+        "INNER JOIN `Order` O ON OL.orderId = O.id " +
+        "WHERE P.deletedAt IS NULL ";
+        
+        if (retailId != 0) {
+            query += "AND O.retailId = ? ";
+            parameters.add(retailId);
+        }
+        query += "GROUP BY P.id " +
+        "ORDER BY SUM(OL.quantity) DESC ";
 
         if (amount != 0) {
             query += "LIMIT ?";

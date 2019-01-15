@@ -126,37 +126,6 @@ public class ProposalLogic {
         }
     }
 
-    public ArrayList<GetRankingResponse> getProfitsByProposal(int supplierId, int amount) throws ApiException {
-        try {
-            ArrayList<Ranking> proposals = pda.getProfitsByProposal(supplierId, amount);
-
-            if (proposals == null || proposals.isEmpty())
-                throw new ApiException("Product was not found.", Status.NOT_FOUND);
-
-            ArrayList<GetRankingResponse> response = new ArrayList<GetRankingResponse>();
-
-            // Generate the response object.
-            for (Ranking proposal : proposals) {
-                response.add(new GetRankingResponse(
-                    new GetProposalsResponse(
-                        ((Proposal)proposal.getEntity()).getId(),
-                        ((Proposal)proposal.getEntity()).getTitle(),
-                        ((Proposal)proposal.getEntity()).getDescription(),
-                        ((Proposal)proposal.getEntity()).getStatus(),
-                        ((Proposal)proposal.getEntity()).getBeginDate(),
-                        ((Proposal)proposal.getEntity()).getEndDate()),
-                        proposal.getSum()
-                ));
-            }
-
-            return response;
-        }
-        catch(SQLException e) {
-          e.printStackTrace();
-            throw new ApiException(e);
-        }
-    }
-
     public DeleteProposalResponse deleteProposal(int proposalId, User loggedUser) throws ApiException {
         try {
             // Only suppliers can delete Proposals

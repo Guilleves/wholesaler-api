@@ -28,11 +28,11 @@ export default new Router({
     routes: [
         { path: '/', component: Main, children: [
             {path: "", component: Dashboard },
+            { path: 'products/ranking', component: ProductsRanking },
             { path: 'products', component: ProductsLayout, children: [
                 { path: "", component: ProductsIndex },
                 { path: ":id", component: ProductsDetail }
             ]},
-            { path: 'products/ranking', component: ProductsRanking },
             { path: 'proposals', component: ProposalsLayout, children: [
                 { path: "", component: ProposalsIndex },
                 { path: ":id", component: ProposalsDetail },

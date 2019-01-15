@@ -104,48 +104,6 @@ public class ProposalDataAccess extends BaseDataAccess {
         return getManyWithoutStatement(rs -> deserializeProposals(rs), query, parameters.toArray());
     }
 
-    public ArrayList<Ranking> getProfitsByProposal(int supplierId, int amount) throws SQLException {
-        ArrayList<Integer> parameters = new ArrayList<Integer>();
-
-        String query = "SELECT " +
-        "Pr.*, " +
-        "O.id as organizationId, " +
-        "O.name as organizationName, "+
-        "O.cuit, " +
-        "O.legalName, " +
-        "O.role, " +
-        "SUM(PL.price * OL.quantity) as `sum` " +
-        "FROM " +
-        "Proposal Pr " +
-        "INNER JOIN Organization O ON O.id = Pr.supplierId " +
-        "INNER JOIN ProposalLine PL ON Pr.id = PL.proposalId " +
-        "INNER JOIN OrderLine OL ON PL.id = OL.proposalLineId " +
-        "INNER JOIN Product P ON P.id = PL.productId " +
-        "INNER JOIN Brand B ON P.brandId = B.id " +
-        "INNER JOIN Category C ON P.categoryId = C.id " +
-        "WHERE Pr.deletedAt IS NULL ";
-
-        if (supplierId != 0) {
-            query += "AND Pr.supplierId = ? ";
-            parameters.add(supplierId);
-        }
-        query += "GROUP BY PR.id " +
-        "ORDER BY SUM(PL.price * OL.quantity) DESC ";
-
-        if (amount != 0) {
-            query += "LIMIT ?";
-            parameters.add(amount);
-        }
-
-        query += ";";
-
-        return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
-    }
-
-    private Ranking deserializeRanking(ResultSet rs) throws SQLException {
-        return new Ranking(rs.getFloat("sum"), new Proposal(rs));
-    }
-
     public int countSearch(String status, Integer supplierId) throws SQLException {
         ArrayList<Object> parameters = new ArrayList<Object>();
 

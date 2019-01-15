@@ -86,7 +86,7 @@
                 <p><router-link to="/products/ranking">More...</router-link></p>
               </div>
               <div class="tile is-child">
-                <ws-bar-chart title="Profits by proposal" barname="Profit" :names="profitByProposal.names" :amount="profitByProposal.sum" color="#2f4554"/>
+                <ws-pie-chart title="Profits by retailer" barname="Profit" :data="profitByRetailer.data" color="#2f4554"/>
                 <p>More...</p>
               </div>
             </div>
@@ -105,6 +105,7 @@
 
 <script>
 import WsBarChart from "@/components/ws-framework/WsBarChart.vue";
+import WsPieChart from "@/components/ws-framework/WsPieChart.vue";
 import API from './../../helpers/api.js';
 import * as Session from '@/helpers/session.js'
 
@@ -117,9 +118,8 @@ export default {
         names: [],
         count: []
       },
-      profitByProposal: {
-        names: [],
-        sum: []
+      profitByRetailer: {
+        data: []
       },
       counts: {
         product: {
@@ -142,13 +142,14 @@ export default {
     };
   },
   components: {
-    WsBarChart
+    WsBarChart,
+    WsPieChart
   },
   methods: {
     fillProductsChart() {
       let self = this;
 
-      new API().get("/rankings/products", { amount: 10, orderBy: "proposal" }).then(response => {
+      new API().get("/rankings/products", { amount: 7, orderBy: "proposal" }).then(response => {
         self.mostUsedProducts.names = response.data.map(ranking => ranking.name);
         self.mostUsedProducts.count = response.data.map(ranking => ranking.count);
       });
@@ -156,9 +157,11 @@ export default {
     fillProfitChart() {
       let self = this;
 
-      new API().get("/rankings/proposals", { amount: 10, type: "profit" }).then(response => {
-        self.profitByProposal.names = response.data.map(ranking => ranking.proposal.title);
-        self.profitByProposal.sum = response.data.map(ranking => ranking.sum);
+      new API().get("/rankings/organizations", { amount: 7, type: "profit" }).then(response => {
+        self.profitByRetailer.data = response.data.map(ranking => {
+          return { name: ranking.organization.name, value: ranking.sum}
+        });
+        console.log(self.profitByRetailer.data);
       });
     },
     countProducts() {
