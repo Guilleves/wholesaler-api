@@ -45,7 +45,7 @@ export default new Router({
             ]},
             { path: 'users', component: UsersLayout, children: [
                 { path: "", component: UsersIndex },
-                { path: ":id(\\d+)", component: UsersDetail }
+                { path: ":id", component: UsersDetail }
             ]},
             { path: 'my-account', component: MyAccountLayout, children: [
               { path: "", component: MyAccountIndex }
