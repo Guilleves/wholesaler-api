@@ -33,9 +33,13 @@ public class ProposalLogic {
         productDa = new ProductDataAccess();
     }
 
-    public int countProposals() throws ApiException {
+    public int countProposals(User loggedUser) throws ApiException {
       try {
-        return pda.countProposals();
+        if(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)) {
+          return pda.countProposals(loggedUser.getOrganization().getId());
+        } else {
+          throw new ApiException("Unauthorized.", Status.UNAUTHORIZED);
+        }
       }
       catch(SQLException ex) {
           throw new ApiException(ex);

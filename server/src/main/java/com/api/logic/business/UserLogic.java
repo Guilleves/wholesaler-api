@@ -36,9 +36,9 @@ public class UserLogic {
 
   // #region UserSetup
 
-  public int countUsers() throws ApiException {
+  public int countUsers(User loggedUser) throws ApiException {
     try {
-      return uda.countUsers();
+      return uda.countUsers(loggedUser.getOrganization().getId());
     }
     catch(SQLException ex) {
       throw new ApiException(ex);
@@ -90,7 +90,7 @@ public class UserLogic {
     }
   }
 
-  public BaseSearchResponse getUsers(GetUsersRequest request) throws ApiException {
+  public BaseSearchResponse getUsers(GetUsersRequest request, User loggedUser) throws ApiException {
     try {
       ArrayList<GetUserResponse> response = new ArrayList<GetUserResponse>();
 
@@ -99,7 +99,8 @@ public class UserLogic {
       request.getKeyword(),
       request.getOrderBy(),
       request.getPageIndex(),
-      request.getPageSize()
+      request.getPageSize(),
+      loggedUser.getOrganization().getId()
       );
 
       if (users == null || users.isEmpty()) {

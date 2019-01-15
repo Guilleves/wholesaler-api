@@ -52,10 +52,10 @@ public class ProposalDataAccess extends BaseDataAccess {
         return getOneWithoutStatement(rs -> deserializeProposal(rs), query, proposalId);
     }
 
-    public int countProposals() throws SQLException {
-      String query = "SELECT COUNT(*) FROM Proposal WHERE deletedAt IS NULL";
+    public int countProposals(int supplierId) throws SQLException {
+      String query = "SELECT COUNT(*) FROM Proposal WHERE deletedAt IS NULL AND supplierId = ?";
 
-      return getInt(query);
+      return getInt(query, supplierId);
     }
 
     public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {

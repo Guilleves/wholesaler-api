@@ -31,7 +31,7 @@
         <div class="column">
           <div class="tile is-ancestor is-vertical">
             <div class="tile is-parent">
-              <div class="tile is-child box">
+              <div class="tile is-child box" v-if="loggedRole === 'supplier'">
                 <div class="columns">
                   <div class="column is-three-fifths">
                     <p class="title" v-if="counts.proposal.loading"><i class="fa fa-spinner fa-spin" /></p>
@@ -53,7 +53,7 @@
                     <b-icon type="is-light" icon="fa fa-shopping-cart fa-3x" />
                   </div>
                 </div>
-                <p>Orders done</p>
+                <p>Orders placed</p>
               </div>
               <div class="tile is-child box">
                 <div class="columns">
@@ -65,7 +65,7 @@
                     <b-icon type="is-light" icon="fa fa-box fa-3x" />
                   </div>
                 </div>
-                <router-link to="/products">Products created</router-link>
+                <router-link to="/products">Products</router-link>
               </div>
               <div class="tile is-child box">
                 <div class="columns">
@@ -77,7 +77,7 @@
                     <b-icon type="is-light" icon="fa fa-users fa-3x" />
                   </div>
                 </div>
-                <router-link to="/users">Users registered</router-link>
+                <router-link to="/users">Users in organization</router-link>
               </div>
             </div>
             <div class="tile is-parent">
@@ -106,11 +106,13 @@
 <script>
 import WsBarChart from "@/components/ws-framework/WsBarChart.vue";
 import API from './../../helpers/api.js';
+import * as Session from '@/helpers/session.js'
 
 export default {
   name: 'HelloWorld',
   data: () => {
     return {
+      loggedRole: Session.get().organization.role,
       mostUsedProducts: {
         names: [],
         count: []
@@ -197,12 +199,14 @@ export default {
     }
   },
   mounted() {
+    if (this.loggedRole === "supplier")
+      this.countProposals();
+
     this.fillProductsChart();
     this.fillProfitChart();
     this.countProducts();
     this.countOrders();
     this.countUsers();
-    this.countProposals();
   }
 }
 </script>

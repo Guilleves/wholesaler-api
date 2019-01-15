@@ -27,7 +27,7 @@
 
 <script>
 import API from '@/helpers/api.js';
-import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearch.vue";
+import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearchByJuan.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";
 
 export default {
