@@ -12,10 +12,10 @@ import com.api.entities.business.User;
 public class UserDataAccess extends BaseDataAccess {
   // #region UserSetup
 
-  public int countUsers() throws SQLException {
-    String query = "SELECT COUNT(*) FROM User WHERE deletedAt IS NULL";
+  public int countUsers(int organizationId) throws SQLException {
+    String query = "SELECT COUNT(*) FROM User WHERE deletedAt IS NULL AND organizationId = ?";
 
-    return getInt(query);
+    return getInt(query, organizationId);
   }
 
   public boolean deleteUser(int id) throws SQLException {
@@ -27,7 +27,7 @@ public class UserDataAccess extends BaseDataAccess {
     id) != 0;
   }
 
-  public ArrayList<User> getUsers(String keyword, String orderBy, Integer pageIndex, Integer pageSize) throws SQLException {
+  public ArrayList<User> getUsers(String keyword, String orderBy, Integer pageIndex, Integer pageSize, int organizationId) throws SQLException {
     ArrayList<Object> parameters = new ArrayList<Object>();
 
     String query = "SELECT " +
@@ -47,6 +47,9 @@ public class UserDataAccess extends BaseDataAccess {
       parameters.add('%' + keyword + '%');
       parameters.add('%' + keyword + '%');
     }
+
+    query += "AND U.organizationId = ? ";
+    parameters.add(organizationId);
 
     if (pageIndex != null && pageSize != null) {
       query += " LIMIT ?, ? ";

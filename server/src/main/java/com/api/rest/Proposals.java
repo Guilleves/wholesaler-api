@@ -54,7 +54,7 @@ public class Proposals {
     pageSize,
     supplierId
     );
-    
+
     try {
       User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
       return Response.ok(pl.getProposals(request, user)).build();
@@ -83,9 +83,10 @@ public class Proposals {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/count")
-  public Response countProposals() {
+  public Response countProposals(@Context SecurityContext context) {
     try {
-      return Response.ok(pl.countProposals()).build();
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(pl.countProposals(user)).build();
     }
     catch(ApiException e) {
       return Response.status(e.getStatus()).entity(e.getErrors()).build();

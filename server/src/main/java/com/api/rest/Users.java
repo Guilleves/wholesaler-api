@@ -49,9 +49,10 @@ public class Users {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/count")
-  public Response count() {
+  public Response count(@Context SecurityContext context) {
     try {
-      return Response.ok(ul.countUsers()).build();
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(ul.countUsers(user)).build();
     }
     catch(ApiException e) {
       return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -63,8 +64,10 @@ public class Users {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/")
-  public Response getUsers(@QueryParam("keyword") String keyword, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+  public Response getUsers(@Context SecurityContext context, @QueryParam("keyword") String keyword, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
     try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+
       GetUsersRequest request = new GetUsersRequest(
       keyword,
       orderBy,
@@ -72,7 +75,7 @@ public class Users {
       pageSize
       );
 
-      return Response.ok(ul.getUsers(request)).build();
+      return Response.ok(ul.getUsers(request, user)).build();
     }
     catch(ApiException e) {
       return Response.status(e.getStatus()).entity(e.getErrors()).build();
@@ -99,7 +102,7 @@ public class Users {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
-  @Path("/logged") // TODO: This is an awuful URL
+  @Path("/logged")
   public Response getLoggedUser(@Context SecurityContext context) {
     User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
 
