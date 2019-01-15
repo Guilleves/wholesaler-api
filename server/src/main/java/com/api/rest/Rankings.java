@@ -2,6 +2,7 @@ package com.api.rest;
 
 // #region Imports
 
+import com.api.logic.business.OrderLogic;
 import com.api.logic.business.OrganizationLogic;
 import com.api.entities.business.User;
 import com.api.rest.security.UserPrincipal;
@@ -30,12 +31,14 @@ import com.api.rest.security.Secured;
 public class Rankings {
   private ProductLogic pl;
   private OrganizationLogic orl;
+  private OrderLogic orderl;
 
   // #region Constructors
 
   public Rankings() {
     pl = new ProductLogic();
     orl = new OrganizationLogic();
+    orderl = new OrderLogic();
   }
 
   // #endregion
@@ -52,6 +55,21 @@ public class Rankings {
       return Response.ok(pl.mostUsedByProposal(user, amount)).build();
       else
       return Response.status(Status.BAD_REQUEST).build();
+    }
+    catch(ApiException e) {
+      return Response.status(e.getStatus()).entity(e.getErrors()).build();
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Secured()
+  @Path("/orders")
+  public Response getOrders(@Context SecurityContext context) {
+    try {
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(orderl.getOrderCountByMonth(user)).build();
     }
     catch(ApiException e) {
       return Response.status(e.getStatus()).entity(e.getErrors()).build();

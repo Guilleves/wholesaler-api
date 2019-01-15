@@ -86,13 +86,13 @@
                 <p><router-link to="/products/ranking">More...</router-link></p>
               </div>
               <div class="tile is-child">
-                <ws-pie-chart title="Profits by retailer" barname="Profit" :data="profitByRetailer.data" color="#2f4554"/>
+                <ws-pie-chart title="Profits by retailer" barname="Profit ($)" :data="profitByRetailer.data" color="#2f4554"/>
                 <p>More...</p>
               </div>
             </div>
             <div class="tile is-parent">
               <div class="tile is-child">
-                <ws-bar-chart title="Anything else"/>
+                <ws-bar-chart title="Orders by month" barname="Amount" :names="ordersByMonth.names" :amount="ordersByMonth.count" color="#4a4a4a"/>
                 <p>More...</p>
               </div>
             </div>
@@ -120,6 +120,10 @@ export default {
       },
       profitByRetailer: {
         data: []
+      },
+      ordersByMonth: {
+        names: [],
+        count: []
       },
       counts: {
         product: {
@@ -152,6 +156,14 @@ export default {
       new API().get("/rankings/products", { amount: 7, orderBy: "proposal" }).then(response => {
         self.mostUsedProducts.names = response.data.map(ranking => ranking.name);
         self.mostUsedProducts.count = response.data.map(ranking => ranking.count);
+      });
+    },
+    fillOrdrsChart() {
+      let self = this;
+
+      new API().get("/rankings/orders", null).then(response => {
+        self.ordersByMonth.names = response.data.map(ranking => ranking.date);
+        self.ordersByMonth.count = response.data.map(ranking => ranking.count);
       });
     },
     fillProfitChart() {
@@ -203,8 +215,9 @@ export default {
   },
   mounted() {
     if (this.loggedRole === "supplier")
-      this.countProposals();
+    this.countProposals();
 
+    this.fillOrdrsChart();
     this.fillProductsChart();
     this.fillProfitChart();
     this.countProducts();

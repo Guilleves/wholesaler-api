@@ -1,5 +1,6 @@
 package com.api.data.business;
 
+import com.api.entities.business.Ranking;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -147,6 +148,33 @@ public class OrderDataAccess extends BaseDataAccess {
             query += ";";
 
         return getManyWithoutStatement(rs -> deserializeOrders(rs), query, parameters.toArray());
+    }
+
+    public ArrayList<Ranking> getOrderCountByMonth(int supplierId) throws SQLException {
+      ArrayList<Object> parameters = new ArrayList<Object>();
+
+      String query = "SELECT count(*) as count, " +
+      "CONCAT(year(O.dateOrdered), ' ',  monthname(O.dateOrdered)) as date " +
+      "FROM " +
+      "( " +
+      "SELECT Ord.dateOrdered, Ord.id FROM " +
+      "`Order` Ord " +
+      "INNER JOIN OrderLine OL ON OL.orderId = Ord.id " +
+      "INNER JOIN ProposalLine PL ON PL.id = OL.proposalLineId " +
+      "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+      "WHERE Pr.deletedAt IS NULL " +
+      "AND Pr.supplierId = ? " +
+      "GROUP BY Ord.id " +
+      ") AS O " +
+      "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
+
+      parameters.add(supplierId);
+
+      return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+    }
+
+    private Ranking deserializeRanking(ResultSet rs) throws SQLException {
+        return new Ranking(rs.getInt("count"), rs.getString("date"));
     }
 
     public int countSearch(Date fromDate, Date toDate, Integer retailId) throws SQLException{

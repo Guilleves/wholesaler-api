@@ -96,10 +96,44 @@ public class OrganizationDataAccess extends BaseDataAccess {
 
         query += ";";
 
-        System.out.println(query);
+        return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+    }
+
+    public ArrayList<Ranking> getSuppliersTopSellers(int retailerId, int amount) throws SQLException {
+        ArrayList<Integer> parameters = new ArrayList<Integer>();
+
+        String query = "SELECT " +
+        "O.id as id, " +
+        "O.name as name, "+
+        "O.cuit as cuit, " +
+        "O.legalName as legalName, " +
+        "O.role as role, " +
+        "SUM(PL.price * OL.quantity) as `sum` " +
+        "FROM " +
+        "Organization O " +
+        "INNER JOIN Proposal Pr ON Pr.supplierId = O.id " +
+        "INNER JOIN ProposalLine PL ON PL.proposalId = Pr.id " +
+        "INNER JOIN OrderLine OL ON OL.proposalLineId = PL.id " +
+        "INNER JOIN `Order` Ord ON OL.orderId = Ord.id " +
+        "WHERE Pr.deletedAt IS NULL ";
+
+        if (retailerId != 0) {
+            query += "AND Ord.retailId = ? ";
+            parameters.add(retailerId);
+        }
+        query += "GROUP BY O.id " +
+        "ORDER BY SUM(PL.price * OL.quantity) DESC ";
+
+        if (amount != 0) {
+            query += "LIMIT ?";
+            parameters.add(amount);
+        }
+
+        query += ";";
 
         return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
     }
+
 
     private Ranking deserializeRanking(ResultSet rs) throws SQLException {
         return new Ranking(rs.getFloat("sum"), new Retail(rs));

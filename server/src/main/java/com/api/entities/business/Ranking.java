@@ -4,6 +4,7 @@ public class Ranking implements BaseEntity {
     private int count;
     private BaseEntity entity;
     private float sum;
+    private String date;
 
 	/**
 	* Default empty Ranking constructor
@@ -28,6 +29,15 @@ public class Ranking implements BaseEntity {
         super();
         this.count = count;
         this.entity = entity;
+    }
+
+    /**
+    * Default Ranking constructor
+    */
+    public Ranking(int count, String date) {
+        super();
+        this.count = count;
+        this.date = date;
     }
 
 	/**
@@ -87,4 +97,12 @@ public class Ranking implements BaseEntity {
 	public void setSum(float sum) {
 		this.sum = sum;
 	}
+
+  public void setDate(String date) {
+    this.date = date;
+  }
+
+  public String getDate() {
+    return date;
+  }
 }

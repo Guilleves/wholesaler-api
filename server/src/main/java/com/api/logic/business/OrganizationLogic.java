@@ -121,25 +121,27 @@ public class OrganizationLogic {
   public ArrayList<GetRankingResponse> getProfitsByOrganization(User loggedUser, int amount) throws ApiException {
     try {
       ArrayList<GetRankingResponse> response = new ArrayList<GetRankingResponse>();
+      ArrayList<Ranking> organizations = null;
 
-      if (loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)) {
-        ArrayList<Ranking> organizations = oda.getProfitsByRetail(loggedUser.getOrganization().getId(), amount);
+      if (loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER))
+        organizations = oda.getProfitsByRetail(loggedUser.getOrganization().getId(), amount);
+      else
+        organizations = oda.getSuppliersTopSellers(loggedUser.getOrganization().getId(), amount);
 
-        if (organizations == null || organizations.isEmpty())
-        throw new ApiException("Product was not found.", Status.NOT_FOUND);
+      if (organizations == null || organizations.isEmpty())
+      throw new ApiException("Not offers have been made.", Status.NOT_FOUND);
 
-        // Generate the response object.
-        for (Ranking organization : organizations) {
-          response.add(new GetRankingResponse(
-          new GetOrganizationResponse(
-          ((Organization)organization.getEntity()).getId(),
-          ((Organization)organization.getEntity()).getName(),
-          ((Organization)organization.getEntity()).getLegalName(),
-          ((Organization)organization.getEntity()).getCuit(),
-          ((Organization)organization.getEntity()).getRole()),
-          organization.getSum()
-          ));
-        }
+      // Generate the response object.
+      for (Ranking organization : organizations) {
+        response.add(new GetRankingResponse(
+        new GetOrganizationResponse(
+        ((Organization)organization.getEntity()).getId(),
+        ((Organization)organization.getEntity()).getName(),
+        ((Organization)organization.getEntity()).getLegalName(),
+        ((Organization)organization.getEntity()).getCuit(),
+        ((Organization)organization.getEntity()).getRole()),
+        organization.getSum()
+        ));
       }
 
       return response;
