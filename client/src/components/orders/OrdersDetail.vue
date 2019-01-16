@@ -161,7 +161,6 @@ export default {
             let data = {
                 dateOrdered: this.order.dateOrdered,
                 lines: this.productPrices.map(line => {
-                    console.log(line);
                     return {
                         proposalLineId: line.lineId,
                         quantity: line.amount

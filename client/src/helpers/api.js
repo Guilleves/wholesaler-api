@@ -20,8 +20,7 @@ class API {
             return response;
         }, error => {
             if (error.response.status === 401) {
-                session.clearToken();
-                Router.push("/login/");
+                Router.push("/unouthorized/");
             }
 
             return Promise.reject(error);

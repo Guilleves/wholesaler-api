@@ -173,7 +173,6 @@ export default {
         self.profitByRetailer.data = response.data.map(ranking => {
           return { name: ranking.organization.name, value: ranking.sum}
         });
-        console.log(self.profitByRetailer.data);
       });
     },
     countProducts() {

@@ -18,6 +18,7 @@ import Login from '@/components/users/Login.vue';
 import Signup from '@/components/users/Signup.vue';
 import Dashboard from '@/components/dashboard/Dashboard.vue';
 import NotFound from '@/components/notfound/NotFound.vue';
+import Unauthorized from '@/components/unauthorized/Unauthorized.vue';
 import MyAccountIndex from '@/components/my-account/MyAccountIndex';
 import MyAccountLayout from '@/components/my-account/MyAccountLayout';
 
@@ -51,6 +52,7 @@ export default new Router({
               { path: "", component: MyAccountIndex }
             ]},
         ]},
+        { path: "/unauthorized", component: Unauthorized },
         { path: "/login", component: Login },
         { path: "/signup", component: Signup },
         { path: "*", component: NotFound }
