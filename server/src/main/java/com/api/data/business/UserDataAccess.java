@@ -38,10 +38,11 @@ public class UserDataAccess extends BaseDataAccess {
     "O.legalName as legalName, " +
     "O.role as role " +
     "FROM User U " +
-    "INNER JOIN Organization O on U.organizationId = O.id ";
+    "INNER JOIN Organization O on U.organizationId = O.id " +
+    "WHERE U.deletedAt IS NULL ";
 
     if (keyword != null && !keyword.isEmpty()) {
-      query += "WHERE (U.firstName LIKE ? or U.lastName LIKE ? or U.email LIKE ? or U.username LIKE ?) ";
+      query += "AND (U.firstName LIKE ? or U.lastName LIKE ? or U.email LIKE ? or U.username LIKE ?) ";
       parameters.add('%' + keyword + '%');
       parameters.add('%' + keyword + '%');
       parameters.add('%' + keyword + '%');
@@ -59,21 +60,26 @@ public class UserDataAccess extends BaseDataAccess {
 
     query += ";";
 
+    System.out.println(query);
+
     return getMany(rs -> new User(rs), query, parameters.toArray());
   }
 
-  public int countSearch(String keyword) throws SQLException {
+  public int countSearch(String keyword, int organizationId) throws SQLException {
     ArrayList<Object> parameters = new ArrayList<Object>();
 
-    String query = "SELECT COUNT(*) FROM User ";
+    String query = "SELECT COUNT(*) FROM User WHERE deletedAt IS NULL ";
 
     if (keyword != null && !keyword.isEmpty()) {
-      query += "WHERE (firstName LIKE ? or lastName LIKE ? or email LIKE ? or username LIKE ?) ";
+      query += "AND (firstName LIKE ? or lastName LIKE ? or email LIKE ? or username LIKE ?) ";
       parameters.add('%' + keyword + '%');
       parameters.add('%' + keyword + '%');
       parameters.add('%' + keyword + '%');
       parameters.add('%' + keyword + '%');
     }
+
+    query += "AND organizationId = ? ";
+    parameters.add(organizationId);
 
     query += ";";
 

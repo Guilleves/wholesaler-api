@@ -173,11 +173,31 @@ public class OrderDataAccess extends BaseDataAccess {
       return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
     }
 
+    public ArrayList<Ranking> getOwnOrderCountByMonth(int retailerId) throws SQLException {
+      ArrayList<Object> parameters = new ArrayList<Object>();
+
+      String query = "SELECT count(*) as count, " +
+      "CONCAT(year(O.dateOrdered), ' ',  monthname(O.dateOrdered)) as date " +
+      "FROM " +
+      "( " +
+      "SELECT Ord.dateOrdered, Ord.id FROM " +
+      "`Order` Ord " +
+      "WHERE ord.deletedAt IS NULL " +
+      "AND ord.retailId = ? " +
+      "GROUP BY Ord.id " +
+      ") AS O " +
+      "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
+
+      parameters.add(retailerId);
+
+      return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+    }
+
     private Ranking deserializeRanking(ResultSet rs) throws SQLException {
         return new Ranking(rs.getInt("count"), rs.getString("date"));
     }
 
-    public int countSearch(Date fromDate, Date toDate, Integer retailId) throws SQLException{
+    public int countSearch(Date fromDate, Date toDate, Integer retailId, Integer supplierId) throws SQLException{
         ArrayList<Object> parameters = new ArrayList<Object>();
 
         // Eeeeeeeeeeeeeeeeeek...
@@ -206,6 +226,11 @@ public class OrderDataAccess extends BaseDataAccess {
             if (retailId != null) {
                 query += " AND O.retailId = ?";
                 parameters.add(retailId);
+            }
+
+            if (supplierId != null) {
+                query += " AND P.supplierId = ?";
+                parameters.add(supplierId);
             }
 
             query += " GROUP BY O.id) as x";

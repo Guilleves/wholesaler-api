@@ -124,9 +124,9 @@ public class OrganizationLogic {
       ArrayList<Ranking> organizations = null;
 
       if (loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER))
-        organizations = oda.getProfitsByRetail(loggedUser.getOrganization().getId(), amount);
+      organizations = oda.getProfitsByRetail(loggedUser.getOrganization().getId(), amount);
       else
-        organizations = oda.getSuppliersTopSellers(loggedUser.getOrganization().getId(), amount);
+      organizations = oda.getSuppliersTopSellers(loggedUser.getOrganization().getId(), amount);
 
       if (organizations == null || organizations.isEmpty())
       throw new ApiException("Not offers have been made.", Status.NOT_FOUND);

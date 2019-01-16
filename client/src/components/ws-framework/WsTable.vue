@@ -26,7 +26,7 @@ export default {
             total: 0,
             loading: false,
             pageIndex: 1,
-            pageSize: 5,
+            pageSize: 8,
             data: [],
             formattedData: [],
             selected: {},

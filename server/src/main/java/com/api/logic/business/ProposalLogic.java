@@ -1,7 +1,5 @@
 package com.api.logic.business;
 
-import com.api.entities.business.Ranking;
-import com.api.entities.models.proposal.GetRankingResponse;
 import java.sql.SQLException;
 import com.api.entities.models.BaseSearchResponse;
 import com.api.entities.models.proposal.GetProposalsRequest;

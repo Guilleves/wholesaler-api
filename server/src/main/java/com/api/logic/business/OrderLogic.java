@@ -87,7 +87,8 @@ public class OrderLogic {
       oda.countSearch(
       request.getFromDate(),
       request.getToDate(),
-      request.getRetailId()),
+      request.getRetailId(),
+      request.getSupplierId()),
       response
       );
     }
@@ -129,9 +130,10 @@ public class OrderLogic {
     ArrayList<GetRankingResponse> response = new ArrayList<GetRankingResponse>();
 
     try {
-      if(loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER)) {
+      if (loggedUser.getOrganization().getRole().equals(OrganizationRoles.SUPPLIER))
         orders = oda.getOrderCountByMonth(loggedUser.getOrganization().getId());
-      }
+      else
+        orders = oda.getOwnOrderCountByMonth(loggedUser.getOrganization().getId());
 
       if (orders == null || orders.isEmpty())
       throw new ApiException("Not orders have been made.", Status.NOT_FOUND);

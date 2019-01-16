@@ -125,7 +125,7 @@ public class UserLogic {
         ));
       }
 
-      return new BaseSearchResponse(uda.countSearch(request.getKeyword()), response);
+      return new BaseSearchResponse(uda.countSearch(request.getKeyword(), loggedUser.getOrganization().getId()), response);
     }
     catch(SQLException ex) {
       throw new ApiException(ex);

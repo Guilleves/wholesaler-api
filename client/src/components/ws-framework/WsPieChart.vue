@@ -20,7 +20,7 @@ export default {
     }
   },
   beforeMount() {
-    if (this.data)
+    if (this.data && Array.isArray(this.data))
     this.loading = false;
 
     this.options = {
