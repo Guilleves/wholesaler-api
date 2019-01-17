@@ -64,6 +64,12 @@
         </span>
         <span>Go back</span>
       </router-link>
+      <router-link class="button is-default" to="/" v-else>
+        <span class="icon">
+          <i class="fas fa-arrow-left"></i>
+        </span>
+        <span>Go back</span>
+      </router-link>
     </div>
   </section>
 </template>

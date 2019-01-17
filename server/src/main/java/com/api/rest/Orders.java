@@ -46,9 +46,10 @@ public class Orders {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/count")
-  public Response count() {
+  public Response count(@Context SecurityContext context) {
     try {
-      return Response.ok(ol.countOrders()).build();
+      User user = ((UserPrincipal)context.getUserPrincipal()).getUser();
+      return Response.ok(ol.countOrders(user)).build();
     }
     catch(ApiException e) {
       return Response.status(e.getStatus()).entity(e.getErrors()).build();

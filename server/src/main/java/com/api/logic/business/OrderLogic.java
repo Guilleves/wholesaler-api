@@ -33,9 +33,12 @@ public class OrderLogic {
     oda = new OrderDataAccess();
   }
 
-  public int countOrders() throws ApiException {
+  public int countOrders(User loggedUser) throws ApiException {
     try {
-      return oda.countOrders();
+      if (loggedUser.getOrganization().getRole().equals(OrganizationRoles.RETAIL))
+        return oda.countOrdersForRetailers(loggedUser.getOrganization().getId());
+      else
+        return oda.countOrdersForSuppliers(loggedUser.getOrganization().getId());
     }
     catch(SQLException ex) {
       throw new ApiException(ex);

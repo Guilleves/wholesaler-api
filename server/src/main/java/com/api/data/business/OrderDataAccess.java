@@ -19,10 +19,24 @@ import com.api.entities.business.Order;
 
 public class OrderDataAccess extends BaseDataAccess {
 
-    public int countOrders() throws SQLException {
-      String query = "SELECT COUNT(*) FROM `Order` WHERE deletedAt IS NULL";
+    public int countOrdersForRetailers(int retailerId) throws SQLException {
+      String query = "SELECT COUNT(*) FROM `Order` WHERE deletedAt IS NULL AND retailId = ?";
 
-      return getInt(query);
+      return getInt(query, retailerId);
+    }
+
+    public int countOrdersForSuppliers(int supplierId) throws SQLException {
+      String subQuery = "(SELECT COUNT(*) FROM `Order` O " +
+      "INNER JOIN OrderLine OL ON O.id = OL.orderId " +
+      "INNER JOIN ProposalLine PL ON PL.id = OL.proposalLineId " +
+      "INNER JOIN Proposal P ON P.id = PL.proposalId " +
+      "WHERE O.deletedAt IS NULL " +
+      "AND P.supplierId = ? " +
+      "GROUP BY O.id) AS OC";
+
+      String query = "SELECT COUNT(*) FROM " + subQuery;
+
+      return getInt(query, supplierId);
     }
 
     public Order getOrder(int orderId) throws SQLException {

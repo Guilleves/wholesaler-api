@@ -45,6 +45,12 @@
       :filters="searchCriteria"
       :format="format"
       @select="onSelect"/>
+      <router-link class="button is-default" to="/">
+        <span class="icon">
+          <i class="fas fa-arrow-left"></i>
+        </span>
+        <span>Go back</span>
+      </router-link>
     </div>
   </section>
 </template>

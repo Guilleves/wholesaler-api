@@ -68,20 +68,22 @@
               </b-field>
             </b-field>
 
-            <b-field grouped position="is-left">
-              <p class="control" position="is-right">
-                <button class="button" type="button" @click="redirectLogin()">
-                  Already have an account
-                </button>
-              </p>
-            </b-field>
+            <b-field grouped>
+              <b-field grouped>
+                <p class="control" position="is-right">
+                  <button class="button" type="button" @click="redirectLogin()">
+                    Already have an account
+                  </button>
+                </p>
+              </b-field>
 
-            <b-field grouped position="is-right">
-              <p class="control">
-                <button class="button is-primary">
-                  Submit
-                </button>
-              </p>
+              <b-field grouped position="is-right" expanded>
+                <p class="control">
+                  <button class="button is-primary">
+                    Submit
+                  </button>
+                </p>
+              </b-field>
             </b-field>
           </form>
         </section>

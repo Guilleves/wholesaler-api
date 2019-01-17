@@ -3,7 +3,7 @@
     <div class="container">
       <div class="columns">
         <div class="column is-one-fifth">
-          <aside class="menu">
+          <aside class="menu" :style="{backgroundColor: 'hsl(0, 0%, 96%)', padding: '20px', borderRadius: '10px'}">
             <p class="menu-label">
               General
             </p>

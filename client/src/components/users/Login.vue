@@ -34,20 +34,22 @@
               password-reveal />
             </b-field>
 
-            <b-field grouped position="is-left">
-              <p class="control" position="is-right">
-                <button class="button" type="button" @click="redirectSignup()">
-                  Create an account
-                </button>
-              </p>
-            </b-field>
+            <b-field grouped>
+              <b-field grouped>
+                <p class="control" position="is-right">
+                  <button class="button" type="button" @click="redirectSignup()">
+                    Create an account
+                  </button>
+                </p>
+              </b-field>
 
-            <b-field grouped position="is-right">
-              <p class="control">
-                <button class="button is-primary">
-                  Submit
-                </button>
-              </p>
+              <b-field grouped position="is-right" expanded>
+                <p class="control">
+                  <button class="button is-primary">
+                    Submit
+                  </button>
+                </p>
+              </b-field>
             </b-field>
           </form>
         </section>
@@ -95,7 +97,7 @@ export default {
         Notifier.error("Please try again");
 
         if (error.response && error.response.data)
-          vm.notifications = error.response.data;
+        vm.notifications = error.response.data;
       }); // No entiendo por qué no me anda el finally acá...
     },
     redirectSignup: function() {
