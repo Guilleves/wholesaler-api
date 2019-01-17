@@ -2,7 +2,7 @@ package com.api.rest;
 
 // #region Import
 
-import com.api.rest.util.DateParameter;
+import java.util.Date;
 import com.api.entities.models.order.GetOrdersRequest;
 import javax.ws.rs.QueryParam;
 import com.api.entities.business.User;
@@ -61,7 +61,7 @@ public class Orders {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/")
-  public Response getOrders(@Context SecurityContext context, @QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("supplierId") Integer supplierId, @QueryParam("fromDate") DateParameter fromDate, @QueryParam("toDate") DateParameter toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+  public Response getOrders(@Context SecurityContext context, @QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("supplierId") Integer supplierId, @QueryParam("fromDate") long fromDate, @QueryParam("toDate") long toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
     GetOrdersRequest request = new GetOrdersRequest(
     orderBy,
     pageIndex,
@@ -69,8 +69,8 @@ public class Orders {
     retailId,
     proposalId,
     supplierId,
-    fromDate == null ? null : fromDate.getDate(),
-    toDate == null ? null : toDate.getDate()
+    fromDate == 0l ? null : new Date(fromDate),
+    toDate == 0l ? null : new Date(toDate)
     );
 
     try {

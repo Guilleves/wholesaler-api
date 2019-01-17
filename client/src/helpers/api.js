@@ -20,7 +20,7 @@ class API {
             return response;
         }, error => {
             if (error.response.status === 401) {
-                Router.push("/unouthorized/");
+                Router.push("/unauthorized/");
             }
 
             return Promise.reject(error);

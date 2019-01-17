@@ -13,17 +13,6 @@
               placeholder="Select a status"
               v-model="selectedStatus" />
             </div>
-            <div class="column">
-              <ws-option-filter
-              :getOptions="getSuppliers"
-              placeholder="Select a supplier"
-              v-model="selectedSupplier" />
-            </div>
-            <div class="column">
-              <b-switch @input="toggleShowMine($event)">
-                Show only from my supplier
-              </b-switch>
-            </div>
           </div>
         </div>
         <div class="column">
@@ -67,7 +56,6 @@ export default {
   data() {
     return {
       selectedStatus: null,
-      selectedSupplier: null,
       currentSupplier: Session.get().organization.id,
       currentRole: Session.get().organization.role,
       searchCriteria: {},
@@ -86,10 +74,7 @@ export default {
   },
   watch: {
     selectedStatus(val) {
-      this.buildSearchCriteria({ status: val.id });
-    },
-    selectedSupplier(val) {
-      this.buildSearchCriteria({ supplierId: val.id });
+      this.buildSearchCriteria({ status: val ? val.id : null });
     }
   },
   components: {
