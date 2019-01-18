@@ -16,15 +16,15 @@
             <ul class="menu-list">
               <li><router-link to="/proposals">Proposals</router-link></li>
               <li><router-link to="/orders">Orders</router-link></li>
-              <li><router-link to="/products">Products</router-link></li>
+              <li v-if="loggedRole === 'supplier'"><router-link to="/products">Products</router-link></li>
               <li><router-link to="/users">Users</router-link></li>
             </ul>
-            <p class="menu-label">
+            <p v-if="loggedRole === 'supplier'" class="menu-label">
               Transactions
             </p>
             <ul class="menu-list">
-              <li><router-link to="/proposals/new">New proposal</router-link></li>
-              <li><router-link to="/products/new">New product</router-link></li>
+              <li v-if="loggedRole === 'supplier'"><router-link to="/proposals/new">New proposal</router-link></li>
+              <li v-if="loggedRole === 'supplier'"><router-link to="/products/new">New product</router-link></li>
             </ul>
           </aside>
         </div>

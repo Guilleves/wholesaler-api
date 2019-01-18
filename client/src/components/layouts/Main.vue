@@ -15,7 +15,7 @@
 
       <div id="navbarExampleTransparentExample" class="navbar-menu">
         <div class="navbar-start" v-if="expandedMenu">
-          <router-link class="navbar-item" to="/products">
+          <router-link v-if="loggedRole === 'supplier'" class="navbar-item" to="/products">
             Products
           </router-link>
           <router-link class="navbar-item" to="/proposals">
@@ -34,7 +34,7 @@
               Admin
             </router-link>
             <div class="navbar-dropdown is-boxed">
-              <router-link class="navbar-item" to="/products">
+              <router-link v-if="loggedRole === 'supplier'" class="navbar-item" to="/products">
                 Products
               </router-link>
               <router-link class="navbar-item" to="/proposals">
@@ -83,6 +83,7 @@ export default {
   name: 'Main',
   data: () => {
     return {
+      loggedRole: Session.get().organization.role,
       expandedMenu: false
     }
   },
