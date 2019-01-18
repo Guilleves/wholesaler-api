@@ -19,427 +19,437 @@ import com.api.entities.business.Order;
 
 public class OrderDataAccess extends BaseDataAccess {
 
-    public int countOrdersForRetailers(int retailerId) throws SQLException {
-      String query = "SELECT COUNT(*) FROM `Order` WHERE deletedAt IS NULL AND retailId = ?";
+  public int countOrdersForRetailers(int retailerId) throws SQLException {
+    String query = "SELECT COUNT(*) FROM `Order` WHERE deletedAt IS NULL AND retailId = ?";
 
-      return getInt(query, retailerId);
+    return getInt(query, retailerId);
+  }
+
+  public int countOrdersForSuppliers(int supplierId) throws SQLException {
+    String subQuery = "(SELECT COUNT(*) FROM `Order` O " +
+    "INNER JOIN OrderLine OL ON O.id = OL.orderId " +
+    "INNER JOIN ProposalLine PL ON PL.id = OL.proposalLineId " +
+    "INNER JOIN Proposal P ON P.id = PL.proposalId " +
+    "WHERE O.deletedAt IS NULL " +
+    "AND P.supplierId = ? " +
+    "GROUP BY O.id) AS OC";
+
+    String query = "SELECT COUNT(*) FROM " + subQuery;
+
+    return getInt(query, supplierId);
+  }
+
+  public Order getOrder(int orderId) throws SQLException {
+    // Eeeeeeeeeeeeeeeeeek...
+    String query = "SELECT " +
+    "O.*, " +
+    "P.id as proposalId, " +
+    "P.title as proposalTitle, " +
+    "P.beginDate, " +
+    "P.endDate, " +
+    "P.description, " +
+    "R.id as organizationId, " +
+    "R.name as organizationName, " +
+    "R.cuit, " +
+    "R.legalName, " +
+    "R.role, " +
+    "OL.id as orderLineId, " +
+    "OL.quantity, " +
+    "PL.price as price, " +
+    "PL.id as proposalLineId, " +
+    "Pr.id as productId, " +
+    "Pr.name as productName, " +
+    "Pr.gtin as gtin, " +
+    "Pr.description as productDescription, " +
+    "B.id as brandId, " +
+    "B.name as brandName, " +
+    "C.id as categoryId, " +
+    "C.name as categoryName " +
+    "FROM " +
+    "`Order` O " +
+    "INNER JOIN Organization R ON R.id = O.retailId " +
+    "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
+    "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+    "INNER JOIN Proposal P ON PL.proposalId = P.id " +
+    "INNER JOIN Product Pr ON PL.productId = Pr.id " +
+    "INNER JOIN Brand B ON Pr.brandId = B.id " +
+    "INNER JOIN Category C ON Pr.categoryId = C.id " +
+    "WHERE O.id = ? " +
+    "AND PL.deletedAt IS NULL;";
+
+    return this.getOneWithoutStatement(rs -> deserializeOrder(rs), query, orderId);
+  }
+
+  public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, Integer proposalId, String orderBy, Integer pageSize, Integer pageIndex, Integer supplierId, boolean showDeleted) throws SQLException{
+    ArrayList<Object> parameters = new ArrayList<Object>();
+
+    String orderSubQuery = "(SELECT O.* FROM `order` O " +
+    "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
+    "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+    "INNER JOIN Proposal P ON P.id = PL.proposalId " +
+    "WHERE ";
+
+    if (!showDeleted)
+      orderSubQuery += "O.deletedAt IS NULL ";
+    else
+      orderSubQuery += "O.id = O.id "; // This is recursive, but is an odd solution to a dumb problem.
+
+    if (fromDate != null) {
+      orderSubQuery += "AND O.dateOrdered > ? ";
+      parameters.add(fromDate);
     }
 
-    public int countOrdersForSuppliers(int supplierId) throws SQLException {
-      String subQuery = "(SELECT COUNT(*) FROM `Order` O " +
-      "INNER JOIN OrderLine OL ON O.id = OL.orderId " +
-      "INNER JOIN ProposalLine PL ON PL.id = OL.proposalLineId " +
-      "INNER JOIN Proposal P ON P.id = PL.proposalId " +
-      "WHERE O.deletedAt IS NULL " +
-      "AND P.supplierId = ? " +
-      "GROUP BY O.id) AS OC";
-
-      String query = "SELECT COUNT(*) FROM " + subQuery;
-
-      return getInt(query, supplierId);
+    if (toDate != null) {
+      orderSubQuery += "AND O.dateOrdered < ? ";
+      parameters.add(toDate);
     }
 
-    public Order getOrder(int orderId) throws SQLException {
-        // Eeeeeeeeeeeeeeeeeek...
-        String query = "SELECT " +
-            "O.*, " +
-            "P.id as proposalId, " +
-            "P.title as proposalTitle, " +
-            "P.beginDate, " +
-            "P.endDate, " +
-            "P.description, " +
-            "R.id as organizationId, " +
-            "R.name as organizationName, " +
-            "R.cuit, " +
-            "R.legalName, " +
-            "R.role, " +
-            "OL.id as orderLineId, " +
-            "OL.quantity, " +
-            "PL.price as price, " +
-            "PL.id as proposalLineId, " +
-            "Pr.id as productId, " +
-            "Pr.name as productName, " +
-            "Pr.gtin as gtin, " +
-            "Pr.description as productDescription, " +
-            "B.id as brandId, " +
-            "B.name as brandName, " +
-            "C.id as categoryId, " +
-            "C.name as categoryName " +
-            "FROM " +
-            "`Order` O " +
-            "INNER JOIN Organization R ON R.id = O.retailId " +
-            "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
-            "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
-            "INNER JOIN Proposal P ON PL.proposalId = P.id " +
-            "INNER JOIN Product Pr ON PL.productId = Pr.id " +
-            "INNER JOIN Brand B ON Pr.brandId = B.id " +
-            "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "WHERE O.id = ? " +
-            "AND PL.deletedAt IS NULL;";
-
-        return this.getOneWithoutStatement(rs -> deserializeOrder(rs), query, orderId);
+    if (retailId != null) {
+      orderSubQuery += "AND O.retailId = ? ";
+      parameters.add(retailId);
     }
 
-    public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, Integer proposalId, String orderBy, Integer pageSize, Integer pageIndex, Integer supplierId) throws SQLException{
-        ArrayList<Object> parameters = new ArrayList<Object>();
-
-        String orderSubQuery = "(SELECT O.* FROM `order` O " +
-        "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
-        "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
-        "INNER JOIN Proposal P ON P.id = PL.proposalId " +
-        "WHERE O.deletedAt IS NULL ";
-
-        if (fromDate != null) {
-            orderSubQuery += " AND O.dateOrdered > ?";
-            parameters.add(fromDate);
-        }
-
-        if (toDate != null) {
-            orderSubQuery += " AND O.dateOrdered < ?";
-            parameters.add(toDate);
-        }
-
-        if (retailId != null) {
-            orderSubQuery += " AND O.retailId = ?";
-            parameters.add(retailId);
-        }
-
-        if (proposalId != null) {
-            orderSubQuery += " AND PL.proposalId = ?";
-            parameters.add(proposalId);
-        }
-
-        if (supplierId != null) {
-            orderSubQuery += " AND P.supplierId = ?";
-            parameters.add(supplierId);
-        }
-
-        if (pageIndex != null && pageSize != null) {
-            orderSubQuery += " LIMIT ?, ? ";
-            parameters.add(pageIndex * pageSize);
-            parameters.add(pageSize);
-        }
-
-        orderSubQuery += ") as O ";
-
-        // Eeeeeeeeeeeeeeeeeek...
-        String query = "SELECT " +
-            "O.*, " +
-            "P.id as proposalId, " +
-            "P.title as proposalTitle, " +
-            "P.beginDate, " +
-            "P.endDate, " +
-            "P.description, " +
-            "R.id as organizationId, " +
-            "R.name as organizationName, " +
-            "R.cuit, " +
-            "R.legalName, " +
-            "R.role, " +
-            "OL.id as orderLineId, " +
-            "OL.quantity, " +
-            "PL.price as price, " +
-            "PL.id as proposalLineId, " +
-            "Pr.id as productId, " +
-            "Pr.name as productName, " +
-            "Pr.gtin as gtin, " +
-            "Pr.description as productDescription, " +
-            "B.id as brandId, " +
-            "B.name as brandName, " +
-            "C.id as categoryId, " +
-            "C.name as categoryName " +
-            "FROM " +
-            orderSubQuery;
-
-        query += "INNER JOIN Organization R ON R.id = O.retailId " +
-            "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
-            "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
-            "INNER JOIN Proposal P ON PL.proposalId = P.id " +
-            "INNER JOIN Product Pr ON PL.productId = Pr.id " +
-            "INNER JOIN Brand B ON Pr.brandId = B.id " +
-            "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "WHERE PL.deletedAt IS NULL";
-
-            query += ";";
-
-        return getManyWithoutStatement(rs -> deserializeOrders(rs), query, parameters.toArray());
+    if (proposalId != null) {
+      orderSubQuery += "AND PL.proposalId = ? ";
+      parameters.add(proposalId);
     }
 
-    public ArrayList<Ranking> getOrderCountByMonth(int supplierId) throws SQLException {
-      ArrayList<Object> parameters = new ArrayList<Object>();
-
-      String query = "SELECT count(*) as count, " +
-      "CONCAT(year(O.dateOrdered), ' ',  monthname(O.dateOrdered)) as date " +
-      "FROM " +
-      "( " +
-      "SELECT Ord.dateOrdered, Ord.id FROM " +
-      "`Order` Ord " +
-      "INNER JOIN OrderLine OL ON OL.orderId = Ord.id " +
-      "INNER JOIN ProposalLine PL ON PL.id = OL.proposalLineId " +
-      "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
-      "WHERE Pr.deletedAt IS NULL " +
-      "AND Pr.supplierId = ? " +
-      "GROUP BY Ord.id " +
-      ") AS O " +
-      "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
-
+    if (supplierId != null) {
+      orderSubQuery += "AND P.supplierId = ? ";
       parameters.add(supplierId);
-
-      return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
     }
 
-    public ArrayList<Ranking> getOwnOrderCountByMonth(int retailerId) throws SQLException {
-      ArrayList<Object> parameters = new ArrayList<Object>();
-
-      String query = "SELECT count(*) as count, " +
-      "CONCAT(year(O.dateOrdered), ' ',  monthname(O.dateOrdered)) as date " +
-      "FROM " +
-      "( " +
-      "SELECT Ord.dateOrdered, Ord.id FROM " +
-      "`Order` Ord " +
-      "WHERE ord.deletedAt IS NULL " +
-      "AND ord.retailId = ? " +
-      "GROUP BY Ord.id " +
-      ") AS O " +
-      "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
-
-      parameters.add(retailerId);
-
-      return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+    if (pageIndex != null && pageSize != null) {
+      orderSubQuery += "LIMIT ?, ? ";
+      parameters.add(pageIndex * pageSize);
+      parameters.add(pageSize);
     }
 
-    private Ranking deserializeRanking(ResultSet rs) throws SQLException {
-        return new Ranking(rs.getInt("count"), rs.getString("date"));
+    orderSubQuery += ") as O ";
+
+    // Eeeeeeeeeeeeeeeeeek...
+    String query = "SELECT " +
+    "O.*, " +
+    "P.id as proposalId, " +
+    "P.title as proposalTitle, " +
+    "P.beginDate, " +
+    "P.endDate, " +
+    "P.description, " +
+    "R.id as organizationId, " +
+    "R.name as organizationName, " +
+    "R.cuit, " +
+    "R.legalName, " +
+    "R.role, " +
+    "OL.id as orderLineId, " +
+    "OL.quantity, " +
+    "PL.price as price, " +
+    "PL.id as proposalLineId, " +
+    "Pr.id as productId, " +
+    "Pr.name as productName, " +
+    "Pr.gtin as gtin, " +
+    "Pr.description as productDescription, " +
+    "B.id as brandId, " +
+    "B.name as brandName, " +
+    "C.id as categoryId, " +
+    "C.name as categoryName " +
+    "FROM " +
+    orderSubQuery;
+
+    query += "INNER JOIN Organization R ON R.id = O.retailId " +
+    "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
+    "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+    "INNER JOIN Proposal P ON PL.proposalId = P.id " +
+    "INNER JOIN Product Pr ON PL.productId = Pr.id " +
+    "INNER JOIN Brand B ON Pr.brandId = B.id " +
+    "INNER JOIN Category C ON Pr.categoryId = C.id " +
+    "WHERE PL.deletedAt IS NULL";
+
+    query += ";";
+
+    return getManyWithoutStatement(rs -> deserializeOrders(rs), query, parameters.toArray());
+  }
+
+  public ArrayList<Ranking> getOrderCountByMonth(int supplierId) throws SQLException {
+    ArrayList<Object> parameters = new ArrayList<Object>();
+
+    String query = "SELECT count(*) as count, " +
+    "CONCAT(year(O.dateOrdered), ' ',  monthname(O.dateOrdered)) as date " +
+    "FROM " +
+    "( " +
+    "SELECT Ord.dateOrdered, Ord.id FROM " +
+    "`Order` Ord " +
+    "INNER JOIN OrderLine OL ON OL.orderId = Ord.id " +
+    "INNER JOIN ProposalLine PL ON PL.id = OL.proposalLineId " +
+    "INNER JOIN Proposal Pr ON Pr.id = PL.proposalId " +
+    "WHERE Pr.deletedAt IS NULL " +
+    "AND Pr.supplierId = ? " +
+    "GROUP BY Ord.id " +
+    ") AS O " +
+    "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
+
+    parameters.add(supplierId);
+
+    return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+  }
+
+  public ArrayList<Ranking> getOwnOrderCountByMonth(int retailerId) throws SQLException {
+    ArrayList<Object> parameters = new ArrayList<Object>();
+
+    String query = "SELECT count(*) as count, " +
+    "CONCAT(year(O.dateOrdered), ' ',  monthname(O.dateOrdered)) as date " +
+    "FROM " +
+    "( " +
+    "SELECT Ord.dateOrdered, Ord.id FROM " +
+    "`Order` Ord " +
+    "WHERE ord.deletedAt IS NULL " +
+    "AND ord.retailId = ? " +
+    "GROUP BY Ord.id " +
+    ") AS O " +
+    "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
+
+    parameters.add(retailerId);
+
+    return getMany(rs -> deserializeRanking(rs), query, parameters.toArray());
+  }
+
+  private Ranking deserializeRanking(ResultSet rs) throws SQLException {
+    return new Ranking(rs.getInt("count"), rs.getString("date"));
+  }
+
+  public int countSearch(Date fromDate, Date toDate, Integer retailId, Integer supplierId, boolean showDeleted) throws SQLException{
+    ArrayList<Object> parameters = new ArrayList<Object>();
+
+    // Eeeeeeeeeeeeeeeeeek...
+    String query = "SELECT COUNT(*) as size " +
+    "FROM " +
+    "( SELECT O.* FROM `Order` O " +
+    "INNER JOIN Organization R ON R.id = O.retailId " +
+    "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
+    "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
+    "INNER JOIN Proposal P ON PL.proposalId = P.id " +
+    "INNER JOIN Product Pr ON PL.productId = Pr.id " +
+    "INNER JOIN Brand B ON Pr.brandId = B.id " +
+    "INNER JOIN Category C ON Pr.categoryId = C.id " +
+    "WHERE ";
+
+    if (!showDeleted)
+      query += "O.deletedAt IS NULL ";
+    else
+      query += "O.id = O.id "; // This is recursive, but is an odd solution to a dumb problem.
+
+    if (fromDate != null) {
+      query += " AND O.dateOrdered > ?";
+      parameters.add(fromDate);
     }
 
-    public int countSearch(Date fromDate, Date toDate, Integer retailId, Integer supplierId) throws SQLException{
-        ArrayList<Object> parameters = new ArrayList<Object>();
-
-        // Eeeeeeeeeeeeeeeeeek...
-        String query = "SELECT COUNT(*) as size " +
-            "FROM " +
-            "( SELECT O.* FROM `Order` O " +
-            "INNER JOIN Organization R ON R.id = O.retailId " +
-            "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
-            "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
-            "INNER JOIN Proposal P ON PL.proposalId = P.id " +
-            "INNER JOIN Product Pr ON PL.productId = Pr.id " +
-            "INNER JOIN Brand B ON Pr.brandId = B.id " +
-            "INNER JOIN Category C ON Pr.categoryId = C.id " +
-            "WHERE PL.deletedAt IS NULL";
-
-            if (fromDate != null) {
-                query += " AND O.dateOrdered > ?";
-                parameters.add(fromDate);
-            }
-
-            if (toDate != null) {
-                query += " AND O.dateOrdered < ?";
-                parameters.add(toDate);
-            }
-
-            if (retailId != null) {
-                query += " AND O.retailId = ?";
-                parameters.add(retailId);
-            }
-
-            if (supplierId != null) {
-                query += " AND P.supplierId = ?";
-                parameters.add(supplierId);
-            }
-
-            query += " GROUP BY O.id) as x";
-
-            query += ";";
-
-        return getInt(query, parameters.toArray());
+    if (toDate != null) {
+      query += " AND O.dateOrdered < ?";
+      parameters.add(toDate);
     }
 
-    public Order registerOrder(Order order) throws SQLException{
-        java.sql.Connection conn = Connection.getInstancia().getConn();
-
-        try {
-            conn.setAutoCommit(false);
-
-            // All this messy code is to run everything as a transaction.
-            order = createOrder(order);
-
-            for (OrderLine ol : order.getOrderLines()) {
-                // TODO: IDK other way to avoid infinite loops, at least this way it works.
-                Order o = new Order();
-                o.setId(order.getId());
-                ol.setOrder(o);
-
-                // Would this do the trick? Damn java, you tha boss.
-                ol = createOrderLine(ol);
-            }
-
-            conn.commit();
-            conn.setAutoCommit(true);
-        }
-        catch(SQLException e1) {
-            try {
-                conn.rollback();
-                conn.setAutoCommit(true);
-                throw e1;
-            }
-            catch(SQLException e2) {
-                throw e2;
-            }
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
-
-        return order;
+    if (retailId != null) {
+      query += " AND O.retailId = ?";
+      parameters.add(retailId);
     }
 
-    public Order createOrder(Order order) throws SQLException{
-        String query = "INSERT INTO `Order` (dateOrdered, retailId) VALUES (?, ?);";
-
-        order.setId(this.create(query,
-            new Timestamp(order.getDateOrdered().getTime()),
-            order.getRetail().getId())
-        );
-
-        return order;
+    if (supplierId != null) {
+      query += " AND P.supplierId = ?";
+      parameters.add(supplierId);
     }
 
-    public OrderLine createOrderLine(OrderLine orderLine) throws SQLException {
-        String query = "INSERT INTO OrderLine (proposalLineId, orderId, quantity) VALUES (?, ?, ?);";
+    query += " GROUP BY O.id) as x";
 
-        orderLine.setId(this.create(query,
-            orderLine.getProposalLine().getId(),
-            orderLine.getOrder().getId(),
-            orderLine.getQuantity())
-        );
+    query += ";";
 
-        return orderLine;
+    return getInt(query, parameters.toArray());
+  }
+
+  public Order registerOrder(Order order) throws SQLException{
+    java.sql.Connection conn = Connection.getInstancia().getConn();
+
+    try {
+      conn.setAutoCommit(false);
+
+      // All this messy code is to run everything as a transaction.
+      order = createOrder(order);
+
+      for (OrderLine ol : order.getOrderLines()) {
+        // TODO: IDK other way to avoid infinite loops, at least this way it works.
+        Order o = new Order();
+        o.setId(order.getId());
+        ol.setOrder(o);
+
+        // Would this do the trick? Damn java, you tha boss.
+        ol = createOrderLine(ol);
+      }
+
+      conn.commit();
+      conn.setAutoCommit(true);
+    }
+    catch(SQLException e1) {
+      try {
+        conn.rollback();
+        conn.setAutoCommit(true);
+        throw e1;
+      }
+      catch(SQLException e2) {
+        throw e2;
+      }
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    private ArrayList<Order> deserializeOrders(ResultSet resultSet) throws SQLException {
-        Order order = null;
-        HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
+    return order;
+  }
 
-        // There are more than 1 result, due to the inner join
-        while (resultSet.next()) {
-            order = orders.get(resultSet.getInt("id"));
+  public Order createOrder(Order order) throws SQLException{
+    String query = "INSERT INTO `Order` (dateOrdered, retailId) VALUES (?, ?);";
 
-            // When order changes, add it to the arrayList and start filling it.
-            if (order == null) {
-                order = new Order();
+    order.setId(this.create(query,
+    new Timestamp(order.getDateOrdered().getTime()),
+    order.getRetail().getId())
+    );
 
-                order.setId(resultSet.getInt("id"));
-                order.setDateOrdered(resultSet.getTimestamp("dateOrdered"));
-                order.setRetail(new Retail(
-                    resultSet.getInt("organizationId"),
-                    resultSet.getString("organizationName"),
-                    resultSet.getString("cuit"),
-                    resultSet.getString("legalName"),
-                    resultSet.getString("role")
-                ));
+    return order;
+  }
 
-                orders.put(order.getId(), order);
-            }
+  public OrderLine createOrderLine(OrderLine orderLine) throws SQLException {
+    String query = "INSERT INTO OrderLine (proposalLineId, orderId, quantity) VALUES (?, ?, ?);";
 
-            // Add all the lines with the proposals and product.
-            OrderLine line = new OrderLine();
+    orderLine.setId(this.create(query,
+    orderLine.getProposalLine().getId(),
+    orderLine.getOrder().getId(),
+    orderLine.getQuantity())
+    );
 
-            line.setQuantity(resultSet.getInt("quantity"));
-            line.setId(resultSet.getInt("orderLineId"));
+    return orderLine;
+  }
 
-            // Add all the lines with the products to the proposal.
-            ProposalLine proposalLine = new ProposalLine();
+  private ArrayList<Order> deserializeOrders(ResultSet resultSet) throws SQLException {
+    Order order = null;
+    HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
 
-            proposalLine.setPrice(resultSet.getFloat("price"));
-            proposalLine.setId(resultSet.getInt("proposalLineId"));
+    // There are more than 1 result, due to the inner join
+    while (resultSet.next()) {
+      order = orders.get(resultSet.getInt("id"));
 
-            proposalLine.setProduct(new Product(
-                resultSet.getInt("productId"),
-                resultSet.getString("productName"),
-                resultSet.getString("gtin"),
-                resultSet.getString("description"),
-                new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
-                new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
-            ));
+      // When order changes, add it to the arrayList and start filling it.
+      if (order == null) {
+        order = new Order();
 
-            Proposal proposal = new Proposal();
+        order.setId(resultSet.getInt("id"));
+        order.setDateOrdered(resultSet.getTimestamp("dateOrdered"));
+        order.setRetail(new Retail(
+        resultSet.getInt("organizationId"),
+        resultSet.getString("organizationName"),
+        resultSet.getString("cuit"),
+        resultSet.getString("legalName"),
+        resultSet.getString("role")
+        ));
 
-            proposal.setId(resultSet.getInt("proposalId"));
-            proposal.setTitle(resultSet.getString("proposalTitle"));
-            proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
-            proposal.setEndDate(resultSet.getTimestamp("endDate"));
-            proposal.setDescription(resultSet.getString("description"));
+        orders.put(order.getId(), order);
+      }
 
-            proposalLine.setProposal(proposal);
+      // Add all the lines with the proposals and product.
+      OrderLine line = new OrderLine();
 
-            line.setProposalLine(proposalLine);
+      line.setQuantity(resultSet.getInt("quantity"));
+      line.setId(resultSet.getInt("orderLineId"));
 
-            order.getOrderLines().add(line);
-        }
+      // Add all the lines with the products to the proposal.
+      ProposalLine proposalLine = new ProposalLine();
 
-        return new ArrayList<Order>(orders.values());
+      proposalLine.setPrice(resultSet.getFloat("price"));
+      proposalLine.setId(resultSet.getInt("proposalLineId"));
+
+      proposalLine.setProduct(new Product(
+      resultSet.getInt("productId"),
+      resultSet.getString("productName"),
+      resultSet.getString("gtin"),
+      resultSet.getString("description"),
+      new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
+      new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
+      ));
+
+      Proposal proposal = new Proposal();
+
+      proposal.setId(resultSet.getInt("proposalId"));
+      proposal.setTitle(resultSet.getString("proposalTitle"));
+      proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
+      proposal.setEndDate(resultSet.getTimestamp("endDate"));
+      proposal.setDescription(resultSet.getString("description"));
+
+      proposalLine.setProposal(proposal);
+
+      line.setProposalLine(proposalLine);
+
+      order.getOrderLines().add(line);
     }
 
-    private Order deserializeOrder(ResultSet resultSet) throws SQLException {
-        Order order = null;
+    return new ArrayList<Order>(orders.values());
+  }
 
-        int currentOrderId = 0;
+  private Order deserializeOrder(ResultSet resultSet) throws SQLException {
+    Order order = null;
 
-        // There are more than 1 result, due to the inner join
-        while (resultSet.next()) {
-            // If proposal didn't change (should be only one... but just in case)
-            if (resultSet.getInt("id") != currentOrderId) {
-                order = new Order();
+    int currentOrderId = 0;
 
-                order.setId(resultSet.getInt("id"));
-                order.setDateOrdered(resultSet.getTimestamp("dateOrdered"));
-                order.setRetail(new Retail(
-                    resultSet.getInt("organizationId"),
-                    resultSet.getString("organizationName"),
-                    resultSet.getString("cuit"),
-                    resultSet.getString("legalName"),
-                    resultSet.getString("role")
-                ));
+    // There are more than 1 result, due to the inner join
+    while (resultSet.next()) {
+      // If proposal didn't change (should be only one... but just in case)
+      if (resultSet.getInt("id") != currentOrderId) {
+        order = new Order();
 
-                currentOrderId = order.getId();
-            }
+        order.setId(resultSet.getInt("id"));
+        order.setDateOrdered(resultSet.getTimestamp("dateOrdered"));
+        order.setRetail(new Retail(
+        resultSet.getInt("organizationId"),
+        resultSet.getString("organizationName"),
+        resultSet.getString("cuit"),
+        resultSet.getString("legalName"),
+        resultSet.getString("role")
+        ));
 
-            // Add all the lines with the proposals and product.
-            OrderLine line = new OrderLine();
+        currentOrderId = order.getId();
+      }
 
-            line.setQuantity(resultSet.getInt("quantity"));
-            line.setId(resultSet.getInt("orderLineId"));
+      // Add all the lines with the proposals and product.
+      OrderLine line = new OrderLine();
 
-            // Add all the lines with the products to the proposal.
-            ProposalLine proposalLine = new ProposalLine();
+      line.setQuantity(resultSet.getInt("quantity"));
+      line.setId(resultSet.getInt("orderLineId"));
 
-            proposalLine.setPrice(resultSet.getFloat("price"));
-            proposalLine.setId(resultSet.getInt("proposalLineId"));
+      // Add all the lines with the products to the proposal.
+      ProposalLine proposalLine = new ProposalLine();
 
-            proposalLine.setProduct(new Product(
-                resultSet.getInt("productId"),
-                resultSet.getString("productName"),
-                resultSet.getString("gtin"),
-                resultSet.getString("description"),
-                new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
-                new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
-            ));
+      proposalLine.setPrice(resultSet.getFloat("price"));
+      proposalLine.setId(resultSet.getInt("proposalLineId"));
 
-            Proposal proposal = new Proposal();
+      proposalLine.setProduct(new Product(
+      resultSet.getInt("productId"),
+      resultSet.getString("productName"),
+      resultSet.getString("gtin"),
+      resultSet.getString("description"),
+      new Brand(resultSet.getInt("brandId"), resultSet.getString("brandName")),
+      new Category(resultSet.getInt("categoryId"), resultSet.getString("categoryName"))
+      ));
 
-            proposal.setId(resultSet.getInt("proposalId"));
-            proposal.setTitle(resultSet.getString("proposalTitle"));
-            proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
-            proposal.setEndDate(resultSet.getTimestamp("endDate"));
-            proposal.setDescription(resultSet.getString("description"));
+      Proposal proposal = new Proposal();
 
-            proposalLine.setProposal(proposal);
+      proposal.setId(resultSet.getInt("proposalId"));
+      proposal.setTitle(resultSet.getString("proposalTitle"));
+      proposal.setBeginDate(resultSet.getTimestamp("beginDate"));
+      proposal.setEndDate(resultSet.getTimestamp("endDate"));
+      proposal.setDescription(resultSet.getString("description"));
 
-            line.setProposalLine(proposalLine);
+      proposalLine.setProposal(proposal);
 
-            order.getOrderLines().add(line);
-        }
+      line.setProposalLine(proposalLine);
 
-        return order;
+      order.getOrderLines().add(line);
     }
+
+    return order;
+  }
 }

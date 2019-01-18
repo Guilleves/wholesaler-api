@@ -64,7 +64,8 @@ public class OrderLogic {
       request.getOrderBy(),
       request.getPageSize(),
       request.getPageIndex(),
-      request.getSupplierId()
+      request.getSupplierId(),
+      request.isShowDeleted()
       );
 
       if (orders == null || orders.isEmpty())
@@ -91,7 +92,8 @@ public class OrderLogic {
       request.getFromDate(),
       request.getToDate(),
       request.getRetailId(),
-      request.getSupplierId()),
+      request.getSupplierId(),
+      request.isShowDeleted()),
       response
       );
     }

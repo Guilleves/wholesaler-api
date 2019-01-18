@@ -60,8 +60,6 @@ public class UserDataAccess extends BaseDataAccess {
 
     query += ";";
 
-    System.out.println(query);
-
     return getMany(rs -> new User(rs), query, parameters.toArray());
   }
 

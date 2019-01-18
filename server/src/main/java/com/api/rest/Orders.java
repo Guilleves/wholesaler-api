@@ -61,7 +61,7 @@ public class Orders {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/")
-  public Response getOrders(@Context SecurityContext context, @QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("supplierId") Integer supplierId, @QueryParam("fromDate") long fromDate, @QueryParam("toDate") long toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+  public Response getOrders(@Context SecurityContext context, @QueryParam("showDeleted") boolean showDeleted, @QueryParam("retailId") Integer retailId, @QueryParam("proposalId") Integer proposalId, @QueryParam("supplierId") Integer supplierId, @QueryParam("fromDate") long fromDate, @QueryParam("toDate") long toDate, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
     GetOrdersRequest request = new GetOrdersRequest(
     orderBy,
     pageIndex,
@@ -70,7 +70,8 @@ public class Orders {
     proposalId,
     supplierId,
     fromDate == 0l ? null : new Date(fromDate),
-    toDate == 0l ? null : new Date(toDate)
+    toDate == 0l ? null : new Date(toDate),
+    showDeleted
     );
 
     try {

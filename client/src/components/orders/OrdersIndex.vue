@@ -103,7 +103,10 @@ export default {
   },
   watch: {
     selectedRetail(val) {
-      this.buildSearchCriteria({ retailId: val.id })
+      this.buildSearchCriteria({ retailId: val ? val.id : null })
+    },
+    showDeleted(val) {
+      this.buildSearchCriteria({ showDeleted: val })
     }
   },
   components: {

@@ -8,6 +8,7 @@ public class GetOrdersRequest extends BaseSearchRequest {
 
     private Integer retailId, proposalId, supplierId;
     private Date fromDate, toDate;
+    private boolean showDeleted;
 
 	/**
 	* Default empty GetOrdersRequest constructor
@@ -19,25 +20,27 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	/**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(Integer retailId, Integer proposalId, Integer supplierId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(Integer retailId, Integer proposalId, Integer supplierId, Date fromDate, Date toDate, boolean showDeleted) {
 		super();
 		this.retailId = retailId;
     this.proposalId = proposalId;
 		this.fromDate = fromDate;
 		this.toDate = toDate;
     this.supplierId = supplierId;
+    this.showDeleted = showDeleted;
 	}
 
     /**
 	* Default GetOrdersRequest constructor
 	*/
-	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Integer proposalId, Integer supplierId, Date fromDate, Date toDate) {
+	public GetOrdersRequest(String orderBy, Integer pageIndex, Integer pageSize, Integer retailId, Integer proposalId, Integer supplierId, Date fromDate, Date toDate, boolean showDeleted) {
 		super(orderBy, pageIndex, pageSize);
 		this.retailId = retailId;
     this.proposalId = proposalId;
 		this.fromDate = fromDate;
     this.supplierId = supplierId;
 		this.toDate = toDate;
+    this.showDeleted = showDeleted;
 	}
 
 	/**
@@ -52,12 +55,28 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	* Sets new value of retailId
 	* @param
 	*/
+	public void setRetailId(Integer retailId) {
+		this.retailId = retailId;
+	}
+
+	/**
+	* Returns value of proposalId
+	* @return
+	*/
+	public Integer getProposalId() {
+		return proposalId;
+	}
+
+	/**
+	* Sets new value of proposalId
+	* @param
+	*/
 	public void setProposalId(Integer proposalId) {
 		this.proposalId = proposalId;
 	}
 
-  /**
-	* Returns value of supplierIdd
+	/**
+	* Returns value of supplierId
 	* @return
 	*/
 	public Integer getSupplierId() {
@@ -70,22 +89,6 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	*/
 	public void setSupplierId(Integer supplierId) {
 		this.supplierId = supplierId;
-	}
-
-    /**
-	* Returns value of retailId
-	* @return
-	*/
-	public Integer getProposalId() {
-		return proposalId;
-	}
-
-	/**
-	* Sets new value of retailId
-	* @param
-	*/
-	public void setRetailId(Integer retailId) {
-		this.retailId = retailId;
 	}
 
 	/**
@@ -118,5 +121,21 @@ public class GetOrdersRequest extends BaseSearchRequest {
 	*/
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
+	}
+
+	/**
+	* Returns value of showDeleted
+	* @return
+	*/
+	public boolean isShowDeleted() {
+		return showDeleted;
+	}
+
+	/**
+	* Sets new value of showDeleted
+	* @param
+	*/
+	public void setShowDeleted(boolean showDeleted) {
+		this.showDeleted = showDeleted;
 	}
 }
