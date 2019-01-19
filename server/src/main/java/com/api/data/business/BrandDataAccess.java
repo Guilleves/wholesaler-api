@@ -1,12 +1,8 @@
 package com.api.data.business;
 
 import com.api.entities.business.Brand;
-
 import java.sql.SQLException;
-
 import java.util.ArrayList;
-
-// #endregion
 
 public class BrandDataAccess extends BaseDataAccess {
 
