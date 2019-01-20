@@ -48,7 +48,7 @@ public class ProductDataAccess extends BaseDataAccess {
     public ArrayList<Product> getProducts(Integer brandId, Integer categoryId, Integer pageIndex, Integer pageSize, String keyword, String orderBy) throws SQLException {
         ArrayList<Object> parameters = new ArrayList<Object>();
 
-        String productSubQuery = "(SELECT P.* FROM Product P INNER JOIN brand B ON B.id = P.brandId INNER JOIN Category C ON C.id = P.categoryId WHERE P.deletedAt IS NULL ";
+        String productSubQuery = "(SELECT P.* FROM Product P INNER JOIN Brand B ON B.id = P.brandId INNER JOIN Category C ON C.id = P.categoryId WHERE P.deletedAt IS NULL ";
 
         if (brandId != null) {
             productSubQuery += " AND B.id = ?";
