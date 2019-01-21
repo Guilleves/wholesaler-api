@@ -201,8 +201,8 @@ public class OrderDataAccess extends BaseDataAccess {
     "( " +
     "SELECT Ord.dateOrdered, Ord.id FROM " +
     "`Order` Ord " +
-    "WHERE ord.deletedAt IS NULL " +
-    "AND ord.retailId = ? " +
+    "WHERE Ord.deletedAt IS NULL " +
+    "AND Ord.retailId = ? " +
     "GROUP BY Ord.id " +
     ") AS O " +
     "GROUP BY YEAR(O.dateOrdered), MONTH(O.dateOrdered) ";
@@ -274,12 +274,9 @@ public class OrderDataAccess extends BaseDataAccess {
       order = createOrder(order);
 
       for (OrderLine ol : order.getOrderLines()) {
-        // TODO: IDK other way to avoid infinite loops, at least this way it works.
         Order o = new Order();
         o.setId(order.getId());
         ol.setOrder(o);
-
-        // Would this do the trick? Damn java, you tha boss.
         ol = createOrderLine(ol);
       }
 

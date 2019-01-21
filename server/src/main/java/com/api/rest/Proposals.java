@@ -46,10 +46,11 @@ public class Proposals {
   @Consumes(MediaType.APPLICATION_JSON)
   @Secured()
   @Path("/")
-  public Response getProposals(@Context SecurityContext context, @QueryParam("status") String status, @QueryParam("supplierId") Integer supplierId, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("pageIndex") Integer pageIndex) {
+  public Response getProposals(@Context SecurityContext context, @QueryParam("status") String status, @QueryParam("supplierId") Integer supplierId, @QueryParam("orderBy") String orderBy, @QueryParam("pageSize") Integer pageSize, @QueryParam("showDeleted") boolean showDeleted, @QueryParam("pageIndex") Integer pageIndex) {
     GetProposalsRequest request = new GetProposalsRequest(
     orderBy,
     status,
+    showDeleted,
     pageIndex,
     pageSize,
     supplierId

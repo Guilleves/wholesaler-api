@@ -13,6 +13,11 @@
               placeholder="Select a status"
               v-model="selectedStatus" />
             </div>
+            <div class="column">
+              <b-switch v-model="showDeleted">
+                Show deleted orders
+              </b-switch>
+            </div>
           </div>
         </div>
         <div class="column">
@@ -55,6 +60,7 @@ export default {
   name: 'proposals-index',
   data() {
     return {
+      showDeleted: false,
       selectedStatus: null,
       currentSupplier: Session.get().organization.id,
       currentRole: Session.get().organization.role,
@@ -75,6 +81,9 @@ export default {
   watch: {
     selectedStatus(val) {
       this.buildSearchCriteria({ status: val ? val.id : null });
+    },
+    showDeleted(val) {
+      this.buildSearchCriteria({ showDeleted: val })
     }
   },
   components: {

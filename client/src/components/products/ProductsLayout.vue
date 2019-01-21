@@ -13,7 +13,7 @@ export default {
   components: {
     WsHero
   },
-  mounted() {
+  beforeMount() {
     if (Session.get().organization && Session.get().organization.role !== "supplier")
       this.$router.push("/unauthorized");
   }

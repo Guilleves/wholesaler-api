@@ -12,270 +12,270 @@ import java.sql.Statement;
 // #endregion
 
 public class BaseDataAccess {
-    protected <T extends BaseEntity> ArrayList<T> getManyWithoutStatement(DBToObject<ArrayList<T>> converter, String query, Object... parameters) throws SQLException {
-        ArrayList<T> ResList = new ArrayList<>();
-    	Statement st = null;
-    	ResultSet rs = null;
+  protected <T extends BaseEntity> ArrayList<T> getManyWithoutStatement(DBToObject<ArrayList<T>> converter, String query, Object... parameters) throws SQLException {
+    ArrayList<T> ResList = new ArrayList<>();
+    Statement st = null;
+    ResultSet rs = null;
 
-        try {
-        	// Create statement or preparedStatement.
-        	if (parameters == null) {
-        		st = Connection.getInstancia().getConn().createStatement();
+    try {
+      // Create statement or preparedStatement.
+      if (parameters == null) {
+        st = Connection.getInstancia().getConn().createStatement();
 
-        		// ... execute the query.
-                rs = st.executeQuery(query);
-        	}
-        	else {
-        		st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        // ... execute the query.
+        rs = st.executeQuery(query);
+      }
+      else {
+        st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-        		int i = 0;
+        int i = 0;
 
-        		for (Object parameter : parameters) {
-        			i++;
+        for (Object parameter : parameters) {
+          i++;
 
-        			((PreparedStatement)st).setObject(i, parameter);
-        		}
-
-        		// ... execute the query.
-                rs = ((PreparedStatement)st).executeQuery();
-        	}
-
-            ResList = converter.createFromDB(rs);
+          ((PreparedStatement)st).setObject(i, parameter);
         }
-        catch (SQLException ex) {
-        	throw ex;
-        }
-		finally {
-			Connection.getInstancia().closeConn();
-		}
 
-        return ResList;
+        // ... execute the query.
+        rs = ((PreparedStatement)st).executeQuery();
+      }
+
+      ResList = converter.createFromDB(rs);
+    }
+    catch (SQLException ex) {
+      throw ex;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected <T extends BaseEntity> ArrayList<T> getMany(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
-        ArrayList<T> ResList = new ArrayList<>();
-    	Statement st = null;
-    	ResultSet rs = null;
+    return ResList;
+  }
 
-        try {
-        	if (parameters == null) {
-        		st = Connection.getInstancia().getConn().createStatement();
+  protected <T extends BaseEntity> ArrayList<T> getMany(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
+    ArrayList<T> ResList = new ArrayList<>();
+    Statement st = null;
+    ResultSet rs = null;
 
-                rs = st.executeQuery(query);
-        	}
-        	else {
-        		st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    try {
+      if (parameters == null) {
+        st = Connection.getInstancia().getConn().createStatement();
 
-        		int i = 0;
+        rs = st.executeQuery(query);
+      }
+      else {
+        st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-        		for (Object parameter : parameters) {
-        			i++;
+        int i = 0;
 
-        			((PreparedStatement)st).setObject(i, parameter);
-        		}
+        for (Object parameter : parameters) {
+          i++;
 
-                rs = ((PreparedStatement)st).executeQuery();
-        	}
-
-            while(rs.next())
-                ResList.add((T)converter.createFromDB(rs));
+          ((PreparedStatement)st).setObject(i, parameter);
         }
-        catch (SQLException ex) {
-        	throw ex;
-        }
-		finally {
-			Connection.getInstancia().closeConn();
-		}
 
-        return ResList;
+        rs = ((PreparedStatement)st).executeQuery();
+      }
+
+      while(rs.next())
+      ResList.add((T)converter.createFromDB(rs));
+    }
+    catch (SQLException ex) {
+      throw ex;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected <T extends BaseEntity> T getOne(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
-    	T result = null;
-    	Statement st = null;
-    	ResultSet rs = null;
+    return ResList;
+  }
 
-        try {
-        	if (parameters == null) {
-        		st = Connection.getInstancia().getConn().createStatement();
+  protected <T extends BaseEntity> T getOne(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
+    T result = null;
+    Statement st = null;
+    ResultSet rs = null;
 
-                rs = st.executeQuery(query);
-        	}
-        	else {
-        		st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    try {
+      if (parameters == null) {
+        st = Connection.getInstancia().getConn().createStatement();
 
-        		int i = 0;
+        rs = st.executeQuery(query);
+      }
+      else {
+        st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-        		for (Object parameter : parameters) {
-        			i++;
+        int i = 0;
 
-        			((PreparedStatement)st).setObject(i, parameter);
-        		}
+        for (Object parameter : parameters) {
+          i++;
 
-                rs = ((PreparedStatement)st).executeQuery();
-        	}
-
-            if (rs.next())
-                result = converter.createFromDB(rs);
+          ((PreparedStatement)st).setObject(i, parameter);
         }
-        catch (SQLException ex) {
-        	throw ex;
-        }
-		finally {
-			Connection.getInstancia().closeConn();
-		}
 
-        return result;
+        rs = ((PreparedStatement)st).executeQuery();
+      }
+
+      if (rs.next())
+      result = converter.createFromDB(rs);
+    }
+    catch (SQLException ex) {
+      throw ex;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected int getInt(String query, Object... parameters) throws SQLException {
-    	int result = 0;
-    	Statement st = null;
-    	ResultSet rs = null;
+    return result;
+  }
 
-        try {
-        	if (parameters == null) {
-        		st = Connection.getInstancia().getConn().createStatement();
+  protected int getInt(String query, Object... parameters) throws SQLException {
+    int result = 0;
+    Statement st = null;
+    ResultSet rs = null;
 
-                rs = st.executeQuery(query);
-        	}
-        	else {
-        		st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    try {
+      if (parameters == null) {
+        st = Connection.getInstancia().getConn().createStatement();
 
-        		int i = 0;
+        rs = st.executeQuery(query);
+      }
+      else {
+        st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-        		for (Object parameter : parameters) {
-        			i++;
+        int i = 0;
 
-        			((PreparedStatement)st).setObject(i, parameter);
-        		}
+        for (Object parameter : parameters) {
+          i++;
 
-                rs = ((PreparedStatement)st).executeQuery();
-        	}
-
-            if (rs.next())
-                result = rs.getInt(1);
+          ((PreparedStatement)st).setObject(i, parameter);
         }
-        catch (SQLException ex) {
-        	throw ex;
-        }
-		finally {
-			Connection.getInstancia().closeConn();
-		}
 
-        return result;
+        rs = ((PreparedStatement)st).executeQuery();
+      }
+
+      if (rs.next())
+      result = rs.getInt(1);
+    }
+    catch (SQLException ex) {
+      throw ex;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected <T extends BaseEntity> T getOneWithoutStatement(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
-        T result = null;
-        Statement st = null;
-        ResultSet rs = null;
+    return result;
+  }
 
-        try {
-            if (parameters == null) {
-                st = Connection.getInstancia().getConn().createStatement();
+  protected <T extends BaseEntity> T getOneWithoutStatement(DBToObject<T> converter, String query, Object... parameters) throws SQLException {
+    T result = null;
+    Statement st = null;
+    ResultSet rs = null;
 
-                rs = st.executeQuery(query);
-            }
-            else {
-                st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    try {
+      if (parameters == null) {
+        st = Connection.getInstancia().getConn().createStatement();
 
-                int i = 0;
+        rs = st.executeQuery(query);
+      }
+      else {
+        st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-                for (Object parameter : parameters) {
-                    i++;
+        int i = 0;
 
-                    ((PreparedStatement)st).setObject(i, parameter);
-                }
+        for (Object parameter : parameters) {
+          i++;
 
-                rs = ((PreparedStatement)st).executeQuery();
-            }
-
-            result = converter.createFromDB(rs);
-        }
-        catch (SQLException ex) {
-            throw ex;
-        }
-        finally {
-            Connection.getInstancia().closeConn();
+          ((PreparedStatement)st).setObject(i, parameter);
         }
 
-        return result;
+        rs = ((PreparedStatement)st).executeQuery();
+      }
+
+      result = converter.createFromDB(rs);
+    }
+    catch (SQLException ex) {
+      throw ex;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected <T extends BaseEntity> int update(String query, Object... parameters) throws SQLException {
-    	int affectedRows = 0;
-    	int result = 0;
-    	PreparedStatement st = null;
+    return result;
+  }
 
-    	try {
-    		st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+  protected <T extends BaseEntity> int update(String query, Object... parameters) throws SQLException {
+    int affectedRows = 0;
+    int result = 0;
+    PreparedStatement st = null;
 
-    		int i = 0;
+    try {
+      st = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-    		for (Object parameter : parameters) {
-    			i++;
+      int i = 0;
 
-    			st.setObject(i, parameter);
-    		}
+      for (Object parameter : parameters) {
+        i++;
 
-    		affectedRows = st.executeUpdate();
+        st.setObject(i, parameter);
+      }
 
-    		if (affectedRows == 0) {
-                throw new SQLException("Creating user failed, no rows affected.");
-            }
+      affectedRows = st.executeUpdate();
 
-    		ResultSet generatedKeys = st.getGeneratedKeys();
+      if (affectedRows == 0) {
+        throw new SQLException("Creating user failed, no rows affected.");
+      }
 
-    		if (generatedKeys.next()) {
-    			result = generatedKeys.getInt(1);
-    		}
-    	}
-    	catch (SQLException ex) {
-        	throw ex;
-        }
-    	finally {
-			Connection.getInstancia().closeConn();
-		}
+      ResultSet generatedKeys = st.getGeneratedKeys();
 
-    	return result;
+      if (generatedKeys.next()) {
+        result = generatedKeys.getInt(1);
+      }
+    }
+    catch (SQLException ex) {
+      throw ex;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected int create(String query, Object... parameters) throws SQLException {
-        int insertedId = 0;
+    return result;
+  }
 
-        PreparedStatement preparedStatement = null;
+  protected int create(String query, Object... parameters) throws SQLException {
+    int insertedId = 0;
 
-        try {
-            preparedStatement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    PreparedStatement preparedStatement = null;
 
-            int i = 0;
+    try {
+      preparedStatement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-    		for (Object parameter : parameters) {
-    			i++;
+      int i = 0;
 
-    			preparedStatement.setObject(i, parameter);
-    		}
+      for (Object parameter : parameters) {
+        i++;
 
-            preparedStatement.executeUpdate();
+        preparedStatement.setObject(i, parameter);
+      }
 
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+      preparedStatement.executeUpdate();
 
-            if (resultSet.next()) {
-                insertedId = resultSet.getInt(1);
-            }
-        }
-        catch(SQLException e) {
-            throw e;
-        }
-        finally {
-            Connection.getInstancia().closeConn();
-        }
+      ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
-        return insertedId;
+      if (resultSet.next()) {
+        insertedId = resultSet.getInt(1);
+      }
+    }
+    catch(SQLException e) {
+      throw e;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
     }
 
-    protected interface DBToObject<T> {
-	       public T createFromDB(ResultSet rs) throws SQLException;
-    }
+    return insertedId;
+  }
+
+  protected interface DBToObject<T> {
+    public T createFromDB(ResultSet rs) throws SQLException;
+  }
 }

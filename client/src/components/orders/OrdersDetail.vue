@@ -20,7 +20,7 @@
                                 <b-table :data="productPrices">
                                     <template slot-scope="props">
                                         <b-table-column field="amount" label="Amt." width="100">
-                                            <b-input type="number" v-model="props.row.amount" @input="selectAmount(props.row.id, props.row.amount)" />
+                                            <b-input type="number" min="1" v-model="props.row.amount" @input="selectAmount(props.row.id, props.row.amount)" />
                                         </b-table-column>
                                         <b-table-column field="name" label="Product name">
                                             {{ props.row.name }}
@@ -56,11 +56,6 @@
                 </b-field>
                 <b-field grouped position="is-right" expanded>
                     <p class="control">
-                        <a class="button is-danger is-outlined" @click="remove" :disabled="!editing">
-                            <span class="icon">
-                                <i class="fas fa-trash"></i>
-                            </span>
-                        </a>
                         <button class="button is-outlined is-dark" type="button" @click="goBack()">
                             Cancel
                         </button>
@@ -169,7 +164,6 @@ export default {
             };
 
             let vm = this;
-            debugger;
             new API().post("/orders", data).then(() => {
                 Notifier.success("Order was created.");
                 vm.errors = [];
@@ -188,29 +182,6 @@ export default {
             this.$router.push(`/proposals/${proposalId}/orders`);
             else
             this.$router.push('/orders');
-        },
-        remove() {
-            this.$dialog.confirm({
-                title: 'Deleting order',
-                message: 'Are you sure you want to <b>delete</b> this order?',
-                confirmText: 'Delete Order',
-                type: 'is-danger',
-                hasIcon: true,
-                onConfirm: () => {
-                    this.loading = true;
-
-                    new API().delete("/orders/" + this.order.id).then(() => {
-                        Notifier.success("Order was deleted.");
-                        this.errors = [];
-                        this.loading = false;
-                        this.goBack();
-                    })
-                    .catch(error => {
-                        this.loading = false;
-                        this.errors = error.response.data;
-                    });
-                }
-            });
         }
     },
     mounted() {

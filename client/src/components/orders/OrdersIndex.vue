@@ -26,12 +26,6 @@
               </b-field>
             </div>
             <div class="column">
-              <ws-option-filter
-              :getOptions="getRetails"
-              placeholder="Select a retailer"
-              v-model="selectedRetail" />
-            </div>
-            <div class="column">
               <b-switch v-model="showDeleted">
                 Show deleted orders
               </b-switch>
@@ -85,7 +79,6 @@ export default {
   name: 'proposals-index',
   data() {
     return {
-      selectedRetail: null,
       selectedProposal: null,
       proposalId: this.$route.params.proposalId,
       currentRole: Session.get().organization.role,
@@ -102,9 +95,6 @@ export default {
     };
   },
   watch: {
-    selectedRetail(val) {
-      this.buildSearchCriteria({ retailId: val ? val.id : null })
-    },
     showDeleted(val) {
       this.buildSearchCriteria({ showDeleted: val })
     }

@@ -1,6 +1,10 @@
 package com.api.data.business;
 
 // #region Imports
+import java.sql.Statement;
+import com.api.data.db.Connection;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.util.Date;
 import java.sql.SQLException;
 
@@ -146,6 +150,32 @@ public class UserDataAccess extends BaseDataAccess {
     String query = "SELECT * FROM User u WHERE u.organizationId = ?;";
 
     return getMany(rs -> new User(rs), query, organizationId);
+  }
+
+  public boolean isAlreadyRegistered(String username, String email) throws SQLException {
+    PreparedStatement statement;
+    ResultSet resultSet;
+    String query = "SELECT * FROM User WHERE username = ? OR email = ?";
+
+    try {
+      statement = Connection.getInstancia().getConn().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+      statement.setString(1, username);
+      statement.setString(2, email);
+
+      resultSet = statement.executeQuery();
+
+      if (resultSet.next()) {
+        return true;
+      }
+    }
+    catch(SQLException e) {
+      throw e;
+    }
+    finally {
+      Connection.getInstancia().closeConn();
+    }
+
+    return false;
   }
 
   // #endregion

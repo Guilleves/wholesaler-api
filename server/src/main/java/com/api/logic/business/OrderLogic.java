@@ -230,6 +230,13 @@ public class OrderLogic {
     if (request.getLines() == null || request.getLines().isEmpty())
     ex.addError("At least a line order is needed.");
 
+    for(Line line: request.getLines()) {
+      if (line.getQuantity() <= 0) {
+        ex.addError("Quantity cannot be negative.");
+        break;
+      }
+    }
+
     return ex;
   }
 

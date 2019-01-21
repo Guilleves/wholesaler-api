@@ -58,10 +58,13 @@ public class ProposalDataAccess extends BaseDataAccess {
       return getInt(query, supplierId);
     }
 
-    public ArrayList<Proposal> getProposals(String status, Integer supplierId, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {
+    public ArrayList<Proposal> getProposals(String status, Integer supplierId, boolean showDeleted, String orderBy, Integer pageSize, Integer pageIndex) throws SQLException {
         ArrayList<Object> parameters = new ArrayList<Object>();
 
-        String proposalSubQuery = "(SELECT * FROM Proposal P WHERE P.deletedAt IS NULL ";
+        String proposalSubQuery = "(SELECT * FROM Proposal P WHERE P.id = P.id ";
+
+        if (!showDeleted)
+        proposalSubQuery += "AND P.deletedAt IS NULL ";
 
         if (status != null) {
             switch (status) {
@@ -198,12 +201,9 @@ public class ProposalDataAccess extends BaseDataAccess {
             proposal = createProposal(proposal);
 
             for (ProposalLine pl : proposal.getProposalLines()) {
-                // TODO: IDK other way to avoid infinite loops, at least this way it works.
                 Proposal p = new Proposal();
                 p.setId(proposal.getId());
                 pl.setProposal(p);
-
-                // Would this do the trick? Damn java, you tha boss.
                 pl = createProposalLine(pl);
             }
 

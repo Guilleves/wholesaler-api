@@ -152,7 +152,7 @@ public class UserLogic {
       if (!(user.getPassword() == null || user.getPassword().isEmpty())) {
         try {
           user.setPassword(sl.encryptPassword(user.getPassword()));
-        } // TODO: Dunno if should specify the exception, since I'll handle all of them equally
+        }
         catch(Exception e) {
           throw ex.addError(e);
         }
@@ -357,8 +357,11 @@ public class UserLogic {
     return sr;
   }
 
-  private ApiException validateSignup(User user, String repeatPassword) {
+  private ApiException validateSignup(User user, String repeatPassword) throws SQLException {
     ApiException sr = new ApiException();
+
+    if (uda.isAlreadyRegistered(user.getUsername(), user.getEmail()))
+    sr.addError("A username with the same username or email already exists.");
 
     if (user.getUsername() == null || user.getUsername().isEmpty())
     sr.addError("Username missing");
