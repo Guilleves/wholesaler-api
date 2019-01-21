@@ -15,7 +15,7 @@
             </div>
             <div class="column">
               <b-switch v-model="showDeleted">
-                Show deleted orders
+                Show deleted proposals
               </b-switch>
             </div>
           </div>

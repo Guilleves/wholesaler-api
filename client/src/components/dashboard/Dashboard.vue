@@ -9,6 +9,7 @@
             </p>
             <ul class="menu-list">
               <li><router-link to="/">Dashboard</router-link></li>
+              <li><router-link to="/rankings">Rankings</router-link></li>
             </ul>
             <p class="menu-label">
               Administration
@@ -53,7 +54,7 @@
                     <b-icon type="is-light" icon="fa fa-shopping-cart fa-3x" />
                   </div>
                 </div>
-                <p>Orders placed</p>
+                <router-link to="/orders">Orders placed</router-link>
               </div>
               <div class="tile is-child box">
                 <div class="columns">
@@ -83,17 +84,17 @@
             <div class="tile is-parent">
               <div class="tile is-child">
                 <ws-bar-chart title="Top sellers" barname="Amount of uses" :names="mostUsedProducts.names" :amount="mostUsedProducts.count" color="#c23531" />
-                <p><router-link to="/products/ranking">More...</router-link></p>
+                <p><router-link to="/rankings/products">More...</router-link></p>
               </div>
               <div class="tile is-child">
-                <ws-pie-chart title="Profits by retailer" barname="Profit ($)" :data="profitByRetailer.data" color="#2f4554"/>
-                <p>More...</p>
+                <ws-pie-chart :title="loggedRole === 'supplier' ? 'Profits by retailer' : 'Money spent on suppliers'" :barname="loggedRole === 'supplier' ? 'Profit ($)' : 'Spent ($)'" :data="profitByRetailer.data" color="#2f4554"/>
+                <p><router-link to="/rankings/organizations">More...</router-link></p>
               </div>
             </div>
             <div class="tile is-parent">
               <div class="tile is-child">
-                <ws-bar-chart title="Orders by month" barname="Amount" :names="ordersByMonth.names" :amount="ordersByMonth.count" color="#4a4a4a"/>
-                <p>More...</p>
+                <ws-bar-chart title="Orders per month" barname="Amount" :names="ordersByMonth.names" :amount="ordersByMonth.count" color="#4a4a4a"/>
+                <p><router-link to="/rankings/orders">More...</router-link></p>
               </div>
             </div>
           </div>

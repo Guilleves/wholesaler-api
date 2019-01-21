@@ -53,7 +53,7 @@
                 </span>
                 <span>Show orders</span>
               </router-link>
-              <a class="button is-danger is-outlined" @click="remove" :disabled="!editing">
+              <a class="button is-danger is-outlined" @click="remove" :disabled="!editing" v-if="loggedRole === 'supplier'">
                 <span class="icon">
                   <i class="fas fa-trash"></i>
                 </span>
@@ -80,10 +80,12 @@ import ProductsSelector from "@/components/ws-framework/WsProductsSelector.vue";
 import WsError from "@/components/ws-framework/WsError.vue";
 import API from "@/helpers/api.js";
 import * as Notifier from "@/helpers/notifier.js";
+import * as Session from '@/helpers/session.js';
 
 export default {
   data() {
     return {
+      loggedRole: Session.get().organization.role,
       id: null,
       title: null,
       beginDate: null,

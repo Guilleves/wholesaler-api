@@ -4,7 +4,6 @@ import Main from '@/components/layouts/Main.vue';
 import ProductsIndex from '@/components/products/ProductsIndex.vue';
 import ProductsLayout from '@/components/products/ProductsLayout.vue';
 import ProductsDetail from '@/components/products/ProductsDetail.vue';
-import ProductsRanking from '@/components/products/ProductsRanking.vue';
 import ProposalsLayout from '@/components/proposals/ProposalsLayout.vue';
 import ProposalsIndex from '@/components/proposals/ProposalsIndex.vue';
 import ProposalsDetail from '@/components/proposals/ProposalsDetail.vue';
@@ -19,8 +18,12 @@ import Signup from '@/components/users/Signup.vue';
 import Dashboard from '@/components/dashboard/Dashboard.vue';
 import NotFound from '@/components/notfound/NotFound.vue';
 import Unauthorized from '@/components/unauthorized/Unauthorized.vue';
-import MyAccountIndex from '@/components/my-account/MyAccountIndex';
-import MyAccountLayout from '@/components/my-account/MyAccountLayout';
+import MyAccountIndex from '@/components/my-account/MyAccountIndex.vue';
+import MyAccountLayout from '@/components/my-account/MyAccountLayout.vue';
+import RankingIndex from '@/components/rankings/RankingIndex.vue';
+import ProductsRanking from '@/components/rankings/ProductsRanking.vue';
+import OrganizationsRanking from '@/components/rankings/OrganizationsRanking.vue';
+import OrdersRanking from '@/components/rankings/OrdersRanking.vue';
 
 Vue.use(Router);
 
@@ -29,7 +32,6 @@ export default new Router({
     routes: [
         { path: '/', component: Main, children: [
             {path: "", component: Dashboard },
-            { path: 'products/ranking', component: ProductsRanking },
             { path: 'products', component: ProductsLayout, children: [
                 { path: "", component: ProductsIndex },
                 { path: ":id", component: ProductsDetail }
@@ -47,6 +49,11 @@ export default new Router({
             { path: 'users', component: UsersLayout, children: [
                 { path: "", component: UsersIndex },
                 { path: ":id", component: UsersDetail }
+            ]},
+            { path: 'rankings', component: RankingIndex, children: [
+              { path: "products", component: ProductsRanking },
+              { path: "organizations", component: OrganizationsRanking },
+              { path: "orders", component: OrdersRanking }
             ]},
             { path: 'my-account', component: MyAccountLayout, children: [
               { path: "", component: MyAccountIndex }

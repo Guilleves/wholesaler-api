@@ -27,6 +27,22 @@
           <router-link class="navbar-item" to="/users">
             Users
           </router-link>
+          <div class="navbar-item has-dropdown is-hoverable">
+            <router-link class="navbar-link" to="/rankings">
+              Rankings
+            </router-link>
+            <div class="navbar-dropdown is-boxed">
+              <router-link class="navbar-item" to="/rankings/products">
+                Products
+              </router-link>
+              <router-link class="navbar-item" to="/rankings/organizations">
+                Organizations
+              </router-link>
+              <router-link class="navbar-item" to="/rankings/orders">
+                Orders
+              </router-link>
+            </div>
+          </div>
         </div>
         <div class="navbar-start" v-else>
           <div class="navbar-item has-dropdown is-hoverable">
@@ -45,6 +61,22 @@
               </router-link>
               <router-link class="navbar-item" to="/users">
                 Users
+              </router-link>
+            </div>
+          </div>
+          <div class="navbar-item has-dropdown is-hoverable">
+            <router-link class="navbar-link" to="/rankings">
+              Rankings
+            </router-link>
+            <div class="navbar-dropdown is-boxed">
+              <router-link class="navbar-item" to="/rankings/products">
+                Products
+              </router-link>
+              <router-link class="navbar-item" to="/rankings/organizations">
+                Organizations
+              </router-link>
+              <router-link class="navbar-item" to="/rankings/orders">
+                Orders
               </router-link>
             </div>
           </div>
