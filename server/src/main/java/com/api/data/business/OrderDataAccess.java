@@ -83,7 +83,7 @@ public class OrderDataAccess extends BaseDataAccess {
   public ArrayList<Order> getOrders(Date fromDate, Date toDate, Integer retailId, Integer proposalId, String orderBy, Integer pageSize, Integer pageIndex, Integer supplierId, boolean showDeleted) throws SQLException{
     ArrayList<Object> parameters = new ArrayList<Object>();
 
-    String orderSubQuery = "(SELECT O.* FROM `order` O " +
+    String orderSubQuery = "(SELECT O.* FROM `Order` O " +
     "INNER JOIN OrderLine OL ON OL.orderId = O.id " +
     "INNER JOIN ProposalLine PL ON OL.proposalLineId = PL.id " +
     "INNER JOIN Proposal P ON P.id = PL.proposalId " +
