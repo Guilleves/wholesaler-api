@@ -1,4 +1,4 @@
-import $toast from 'buefy/src/components/toast';
+import { ToastProgrammatic as $toast } from 'buefy'
 
 export const success = (message) => {
     $toast.open({

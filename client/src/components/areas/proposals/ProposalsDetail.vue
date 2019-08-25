@@ -47,7 +47,7 @@
           </b-field>
           <b-field grouped position="is-right" expanded>
             <p class="control">
-              <router-link class="button is-default" :to="`/proposals/${id}/orders/`" v-if="editing">
+              <router-link class="button is-dark" :to="`/proposals/${id}/orders/`" v-if="editing">
                 <span class="icon">
                   <i class="fas fa-book"></i>
                 </span>
@@ -58,17 +58,20 @@
                   <i class="fas fa-trash"></i>
                 </span>
               </a>
-              <button class="button is-outlined is-dark" type="button" @click="goBack()">
-                Cancel
-              </button>
-              <b-tooltip label="Can't edit proposals" :active="editing" class="is-success" position="is-top">
-                <button class="button is-success is-outlined" :disabled="editing">
+              <b-tooltip label="Can't edit proposals" :active="editing" class="is-primary" position="is-top">
+                <button class="button is-primary " :disabled="editing">
                   Save
                 </button>
               </b-tooltip>
             </p>
           </b-field>
         </b-field>
+        <a class="button is-dark" @click="goBack()">
+          <span class="icon">
+            <i class="fas fa-arrow-left"></i>
+          </span>
+          <span>Go back</span>
+      </a>
       </form>
     </div>
   </section>
@@ -144,7 +147,7 @@ export default {
       this.$router.push(`/proposals`);
     },
     remove() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: 'Deleting proposal',
         message: 'Are you sure you want to <b>delete</b> this proposal?',
         confirmText: 'Delete Proposal',

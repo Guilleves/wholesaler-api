@@ -38,7 +38,7 @@
         :filters="searchCriteria"
         @select="onSelect"
         :format="format" />
-        <router-link class="button is-default" to="/">
+        <router-link class="button is-dark" to="/">
           <span class="icon">
             <i class="fas fa-arrow-left"></i>
           </span>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import API from './../../helpers/api.js';
+import API from '@/helpers/api.js';
 import WsOptionFilter from "@/components/ws-framework/WsOptionFilter.vue";
 import WsKeywordSearch from "@/components/ws-framework/WsKeywordSearchByJuan.vue";
 import WsTable from "@/components/ws-framework/WsTable.vue";

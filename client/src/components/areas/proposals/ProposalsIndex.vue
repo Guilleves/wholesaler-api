@@ -39,7 +39,7 @@
       :filters="searchCriteria"
       :format="format"
       @select="onSelect"/>
-      <router-link class="button is-default" to="/">
+      <router-link class="button is-dark" to="/">
         <span class="icon">
           <i class="fas fa-arrow-left"></i>
         </span>

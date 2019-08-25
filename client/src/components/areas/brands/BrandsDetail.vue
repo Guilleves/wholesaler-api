@@ -21,10 +21,10 @@
                                 <i class="fas fa-trash"></i>
                             </span>
                         </a>
-                        <button class="button is-outlined is-dark" type="button" @click="goBack()">
+                        <button class="button  is-dark" type="button" @click="goBack()">
                             Cancel
                         </button>
-                        <button class="button is-success is-outlined">
+                        <button class="button is-primary ">
                             Save
                         </button>
                     </p>
@@ -68,7 +68,7 @@ export default {
             this.$router.push("/brands");
         },
         remove() {
-            this.$dialog.confirm({
+            this.$buefy.dialog.confirm({
                 title: 'Deleting brand',
                 message: 'Are you sure you want to <b>delete</b> this brand?',
                 confirmText: 'Delete Brand',

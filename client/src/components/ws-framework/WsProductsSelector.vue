@@ -90,8 +90,11 @@ export default {
             this.value.splice(index, 1);
         },
         show() {
-            console.log(this.value);
+
         }
+    },
+    beforeMount() {
+        this.getProducts("");
     }
 }
 </script>

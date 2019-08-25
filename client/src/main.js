@@ -12,7 +12,7 @@ import Multiselect from 'vue-multiselect';
 import IEcharts from 'vue-echarts-v3/src/full';
 
 // Styles
-import 'buefy/lib/buefy.css';
+import 'buefy/dist/buefy.css';
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
 Vue.config.productionTip = false;

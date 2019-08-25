@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import API from './../../helpers/api.js';
+import API from '@/helpers/api.js';
 import WsTable from "@/components/ws-framework/WsTable.vue";
 import WsHero from "@/components/ws-framework/WsHero.vue";
 

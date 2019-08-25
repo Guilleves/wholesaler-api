@@ -60,15 +60,18 @@
         <b-field grouped>
           <b-field grouped position="is-right" expanded>
             <p class="control">
-              <button class="button is-outlined is-dark" type="button" @click="goBack()">
-                Cancel
-              </button>
-              <button class="button is-success is-outlined">
+              <button class="button is-primary ">
                 Save
               </button>
             </p>
           </b-field>
         </b-field>
+        <router-link class="button is-dark" to="/">
+          <span class="icon">
+            <i class="fas fa-arrow-left"></i>
+          </span>
+          <span>Go back</span>
+        </router-link>
       </form>
     </div>
   </section>

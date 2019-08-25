@@ -52,13 +52,13 @@
       :format="format"
       @select="onSelect"/>
 
-      <router-link class="button is-default" :to="`/proposals/${proposalId}`" v-if="proposalId">
+      <router-link class="button is-dark" :to="`/proposals/${proposalId}`" v-if="proposalId">
         <span class="icon">
           <i class="fas fa-arrow-left"></i>
         </span>
         <span>Go back</span>
       </router-link>
-      <router-link class="button is-default" to="/" v-else>
+      <router-link class="button is-dark" to="/" v-else>
         <span class="icon">
           <i class="fas fa-arrow-left"></i>
         </span>

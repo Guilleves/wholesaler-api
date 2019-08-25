@@ -4,7 +4,7 @@
     <div>
       <section class="section">
         <div class="container">
-          <b-field>
+          <b-field position="is-centered">
             <b-radio-button native-value="products" v-model="selectedRanking">
               <b-icon icon="fa fa-box" />
               <span>Top seller products</span>
@@ -21,7 +21,7 @@
           </b-field>
           <router-view />
           <br />
-          <router-link class="button is-default" to="/">
+          <router-link class="button is-dark" to="/">
             <span class="icon">
               <i class="fas fa-arrow-left"></i>
             </span>
@@ -53,6 +53,9 @@ export default {
   beforeMount() {
     var pathArray = this.$route.path.split("/");
     this.selectedRanking = pathArray[2];
+
+    if (!this.selectedRanking)
+        this.selectedRanking = "products";
   },
   components: {
     WsHero
